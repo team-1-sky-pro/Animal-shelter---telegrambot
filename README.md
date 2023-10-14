@@ -26,7 +26,7 @@
 - Telegram API
 - Java 17
 - Spring Framework
-- PostgresSQL
+- PostgreSQL
 
 
 ## Как запустить
