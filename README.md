@@ -1,4 +1,3 @@
-# Animal-shelter---telegrambot
 # Приют-Бот в Telegram
 
 ## Описание Проекта
