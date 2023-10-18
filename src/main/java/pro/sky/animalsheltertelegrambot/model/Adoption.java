@@ -12,6 +12,11 @@ public class Adoption {
 
 
     private final Long id;
+
+    /**
+     * Адрес электронной почты, связанный с данным принятием на усыновление.
+     * Должен быть действительным адресом электронной почты и уникальным для каждой записи Adoption.
+     */
     private final String email;
     private final String phone;
 

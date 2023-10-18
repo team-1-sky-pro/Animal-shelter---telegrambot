@@ -18,6 +18,18 @@ public class AdoptionController {
     private final AdoptionService adoptionService;
 
 
+    /**
+     * Добавляет новую запись о принятии животного на усыновление.
+     *
+     * @param adoption Объект, содержащий информацию о принятии на усыновление.
+     * @param result   Объект, содержащий информацию об ошибках валидации объекта adoption.
+     * @return ResponseEntity содержащий созданный объект Adoption в случае успешного создания
+     * или список ошибок валидации в случае ошибки.
+     *
+     * @throws IllegalArgumentException если {@code adoption} является null или содержит неверные данные.
+     *
+     * @author Ваше имя или имя команды
+     */
     @PostMapping
     public ResponseEntity<?> addAdoption(@RequestBody Adoption adoption, BindingResult result) {
         if (result.hasErrors()) {
