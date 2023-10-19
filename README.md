@@ -11,10 +11,10 @@
 
 ## Участники
 
-### Анна 
-### Иван 
-### Сергей 
-### Алексей 
+### [Анна](https://github.com/AnnBelousova) 
+### [Иван](https://github.com/Rnd-mi) 
+### [Сергей](https://github.com/SyutinS)
+### [Алексей](https://github.com/x3imal) 
 
 ## Функциональность
 
@@ -26,7 +26,7 @@
 - Telegram API
 - Java 17
 - Spring Framework
-- PostgresQL
+- PostgreSQL
 
 
 ## Как запустить
