@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import pro.sky.animalsheltertelegrambot.animal_status.Status;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 /**
@@ -23,7 +24,7 @@ public class Animal {
 
     private String name;
 
-    private Date birthDate;
+    private LocalDate birthDate;
 
     /**
      * Описание животного, например: внешние особенности, наличие заболеваний
