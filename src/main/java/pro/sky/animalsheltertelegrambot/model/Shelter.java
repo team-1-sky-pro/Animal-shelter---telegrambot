@@ -1,8 +1,10 @@
 package pro.sky.animalsheltertelegrambot.model;
 
+import jakarta.persistence.OneToMany;
 import lombok.Data;
 
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Модель Shelter - приют
@@ -22,6 +24,14 @@ public class Shelter {
     private String security_contact;
     private String working_hours;
     private String safety_guide;
+
+    /**
+     * животные живущие в определенном приюте
+     * !! проверить правильность и установить связь !!
+     * private Set<Pet> pets
+     */
+    @OneToMany(mappedBy = "shelter")
+    private Set<Pet> pets;
 
     @Override
     public boolean equals(Object o) {
