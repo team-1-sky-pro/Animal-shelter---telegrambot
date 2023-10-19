@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * Service class that listens to updates from telegram bot
+ * Сервис, который держит соединение с ботом и постоянно принимает входящие от пользователей сообщения
  * @author Rnd-mi
  */
 @Service
