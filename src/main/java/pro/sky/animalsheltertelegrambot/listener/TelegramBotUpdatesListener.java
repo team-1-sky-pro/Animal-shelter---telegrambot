@@ -12,6 +12,7 @@ import java.util.List;
 
 /**
  * Service class that listens to updates from telegram bot
+ * @author Rnd-mi
  */
 @Service
 public class TelegramBotUpdatesListener implements UpdatesListener{
