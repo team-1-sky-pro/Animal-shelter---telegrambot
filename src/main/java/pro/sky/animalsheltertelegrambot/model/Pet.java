@@ -9,14 +9,14 @@ import pro.sky.animalsheltertelegrambot.animal_status.Status;
 import java.time.LocalDate;
 
 /**
- * Animal сущность
+ * Pet сущность
  * @author Rnd-mi
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Animal {
+public class Pet {
 
     @EqualsAndHashCode.Include
     private Long id;
@@ -26,12 +26,12 @@ public class Animal {
     private LocalDate birthDate;
 
     /**
-     * Описание животного, например: внешние особенности, наличие заболеваний
+     * Описание питомца, например: внешние особенности, наличие заболеваний
      */
     private String description;
 
     /**
-     * Внешний ключ: ID приюта из таблицы 'shelters', к которому относится данное животное
+     * Внешний ключ: ID приюта из таблицы 'shelters', к которому относится данный питомец
      * @see Shelter
      */
     private Long shelterId;
@@ -43,7 +43,7 @@ public class Animal {
     private Long photoID;
 
     /**
-     * Статус, который присвоен животному
+     * Статус, который присвоен питомцу
      * @see Status
      */
     private Status status;
