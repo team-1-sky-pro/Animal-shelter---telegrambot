@@ -30,8 +30,8 @@ public class Shelter {
      * !! проверить правильность и установить связь !!
      * private Set<Pet> pets
      */
-    @OneToMany(mappedBy = "shelter")
-    private Set<Pet> pets;
+//    @OneToMany(mappedBy = "shelter")
+//    private Set<Pet> pets;
 
     @Override
     public boolean equals(Object o) {
