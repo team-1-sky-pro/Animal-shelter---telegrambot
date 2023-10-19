@@ -7,7 +7,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Class which responsible for configuring telegram bot
+ * TelegramBotConfiguration class is responsible for configuring telegram bot
+ * @author Rnd-mi
  */
 @Configuration
 public class TelegramBotConfiguration {
