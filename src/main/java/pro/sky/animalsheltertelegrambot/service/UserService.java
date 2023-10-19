@@ -12,14 +12,15 @@ import java.util.Optional;
  * обновление
  * удаление
  * вывод (просмотр) всех
+ * получить список всех волонтеров
  * @author SyutinS
  */
 
 public interface UserService {
     User addUser(User user);
     Optional<User> getUser(Long id);
-    public Collection<User> getAllVolunteer();
     User updateUser(Long id, User user);
     void deleteUser(Long id);
     Collection<User> getAllUsers();
+    Collection<User> getAllVolunteer();
 }

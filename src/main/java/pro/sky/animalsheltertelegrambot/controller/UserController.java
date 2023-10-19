@@ -39,6 +39,14 @@ public class UserController {
         return userService.getAllUsers();
     }
 
+    /**
+     * получает список всех волонтеров
+     */
+    @GetMapping("/volunteer")
+    public Collection<User> getAllVolunteers() {
+        return userService.getAllVolunteer();
+    }
+
     @PostMapping
     public User createUser(@RequestBody User user) {
         return userService.addUser(user);

@@ -12,9 +12,9 @@ import java.util.Optional;
 
 /**
  * Реализация работы сервиса базовый CRUD для - User
- * - далеко не окончательный вариант требует доработки в ближайшем будующем
  * добавление
  * просмотр
+ * получить список всех волонтеров
  * изменение
  * удаление
  * @author SyutinS
@@ -56,5 +56,4 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
-
 }
