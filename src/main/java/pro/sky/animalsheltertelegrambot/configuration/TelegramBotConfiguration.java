@@ -2,6 +2,7 @@ package pro.sky.animalsheltertelegrambot.configuration;
 
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.DeleteMyCommands;
+import com.pengrad.telegrambot.request.BaseRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +21,9 @@ public class TelegramBotConfiguration {
     private String token;
 
     /**
-     * Generating TelegramBot bean
+     * Creating Spring Bean of {@link TelegramBot} using token
+     * and then invoking {@link TelegramBot#execute(BaseRequest)}
+     * with empty {@link DeleteMyCommands} instance of {@link BaseRequest}
      * @return TelegramBot instance
      */
     @Bean
