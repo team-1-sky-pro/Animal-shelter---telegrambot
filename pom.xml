@@ -15,6 +15,7 @@
     <description>Animal shelter - telegram-bot</description>
     <properties>
         <java.version>17</java.version>
+        <telegram-bot.version>5.7.0</telegram-bot.version>
     </properties>
     <dependencies>
         <dependency>
@@ -25,7 +26,13 @@
         <dependency>
             <groupId>com.github.pengrad</groupId>
             <artifactId>java-telegram-bot-api</artifactId>
-            <version>5.7.0</version>
+            <version>${telegram-bot.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
