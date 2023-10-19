@@ -8,23 +8,23 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * TelegramBotConfiguration class is responsible for configuring telegram bot
+ * TelegramBotConfiguration класс отвечает за конфигурацию телеграм бота
  * @author Rnd-mi
  */
 @Configuration
 public class TelegramBotConfiguration {
 
     /**
-     * Retrieving token value from application.properties
+     * Токен телеграм бота. Значение указано в application.properties
      */
     @Value("${telegram.bot.token}")
     private String token;
 
     /**
-     * Creating Spring Bean of {@link TelegramBot} using token
-     * and then invoking {@link TelegramBot#execute(BaseRequest)}
-     * with empty {@link DeleteMyCommands} instance of {@link BaseRequest}
-     * @return TelegramBot instance
+     * Метод создания {@link TelegramBot} бина. Для этого используется токен
+     * и затем вызывается {@link TelegramBot#execute(BaseRequest)}
+     * с пустым объектом класса {@link DeleteMyCommands}, который наследуется от {@link BaseRequest}
+     * @return объект TelegramBot
      */
     @Bean
     public TelegramBot telegramBot() {
