@@ -17,7 +17,7 @@ import java.util.List;
 @Service
 public class TelegramBotUpdatesListener implements UpdatesListener{
     private final Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
-    private TelegramBot telegramBot;
+    private final TelegramBot telegramBot;
 
     public TelegramBotUpdatesListener(TelegramBot telegramBot) {
         this.telegramBot = telegramBot;
