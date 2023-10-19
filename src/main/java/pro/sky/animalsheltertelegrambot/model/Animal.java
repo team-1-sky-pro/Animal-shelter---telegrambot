@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import pro.sky.animalsheltertelegrambot.animal_status.Status;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 /**
  * Animal сущность
