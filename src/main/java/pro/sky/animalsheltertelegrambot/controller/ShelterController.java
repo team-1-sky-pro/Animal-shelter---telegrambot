@@ -7,6 +7,7 @@ import pro.sky.animalsheltertelegrambot.model.Shelter;
 import pro.sky.animalsheltertelegrambot.service.ShelterService;
 
 import java.util.Collection;
+import java.util.Optional;
 
 /**
  * Контроллер Приютов в ручном режиме
@@ -27,9 +28,9 @@ public class ShelterController {
     private final ShelterService shelterService;
 
     @GetMapping("{id}")
-    public ResponseEntity<Shelter> getShelter(@PathVariable Long id) {
-        Shelter existShelter = shelterService.getShelter(id);
-        if (existShelter == null) {
+    public ResponseEntity<Optional<Shelter>> getShelter(@PathVariable Long id) {
+        Optional<Shelter> existShelter = shelterService.getShelter(id);
+        if (existShelter.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(existShelter);

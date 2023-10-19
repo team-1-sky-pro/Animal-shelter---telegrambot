@@ -1,10 +1,11 @@
 package pro.sky.animalsheltertelegrambot.model;
 
-import jakarta.persistence.OneToMany;
-import lombok.Data;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * Модель Shelter - приют
@@ -16,8 +17,14 @@ import java.util.Set;
  * @ author SyutinS
  */
 
-@Data
+@Entity
+@Getter
+@Setter
+@RequiredArgsConstructor
 public class Shelter {
+
+    @Id
+    @GeneratedValue
     private Long id;
     private String address;
     private String type;

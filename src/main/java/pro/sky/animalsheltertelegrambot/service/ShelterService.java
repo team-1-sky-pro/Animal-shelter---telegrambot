@@ -3,6 +3,7 @@ package pro.sky.animalsheltertelegrambot.service;
 import pro.sky.animalsheltertelegrambot.model.Shelter;
 
 import java.util.Collection;
+import java.util.Optional;
 
 /**
  * Интерфейс сервиса Приюта (Shelter)
@@ -17,7 +18,7 @@ import java.util.Collection;
 
 public interface ShelterService {
     Shelter addShelter(Shelter shelter);
-    Shelter getShelter(Long id);
+    Optional<Shelter> getShelter(Long id);
     Shelter updateShelter(Long id, Shelter shelter);
     void deleteShelter(Long id);
     Collection<Shelter> getAllShelters();
