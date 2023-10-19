@@ -7,6 +7,7 @@ import pro.sky.animalsheltertelegrambot.model.User;
 import pro.sky.animalsheltertelegrambot.service.UserService;
 
 import java.util.Collection;
+import java.util.Optional;
 
 /**
  * Контроллер User (Пользователей всех включая волонтеров) -
@@ -25,9 +26,9 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("{id}")
-    public ResponseEntity<User> getUser(@PathVariable Long id) {
-        User existUser = userService.getUser(id);
-        if (existUser == null) {
+    public ResponseEntity<Optional<User>> getUser(@PathVariable Long id) {
+        Optional<User> existUser = userService.getUser(id);
+        if (existUser.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(existUser);

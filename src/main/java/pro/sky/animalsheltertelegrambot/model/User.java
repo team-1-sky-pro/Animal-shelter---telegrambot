@@ -1,5 +1,6 @@
 package pro.sky.animalsheltertelegrambot.model;
 
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Objects;
@@ -13,13 +14,22 @@ import java.util.Objects;
  * volunteer - проверка является User волонтером или нет (по умолчанию - Нет)
  * @author SyutinS
  */
+
+@Entity
+@Table(name = "user")
 @Data
 public class User {
 
+    @Id
+    @GeneratedValue
     private Long id;
+    @JoinColumn(name = "userName")
     private String name;
+    @JoinColumn(name = "phone")
     private String phone;
+    @JoinColumn(name = "email")
     private String email;
+    @JoinColumn(name = "isVolunteer")
     private boolean volunteer;
 
     @Override
