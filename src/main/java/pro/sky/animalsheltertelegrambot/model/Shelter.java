@@ -23,7 +23,7 @@ public class Shelter {
     @Id
     @GeneratedValue
     private Long id;
-    private String contact;
+    private String contacts;
     private String shelterType;
     private String securityContact;
     private String workingHours;
