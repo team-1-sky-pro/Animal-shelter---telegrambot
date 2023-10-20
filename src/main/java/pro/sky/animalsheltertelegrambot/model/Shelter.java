@@ -1,9 +1,7 @@
 package pro.sky.animalsheltertelegrambot.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Objects;
 
@@ -18,9 +16,8 @@ import java.util.Objects;
  */
 
 @Entity
-@Getter
-@Setter
-@RequiredArgsConstructor
+@Data
+@NoArgsConstructor
 public class Shelter {
 
     @Id
