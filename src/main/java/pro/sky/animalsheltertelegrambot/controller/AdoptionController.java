@@ -1,6 +1,9 @@
 package pro.sky.animalsheltertelegrambot.controller;
 
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,20 +21,25 @@ public class AdoptionController {
     private final AdoptionService adoptionService;
 
 
-    /**
-     * Добавляет новую запись о принятии животного на усыновление.
-     *
-     * @param adoption Объект, содержащий информацию о принятии на усыновление.
-     * @param result   Объект, содержащий информацию об ошибках валидации объекта adoption.
-     * @return ResponseEntity содержащий созданный объект Adoption в случае успешного создания
-     * или список ошибок валидации в случае ошибки.
-     *
-     * @throws IllegalArgumentException если {@code adoption} является null или содержит неверные данные.
-     *
-     * @author Ваше имя или имя команды
-     */
+    @Operation(
+            summary = "Добавление нового усыновления в базу",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody (
+                    description = "Новое усыновление"
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "201",
+                            description = "Успешное добавление"
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Неправильное, неполное заполнение полей сущности"
+                    )
+            },
+            tags = "Adoptions"
+    )
     @PostMapping
-    public ResponseEntity<?> addAdoption(@RequestBody Adoption adoption, BindingResult result) {
+    public ResponseEntity<?> addAdoption(@Valid @RequestBody Adoption adoption, BindingResult result) {
         if (result.hasErrors()) {
             return new ResponseEntity<>(ErrorUtils.errorsList(result), HttpStatus.BAD_REQUEST);
         }
@@ -39,6 +47,20 @@ public class AdoptionController {
         return new ResponseEntity<>(newAdoption, HttpStatus.CREATED);
     }
 
+    @Operation(
+            summary = "Получение усыновления по ID",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Усыновление найдено"
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Усыновление не найдено"
+                    )
+            },
+            tags = "Adoptions"
+    )
     @GetMapping("/{id}")
     public ResponseEntity<?> getAdoption(@PathVariable Long id) {
         Adoption existAdoption = adoptionService.getAdoption(id);
@@ -48,8 +70,25 @@ public class AdoptionController {
         return new ResponseEntity<>(existAdoption, HttpStatus.OK);
     }
 
+    @Operation(
+            summary = "Обновление данных усыновления по ID",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody (
+                    description = "Обновленные данные усыновления"
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Усыновление успешно обновлено"
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Неправильное, неполное заполнение полей сущности или усыновление не найдено"
+                    )
+            },
+            tags = "Adoptions"
+    )
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateAdoption(@PathVariable Long id, @RequestBody Adoption adoption,
+    public ResponseEntity<?> updateAdoption(@Valid @PathVariable Long id, @RequestBody Adoption adoption,
                                             BindingResult result) {
         if (result.hasErrors()) {
             return new ResponseEntity<>(ErrorUtils.errorsList(result), HttpStatus.BAD_REQUEST);
@@ -58,6 +97,20 @@ public class AdoptionController {
         return new ResponseEntity<>(updateAdoption, HttpStatus.OK);
     }
 
+    @Operation(
+            summary = "Удаление усыновления по ID",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Усыновление успешно удалено"
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Усыновление не найдено"
+                    )
+            },
+            tags = "Adoptions"
+    )
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteAdoption(@PathVariable Long id) {
         adoptionService.deleteAdoption(id);
