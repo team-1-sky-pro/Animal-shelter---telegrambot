@@ -18,6 +18,9 @@ public class PetController {
 
     @Operation(
             summary = "Добавление нового питомца в базу",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody (
+                    description = "Новый питомец"
+            ),
             responses = {
                     @ApiResponse(
                             responseCode = "200",
