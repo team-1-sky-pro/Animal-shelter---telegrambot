@@ -23,7 +23,7 @@ import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/shelter")
+@RequestMapping("/shelters")
 public class ShelterController {
     private final ShelterService shelterService;
 
