@@ -25,7 +25,7 @@ public class Shelter {
     private Long id;
     private String contacts;
     private String shelterType;
-    private String securityContact;
+    private String securityContacts;
     private String workingHours;
 
     /**
