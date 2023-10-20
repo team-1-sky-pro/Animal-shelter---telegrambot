@@ -73,7 +73,7 @@ public class PetController {
             tags = "Pets"
     )
     @GetMapping("/{id}")
-    public ResponseEntity<Pet> getPet(@PathVariable Long id) {
+    public ResponseEntity<Pet> getPet(@Parameter(description = "id питомца") @PathVariable Long id) {
         return new ResponseEntity<>(service.getPet(id), HttpStatus.OK);
     }
 
@@ -92,7 +92,7 @@ public class PetController {
             tags = "Pets"
     )
     @DeleteMapping("/{id}")
-    public void deletePet(@PathVariable Long id) {
+    public void deletePet(@Parameter(description = "id питомца") @PathVariable Long id) {
         service.deletePet(id);
     }
 }
