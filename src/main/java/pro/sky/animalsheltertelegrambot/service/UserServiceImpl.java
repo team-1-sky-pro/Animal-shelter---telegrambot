@@ -1,8 +1,6 @@
 package pro.sky.animalsheltertelegrambot.service;
 
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import pro.sky.animalsheltertelegrambot.model.User;
 import pro.sky.animalsheltertelegrambot.repository.UserRepository;
@@ -25,7 +23,6 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Override
     public User addUser(User user) {

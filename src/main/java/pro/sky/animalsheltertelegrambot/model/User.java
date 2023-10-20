@@ -16,20 +16,16 @@ import java.util.Objects;
  */
 
 @Entity
-@Table(name = "user")
-@RequiredArgsConstructor
+@Data
+@NoArgsConstructor
 public class User {
 
     @Id
     @GeneratedValue
     private Long id;
-    @JoinColumn(name = "userName")
     private String name;
-    @JoinColumn(name = "phone")
     private String phone;
-    @JoinColumn(name = "email")
     private String email;
-    @JoinColumn(name = "isVolunteer")
     private boolean volunteer;
 
     @Override
