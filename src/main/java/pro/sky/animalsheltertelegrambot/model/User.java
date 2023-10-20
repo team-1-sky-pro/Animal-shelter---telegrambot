@@ -26,7 +26,7 @@ public class User {
     private String name;
     private String phone;
     private String email;
-    private boolean volunteer;
+    private boolean isVolunteer;
 
     @Override
     public boolean equals(Object o) {
