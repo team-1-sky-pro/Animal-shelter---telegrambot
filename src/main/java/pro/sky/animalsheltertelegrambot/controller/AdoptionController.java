@@ -1,6 +1,7 @@
 package pro.sky.animalsheltertelegrambot.controller;
 
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +32,7 @@ public class AdoptionController {
      * @author Ваше имя или имя команды
      */
     @PostMapping
-    public ResponseEntity<?> addAdoption(@RequestBody Adoption adoption, BindingResult result) {
+    public ResponseEntity<?> addAdoption(@Valid @RequestBody Adoption adoption, BindingResult result) {
         if (result.hasErrors()) {
             return new ResponseEntity<>(ErrorUtils.errorsList(result), HttpStatus.BAD_REQUEST);
         }
@@ -49,7 +50,7 @@ public class AdoptionController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateAdoption(@PathVariable Long id, @RequestBody Adoption adoption,
+    public ResponseEntity<?> updateAdoption(@Valid @PathVariable Long id, @RequestBody Adoption adoption,
                                             BindingResult result) {
         if (result.hasErrors()) {
             return new ResponseEntity<>(ErrorUtils.errorsList(result), HttpStatus.BAD_REQUEST);
