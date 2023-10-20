@@ -22,7 +22,7 @@ import java.util.Optional;
 public class ShelterServiceImpl implements ShelterService{
 
     private final Logger logger = LoggerFactory.getLogger(ShelterServiceImpl.class);
-    ShelterRepository shelterRepository;
+    private final ShelterRepository shelterRepository;
 
     @Override
     public Shelter addShelter(Shelter shelter) {
