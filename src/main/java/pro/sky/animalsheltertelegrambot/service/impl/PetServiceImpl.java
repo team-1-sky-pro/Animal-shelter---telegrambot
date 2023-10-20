@@ -1,7 +1,8 @@
-package pro.sky.animalsheltertelegrambot.service;
+package pro.sky.animalsheltertelegrambot.service.impl;
 
 import org.springframework.stereotype.Service;
 import pro.sky.animalsheltertelegrambot.model.Pet;
+import pro.sky.animalsheltertelegrambot.service.PetService;
 
 @Service
 public class PetServiceImpl implements PetService {

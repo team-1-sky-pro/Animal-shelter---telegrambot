@@ -1,9 +1,10 @@
-package pro.sky.animalsheltertelegrambot.service;
+package pro.sky.animalsheltertelegrambot.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pro.sky.animalsheltertelegrambot.model.User;
 import pro.sky.animalsheltertelegrambot.repository.UserRepository;
+import pro.sky.animalsheltertelegrambot.service.UserService;
 
 import java.util.Collection;
 import java.util.Optional;

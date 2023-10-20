@@ -21,7 +21,7 @@ import java.util.Objects;
 public class Shelter {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String contacts;
     private String shelterType;

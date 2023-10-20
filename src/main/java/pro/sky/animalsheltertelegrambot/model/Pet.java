@@ -1,10 +1,12 @@
 package pro.sky.animalsheltertelegrambot.model;
 
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import pro.sky.animalsheltertelegrambot.animal_status.Status;
 
 import java.time.LocalDate;
 
@@ -19,11 +21,13 @@ import java.time.LocalDate;
 public class Pet {
 
     @EqualsAndHashCode.Include
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String name;
+    private String petName;
 
-    private LocalDate birthDate;
+    private LocalDate birthday;
 
     /**
      * Описание питомца, например: внешние особенности, наличие заболеваний
@@ -40,11 +44,11 @@ public class Pet {
      * Внешний ключ: ID фото из таблицы 'photos'
      * @see Photo
      */
-    private Long photoID;
+    private Long photoId;
 
     /**
      * Статус, который присвоен питомцу
      * @see Status
      */
-    private Status status;
+    private boolean isAdopted;
 }

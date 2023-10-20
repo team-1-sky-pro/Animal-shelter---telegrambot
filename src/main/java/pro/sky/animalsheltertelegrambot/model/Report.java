@@ -1,5 +1,8 @@
 package pro.sky.animalsheltertelegrambot.model;
 
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,6 +21,8 @@ import java.util.Date;
 public class Report {
 
     @EqualsAndHashCode.Include
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     /**
@@ -25,7 +30,7 @@ public class Report {
      */
     private Date dateTime;
 
-    private String text;
+    private String reportText;
 
     /**
      * Внешний ключ: ID питомца, к которому относится данный отчет
