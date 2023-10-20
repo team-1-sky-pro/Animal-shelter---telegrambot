@@ -1,10 +1,7 @@
 package pro.sky.animalsheltertelegrambot.model;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,6 +12,7 @@ import java.util.Objects;
 //@AllArgsConstructor
 @Entity
 @NoArgsConstructor
+@Table(name = "photos")
 public class Photo {
 
     @Id

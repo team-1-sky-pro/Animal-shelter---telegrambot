@@ -4,6 +4,7 @@ package pro.sky.animalsheltertelegrambot.model;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -14,6 +15,7 @@ import java.util.Objects;
 
 @Data
 @AllArgsConstructor
+@Table(name = "adoptions")
 public class Adoption {
 
     @Id

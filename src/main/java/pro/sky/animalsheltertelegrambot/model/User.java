@@ -18,6 +18,7 @@ import java.util.Objects;
 @Entity
 @Data
 @NoArgsConstructor
+@Table(name = "users")
 public class User {
 
     @Id
