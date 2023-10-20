@@ -23,11 +23,10 @@ public class Shelter {
     @Id
     @GeneratedValue
     private Long id;
-    private String address;
-    private String type;
-    private String security_contact;
-    private String working_hours;
-    private String safety_guide;
+    private String contact;
+    private String shelterType;
+    private String securityContact;
+    private String workingHours;
 
     /**
      * животные живущие в определенном приюте
