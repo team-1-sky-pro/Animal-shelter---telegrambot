@@ -1,18 +1,25 @@
 package pro.sky.animalsheltertelegrambot.model;
 
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Objects;
 
 @Data
-@AllArgsConstructor
+//@AllArgsConstructor
+@Entity
+@NoArgsConstructor
+@Table(name = "photos")
 public class Photo {
 
-    private final Long id;
-    private final Long reportsPhoto_id;
-    private final boolean isInitial;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    private Long reportPhotoId;
+    private boolean isInitial;
 
     @Override
     public boolean equals(Object o) {

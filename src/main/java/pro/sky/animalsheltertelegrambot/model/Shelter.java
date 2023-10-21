@@ -18,10 +18,11 @@ import java.util.Objects;
 @Entity
 @Data
 @NoArgsConstructor
+@Table(name = "shelters")
 public class Shelter {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String contacts;
     private String shelterType;

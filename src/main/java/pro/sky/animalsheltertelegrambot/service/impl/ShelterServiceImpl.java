@@ -1,4 +1,4 @@
-package pro.sky.animalsheltertelegrambot.service;
+package pro.sky.animalsheltertelegrambot.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import pro.sky.animalsheltertelegrambot.model.Shelter;
 import pro.sky.animalsheltertelegrambot.repository.ShelterRepository;
+import pro.sky.animalsheltertelegrambot.service.ShelterService;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -19,7 +20,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class ShelterServiceImpl implements ShelterService{
+public class ShelterServiceImpl implements ShelterService {
 
     private final Logger logger = LoggerFactory.getLogger(ShelterServiceImpl.class);
     private final ShelterRepository shelterRepository;

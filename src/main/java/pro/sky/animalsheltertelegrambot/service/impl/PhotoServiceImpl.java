@@ -1,9 +1,10 @@
-package pro.sky.animalsheltertelegrambot.service;
+package pro.sky.animalsheltertelegrambot.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pro.sky.animalsheltertelegrambot.model.Adoption;
 import pro.sky.animalsheltertelegrambot.model.Photo;
+import pro.sky.animalsheltertelegrambot.service.PhotoService;
 
 
 @Service

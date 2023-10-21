@@ -1,13 +1,14 @@
-package pro.sky.animalsheltertelegrambot.service;
+package pro.sky.animalsheltertelegrambot.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pro.sky.animalsheltertelegrambot.model.Adoption;
+import pro.sky.animalsheltertelegrambot.service.AdoptionService;
 
 
 @Service
 @RequiredArgsConstructor
-public class AdoptionServiceImpl implements  AdoptionService{
+public class AdoptionServiceImpl implements AdoptionService {
 
 
     @Override
