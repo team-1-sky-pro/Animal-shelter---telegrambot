@@ -6,6 +6,6 @@ import pro.sky.animalsheltertelegrambot.model.User;
 import java.util.Collection;
 
 public interface UserRepository extends JpaRepository<User, Long> {
-    Collection<User> findAllById();
-    Collection<User> findAllByVolunteerIsTrue();
+/*    Collection<User> findAllById();
+    Collection<User> findAllByVolunteerIsTrue();*/
 }

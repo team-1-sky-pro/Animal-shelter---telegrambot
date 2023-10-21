@@ -35,15 +35,15 @@ public class UserServiceImpl implements UserService {
         return userRepository.findById(id);
     }
 
-    @Override
-    public Collection<User> getAllUsers() {
-        return userRepository.findAllById();
-    }
+//    @Override
+//    public Collection<User> getAllUsers() {
+//        return userRepository.findAllById();
+//    }
 
-    @Override
-    public Collection<User> getAllVolunteer() {
-        return userRepository.findAllByVolunteerIsTrue();
-    }
+//    @Override
+//    public Collection<User> getAllVolunteer() {
+//        return userRepository.findAllByVolunteerIsTrue();
+//    }
 
     @Override
     public User updateUser(Long id, User user) {

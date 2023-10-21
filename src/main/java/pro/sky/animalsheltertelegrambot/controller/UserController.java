@@ -34,18 +34,18 @@ public class UserController {
         return ResponseEntity.ok(existUser);
     }
 
-    @GetMapping("/all")
-    public Collection<User> getAllUsers() {
-        return userService.getAllUsers();
-    }
+//    @GetMapping("/all")
+//    public Collection<User> getAllUsers() {
+//        return userService.getAllUsers();
+//    }
 
     /**
      * получает список всех волонтеров
      */
-    @GetMapping("/volunteer")
-    public Collection<User> getAllVolunteers() {
-        return userService.getAllVolunteer();
-    }
+//    @GetMapping("/volunteer")
+//    public Collection<User> getAllVolunteers() {
+//        return userService.getAllVolunteer();
+//    }
 
     @PostMapping
     public User createUser(@RequestBody User user) {
