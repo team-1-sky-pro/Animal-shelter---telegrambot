@@ -20,6 +20,10 @@ public class AdoptionController {
 
     private final AdoptionService adoptionService;
 
+    public AdoptionController(AdoptionService adoptionService) {
+        this.adoptionService = adoptionService;
+    }
+
 
     @Operation(
             summary = "Добавление нового усыновления в базу",

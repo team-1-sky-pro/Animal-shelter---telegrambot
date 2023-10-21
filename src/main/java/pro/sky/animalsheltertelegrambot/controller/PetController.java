@@ -16,6 +16,10 @@ import pro.sky.animalsheltertelegrambot.service.PetService;
 public class PetController {
     private final PetService service;
 
+    public PetController(PetService service) {
+        this.service = service;
+    }
+
     @Operation(
             summary = "Добавление нового питомца в базу",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody (

@@ -20,6 +20,10 @@ public class PhotoController {
 
     private final PhotoService photoService;
 
+    public PhotoController(PhotoService photoService) {
+        this.photoService = photoService;
+    }
+
     @Operation(
             summary = "Добавление новой фотографии в базу",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody (
