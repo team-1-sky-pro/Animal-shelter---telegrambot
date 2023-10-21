@@ -20,11 +20,6 @@ public class AdoptionController {
 
     private final AdoptionService adoptionService;
 
-    public AdoptionController(AdoptionService adoptionService) {
-        this.adoptionService = adoptionService;
-    }
-
-
     @Operation(
             summary = "Добавление нового усыновления в базу",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody (

@@ -13,10 +13,6 @@ import pro.sky.animalsheltertelegrambot.service.ReportService;
 public class ReportController {
     private final ReportService service;
 
-    public ReportController(ReportService service) {
-        this.service = service;
-    }
-
     @PostMapping
     public void addReport(@RequestBody Report report) {
         service.addReport(report);

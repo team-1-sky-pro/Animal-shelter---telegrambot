@@ -27,10 +27,6 @@ import java.util.Optional;
 public class ShelterController {
     private final ShelterService shelterService;
 
-    public ShelterController(ShelterService shelterService) {
-        this.shelterService = shelterService;
-    }
-
     @GetMapping("{id}")
     public ResponseEntity<Optional<Shelter>> getShelter(@PathVariable Long id) {
         Optional<Shelter> existShelter = shelterService.getShelter(id);

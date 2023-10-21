@@ -28,6 +28,7 @@ public class Adoption {
      */
     private LocalDate adoptionDate;
     private LocalDateTime trialEndDate;
+    private boolean isActive;
 
 
     @Override

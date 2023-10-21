@@ -22,6 +22,7 @@ create TABLE adoptions (
     id BIGSERIAL PRIMARY KEY,
     adoption_date TIMESTAMP NOT NULL,
     trial_end_date TIMESTAMP NOT NULL,
+    isActive BOOLEAN NOT NULL,
     user_id BIGSERIAL,
     pet_id BIGSERIAL
 );

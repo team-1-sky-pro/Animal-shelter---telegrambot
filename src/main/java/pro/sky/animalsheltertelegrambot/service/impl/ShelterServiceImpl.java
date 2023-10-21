@@ -25,10 +25,6 @@ public class ShelterServiceImpl implements ShelterService {
     private final Logger logger = LoggerFactory.getLogger(ShelterServiceImpl.class);
     private final ShelterRepository shelterRepository;
 
-    public ShelterServiceImpl(ShelterRepository shelterRepository) {
-        this.shelterRepository = shelterRepository;
-    }
-
     @Override
     public Shelter addShelter(Shelter shelter) {
         return shelterRepository.save(shelter);
