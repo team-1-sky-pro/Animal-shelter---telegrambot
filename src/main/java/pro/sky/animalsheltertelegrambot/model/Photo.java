@@ -20,10 +20,13 @@ public class Photo {
     private Long id;
 
     @Column(name = "report_id")
-    private Long reportPhotoId;
+    private Long reportId;
 
-    @Column
+    @Column(name = "is_initial")
     private boolean isInitial;
+
+    @Column(name = "file_path")
+    private String filePath;
 
     @Override
     public boolean equals(Object o) {

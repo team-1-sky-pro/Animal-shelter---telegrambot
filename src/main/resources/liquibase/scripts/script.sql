@@ -49,3 +49,7 @@ create TABLE photos (
 ALTER TABLE adoptions
     RENAME COLUMN isactive TO is_active;
 
+-- changeSet x3imal:29.1
+ALTER TABLE photos
+    RENAME COLUMN isinitial TO is_initial;
+
