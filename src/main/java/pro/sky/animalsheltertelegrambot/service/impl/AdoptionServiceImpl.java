@@ -41,7 +41,7 @@ public class AdoptionServiceImpl implements AdoptionService {
      *
      * @param id Id усыновления, который требуется получить.
      * @return Найденное усыновление.
-     * @throws AdoptionNotFoundException Если усыновление не обнаружено.
+     * @throws AdoptionNotFoundExceptions Если усыновление не обнаружено.
      * @throws NullPointerException Если Id равен null.
      */
     @Override
