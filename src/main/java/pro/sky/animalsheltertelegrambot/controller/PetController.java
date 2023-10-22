@@ -50,7 +50,7 @@ public class PetController {
             responses = {
                     @ApiResponse(
                             responseCode = "200",
-                            description = "Успешное добавление"
+                            description = "Успешное обновление"
                     ),
                     @ApiResponse(
                             responseCode = "400",
