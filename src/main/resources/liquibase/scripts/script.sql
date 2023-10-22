@@ -44,3 +44,8 @@ create TABLE photos (
     isInitial BOOLEAN,
     report_id BIGSERIAL
 );
+
+-- changeSet x3imal:29
+ALTER TABLE adoptions
+    RENAME COLUMN isactive TO is_active;
+
