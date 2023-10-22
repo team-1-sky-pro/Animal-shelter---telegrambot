@@ -1,14 +1,12 @@
 package pro.sky.animalsheltertelegrambot.model;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -30,8 +28,10 @@ public class Report {
     /**
      * Дата и время, когда был отправлен отчет
      */
-    private Date dateTime;
+    @Column(name = "report_date_time")
+    private LocalDateTime dateTime;
 
+    @Column(name = "report_text")
     private String reportText;
 
     /**

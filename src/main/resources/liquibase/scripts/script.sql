@@ -53,3 +53,7 @@ ALTER TABLE adoptions
 ALTER TABLE photos
     RENAME COLUMN isinitial TO is_initial;
 
+-- changeSet x3imal:32
+ALTER TABLE reports
+RENAME COLUMN report_datetime TO report_date_time
+
