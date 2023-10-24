@@ -44,3 +44,7 @@ create TABLE photos (
     isInitial BOOLEAN,
     report_id BIGSERIAL
 );
+
+-- changeSet SyutinS:35
+ALTER TABLE users
+    RENAME COLUMN isVolunteer TO is_volunteer
