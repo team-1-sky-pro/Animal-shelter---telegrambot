@@ -50,7 +50,6 @@ public class Pet {
 
     /**
      * Статус, который присвоен питомцу
-     * @see Status
      */
     private boolean isAdopted;
 }
