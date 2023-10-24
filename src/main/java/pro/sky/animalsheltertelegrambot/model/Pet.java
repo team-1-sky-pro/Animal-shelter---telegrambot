@@ -1,9 +1,6 @@
 package pro.sky.animalsheltertelegrambot.model;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,6 +12,7 @@ import java.time.LocalDate;
  * Pet сущность
  * @author Rnd-mi
  */
+@Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -24,7 +22,7 @@ public class Pet {
 
     @EqualsAndHashCode.Include
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String petName;
