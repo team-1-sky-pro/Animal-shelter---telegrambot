@@ -25,14 +25,14 @@ import java.util.Optional;
 public class UserController {
     private final UserService userService;
 
-    @GetMapping("{id}")
-    public ResponseEntity<Optional<User>> getUser(@PathVariable Long id) {
-        Optional<User> existUser = userService.getUser(id);
-        if (existUser.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(existUser);
-    }
+//    @GetMapping("{id}")
+//    public ResponseEntity<Optional<User>> getUser(@PathVariable Long id) {
+//        Optional<User> existUser = userService.getUser(id);
+//        if (existUser.isEmpty()) {
+//            return ResponseEntity.notFound().build();
+//        }
+//        return ResponseEntity.ok(existUser);
+//    }
 
 //    @GetMapping("/all")
 //    public Collection<User> getAllUsers() {
@@ -47,23 +47,23 @@ public class UserController {
 //        return userService.getAllVolunteer();
 //    }
 
-    @PostMapping
-    public User createUser(@RequestBody User user) {
-        return userService.addUser(user);
-    }
-
-    @PutMapping("{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id,
-                                           @RequestBody User user) {
-        User changeUser = userService.updateUser(id, user);
-        if (changeUser == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(changeUser);
-    }
-
-    @DeleteMapping("{id}")
-    public void removeUser(@PathVariable Long id) {
-        userService.deleteUser(id);
-    }
+//    @PostMapping
+//    public User createUser(@RequestBody User user) {
+//        return userService.addUser(user);
+//    }
+//
+//    @PutMapping("{id}")
+//    public ResponseEntity<User> updateUser(@PathVariable Long id,
+//                                           @RequestBody User user) {
+//        User changeUser = userService.updateUser(id, user);
+//        if (changeUser == null) {
+//            return ResponseEntity.notFound().build();
+//        }
+//        return ResponseEntity.ok(changeUser);
+//    }
+//
+//    @DeleteMapping("{id}")
+//    public void removeUser(@PathVariable Long id) {
+//        userService.deleteUser(id);
+//    }
 }

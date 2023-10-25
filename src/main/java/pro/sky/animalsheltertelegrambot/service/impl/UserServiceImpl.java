@@ -6,7 +6,6 @@ import pro.sky.animalsheltertelegrambot.model.User;
 import pro.sky.animalsheltertelegrambot.repository.UserRepository;
 import pro.sky.animalsheltertelegrambot.service.UserService;
 
-import java.util.Collection;
 import java.util.Optional;
 
 /**
@@ -25,15 +24,15 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
-    @Override
-    public User addUser(User user) {
-        return userRepository.save(user);
-    }
-
-    @Override
-    public Optional<User> getUser(Long id) {
-        return userRepository.findById(id);
-    }
+//    @Override
+//    public User addUser(User user) {
+//        return userRepository.save(user);
+//    }
+//
+//    @Override
+//    public Optional<User> getUser(Long id) {
+//        return userRepository.findById(id);
+//    }
 
 //    @Override
 //    public Collection<User> getAllUsers() {
@@ -45,14 +44,14 @@ public class UserServiceImpl implements UserService {
 //        return userRepository.findAllByVolunteerIsTrue();
 //    }
 
-    @Override
-    public User updateUser(Long id, User user) {
-        return userRepository.save(user);
-    }
-
-    @Override
-    public void deleteUser(Long id) {
-        userRepository.deleteById(id);
-    }
+//    @Override
+//    public User updateUser(Long id, User user) {
+//        return userRepository.save(user);
+//    }
+//
+//    @Override
+//    public void deleteUser(Long id) {
+//        userRepository.deleteById(id);
+//    }
 
 }

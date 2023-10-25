@@ -17,10 +17,11 @@ import java.util.Optional;
  */
 
 public interface UserService {
-    User addUser(User user);
-    Optional<User> getUser(Long id);
-    User updateUser(Long id, User user);
-    void deleteUser(Long id);
+//    User addUser(User user);
+//    Optional<User> getUser(Long id);
+//    User updateUser(Long id, User user);
+//    void deleteUser(Long id);
+
 //    Collection<User> getAllUsers();
 //    Collection<User> getAllVolunteer();
 }

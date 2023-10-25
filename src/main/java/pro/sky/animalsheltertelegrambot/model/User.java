@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * User - Все зарегестрированные пользователи в том чесле и волонтеры
@@ -15,18 +16,22 @@ import java.util.Objects;
  * @author SyutinS
  */
 
-@Entity
+@Entity(name = "users")
 @Data
 @NoArgsConstructor
-@Table(name = "users")
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id",nullable = false)
     private Long id;
+    @Column(name = "user_name")
     private String name;
+    @Column(name = "phone", unique = true)
     private String phone;
+    @Column(name = "email", unique = true)
     private String email;
+    @Column(name = "is_volunteer", nullable = false)
     private boolean isVolunteer;
 
     @Override
@@ -40,5 +45,11 @@ public class User {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    public User(Long id, String name, boolean isVolunteer) {
+        this.id = id;
+        this.name = name;
+        this.isVolunteer = isVolunteer;
     }
 }
