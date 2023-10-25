@@ -6,13 +6,16 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import pro.sky.animalsheltertelegrambot.model.Pet;
 import pro.sky.animalsheltertelegrambot.service.PetService;
+import pro.sky.animalsheltertelegrambot.utils.ErrorUtils;
 
 @RestController
 @RequiredArgsConstructor
@@ -38,8 +41,12 @@ public class PetController {
             }
     )
     @PostMapping
-    public void addPet(@RequestBody Pet pet) {
+    public ResponseEntity<?> addPet(@Valid @RequestBody Pet pet, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return new ResponseEntity<>(ErrorUtils.errorsList(bindingResult), HttpStatus.BAD_REQUEST);
+        }
         service.addPet(pet);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Operation(
@@ -59,9 +66,14 @@ public class PetController {
             }
     )
     @PutMapping("/{id}")
-    public void updatePet(@Parameter(description = "id питомца") @PathVariable Long id,
-                          @RequestBody Pet pet) {
+    public ResponseEntity<?> updatePet(@Parameter(description = "id питомца") @PathVariable Long id,
+                          @Valid @RequestBody Pet pet,
+                          BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return new ResponseEntity<>(ErrorUtils.errorsList(bindingResult), HttpStatus.BAD_REQUEST);
+        }
         service.updatePet(id, pet);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Operation(
