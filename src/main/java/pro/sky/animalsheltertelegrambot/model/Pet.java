@@ -1,6 +1,8 @@
 package pro.sky.animalsheltertelegrambot.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -25,8 +27,10 @@ public class Pet {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Pattern(regexp = "[a-zA-Zа-яА-Я]+", message = "должно содержать только русские или английский буквы")
     private String petName;
 
+    @PastOrPresent
     private LocalDate birthday;
 
     /**
