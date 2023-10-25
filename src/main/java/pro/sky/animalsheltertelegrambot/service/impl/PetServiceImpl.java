@@ -3,7 +3,7 @@ package pro.sky.animalsheltertelegrambot.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import pro.sky.animalsheltertelegrambot.exception.AvatarAlreadyExistsException;
+import pro.sky.animalsheltertelegrambot.exception.PetAlreadyExistsException;
 import pro.sky.animalsheltertelegrambot.exception.PetNotFoundException;
 import pro.sky.animalsheltertelegrambot.model.Pet;
 import pro.sky.animalsheltertelegrambot.repository.PetRepository;
@@ -24,7 +24,7 @@ public class PetServiceImpl implements PetService {
             petRepository.save(pet);
         } catch (Exception e) {
             log.error("Pet with name '{}' is already in repo", pet.getPetName());
-            throw new AvatarAlreadyExistsException();
+            throw new PetAlreadyExistsException();
         }
     }
 
