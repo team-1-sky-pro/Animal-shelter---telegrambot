@@ -13,6 +13,7 @@ import java.util.Date;
  * Report сущность
  * @author Rnd-mi
  */
+@Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
