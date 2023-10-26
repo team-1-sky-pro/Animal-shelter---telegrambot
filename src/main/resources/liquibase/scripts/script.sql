@@ -60,3 +60,11 @@ ALTER TABLE photos
 -- changeSet x3imal:32
 ALTER TABLE reports
 RENAME COLUMN report_datetime TO report_date_time
+
+-- changeSet Rnd-mi:30
+ALTER TABLE pets
+RENAME COLUMN isAdopted TO is_adopted
+
+-- changeSet Rnd-mi:30.1
+ALTER TABLE pets
+ALTER COLUMN birthday TYPE DATE
