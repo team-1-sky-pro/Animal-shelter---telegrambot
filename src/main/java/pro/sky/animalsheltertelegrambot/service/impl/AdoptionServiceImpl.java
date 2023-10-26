@@ -42,7 +42,7 @@ public class AdoptionServiceImpl implements AdoptionService {
      * @param id Id усыновления, который требуется получить.
      * @return Найденное усыновление.
      * @throws AdoptionNotFoundExceptions Если усыновление не обнаружено.
-     * @throws NullPointerException Если Id равен null.
+     * @throws IllegalArgumentException Если Id равен null.
      */
     @Override
     public Adoption getAdoption(Long id) {
@@ -86,7 +86,7 @@ public class AdoptionServiceImpl implements AdoptionService {
      * Удаляет усыновление по его Id.
      *
      * @param id Id усыновления, которое необходимо удалить.
-     * @throws EntityExistsException Если усыновление не обнаружено.
+     * @throws AdoptionNotFoundExceptions Если усыновление не обнаружено.
      * @throws NullPointerException Если Id равен null.
      */
     @Override
@@ -98,7 +98,7 @@ public class AdoptionServiceImpl implements AdoptionService {
 
         if (!adoptionRepository.existsById(id)) {
             log.error("Adoption with ID {} not found", id);
-            throw new EntityExistsException();
+            throw new AdoptionNotFoundExceptions("Adoption this Id not found");
         }
 
         log.info("Deleting adoption with ID: {}", id);
