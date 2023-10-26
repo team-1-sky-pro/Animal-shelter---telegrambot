@@ -44,3 +44,19 @@ create TABLE photos (
     isInitial BOOLEAN,
     report_id BIGSERIAL
 );
+
+-- changeSet SyutinS:35
+ALTER TABLE users
+    RENAME COLUMN isVolunteer TO is_volunteer
+
+-- changeSet x3imal:29
+ALTER TABLE adoptions
+    RENAME COLUMN isactive TO is_active;
+
+-- changeSet x3imal:29.1
+ALTER TABLE photos
+    RENAME COLUMN isinitial TO is_initial;
+
+-- changeSet x3imal:32
+ALTER TABLE reports
+RENAME COLUMN report_datetime TO report_date_time
