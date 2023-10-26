@@ -45,6 +45,10 @@ create TABLE photos (
     report_id BIGSERIAL
 );
 
+-- changeSet SyutinS:35
+ALTER TABLE users
+    RENAME COLUMN isVolunteer TO is_volunteer
+
 -- changeSet x3imal:29
 ALTER TABLE adoptions
     RENAME COLUMN isactive TO is_active;
@@ -56,4 +60,3 @@ ALTER TABLE photos
 -- changeSet x3imal:32
 ALTER TABLE reports
 RENAME COLUMN report_datetime TO report_date_time
-
