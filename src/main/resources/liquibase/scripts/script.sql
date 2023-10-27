@@ -47,7 +47,7 @@ create TABLE photos (
 
 -- changeSet SyutinS:35
 ALTER TABLE users
-    RENAME COLUMN isVolunteer TO is_volunteer;
+    RENAME COLUMN isVolunteer TO is_volunteer
 
 -- changeSet x3imal:29
 ALTER TABLE adoptions
@@ -59,12 +59,12 @@ ALTER TABLE photos
 
 -- changeSet x3imal:32
 ALTER TABLE reports
-RENAME COLUMN report_datetime TO report_date_time;
+RENAME COLUMN report_datetime TO report_date_time
 
 -- changeSet Rnd-mi:30
 ALTER TABLE pets
-RENAME COLUMN isAdopted TO is_adopted;
+RENAME COLUMN isAdopted TO is_adopted
 
 -- changeSet Rnd-mi:30.1
 ALTER TABLE pets
-ALTER COLUMN birthday TYPE DATE;
+ALTER COLUMN birthday TYPE DATE
