@@ -22,8 +22,8 @@ import java.util.UUID;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id",nullable = false)
+    @JoinColumn(name = "adoptions", referencedColumnName = "user_id")
     private Long id;
     @Column(name = "user_name")
     private String name;

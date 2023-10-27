@@ -1,21 +1,20 @@
 package pro.sky.animalsheltertelegrambot.model;
 
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Objects;
 
 @Data
 @AllArgsConstructor
-@Table(name = "adoptions")
+@Entity(name = "adoptions")
 public class Adoption {
 
     @Id
@@ -28,9 +27,8 @@ public class Adoption {
      */
     private LocalDate adoptionDate;
     private LocalDateTime trialEndDate;
+    @Column(name = "is_active")
     private boolean isActive;
-
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

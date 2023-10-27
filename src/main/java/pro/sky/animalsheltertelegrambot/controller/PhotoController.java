@@ -88,7 +88,7 @@ public class PhotoController {
     )
     @PutMapping("/{id}")
     public ResponseEntity<?> updatePhoto(@Valid @PathVariable Long id, @RequestBody Photo photo,
-                                            BindingResult result) {
+                                         BindingResult result) {
         if (result.hasErrors()) {
             return new ResponseEntity<>(ErrorUtils.errorsList(result), HttpStatus.BAD_REQUEST);
         }
@@ -96,20 +96,20 @@ public class PhotoController {
         return new ResponseEntity<>(updatePhoto, HttpStatus.OK);
     }
 
-@Operation(
-        summary = "Удаление фотографии по ID",
-        responses = {
-                @ApiResponse(
-                        responseCode = "200",
-                        description = "Фотография успешно удалена"
-                ),
-                @ApiResponse(
-                        responseCode = "400",
-                        description = "Фотография не найдена"
-                )
-        },
-        tags = "Photos"
-)
+    @Operation(
+            summary = "Удаление фотографии по ID",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Фотография успешно удалена"
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Фотография не найдена"
+                    )
+            },
+            tags = "Photos"
+    )
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deletePhoto(@PathVariable Long id) {
         photoService.deletePhoto(id);

@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pro.sky.animalsheltertelegrambot.model.User;
+import pro.sky.animalsheltertelegrambot.repository.AdoptionRepository;
 import pro.sky.animalsheltertelegrambot.repository.UserRepository;
 
 import java.util.List;
@@ -24,12 +25,15 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     private final Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
     private final TelegramBot telegramBot;
 
+
     public TelegramBotUpdatesListener(TelegramBot telegramBot) {
         this.telegramBot = telegramBot;
     }
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private AdoptionRepository adoptionRepository;
 //    static final String HELP_TEXT = "Привет! Я чат-бот приюта для животных.\n\n" +
 //            "Я помогу тебе:\n\n" +
 //            "1. найти доброго и преданного друга,\n\n" +
@@ -49,12 +53,11 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                 logger.info("Null message was sent");
                 return;
             }
-            Long chatId = update.message().chat().id();
+            Long userId = update.message().chat().id();
             String userName = update.message().chat().username();
             String messageReceived = update.message().text();
             if (("/start").equals(messageReceived)) {
-                saveUserToDB(chatId, userName);
-                startMessageReceived(chatId, update.message().chat().firstName());
+                checkUserStatus(userId, userName);
             }
         });
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
@@ -68,15 +71,29 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     /**
      * method to sent welcome message if "/start" command was sent
      */
-    private void startMessageReceived(Long chatId, String userName) {
-        String responseMessage = "Привет, " + userName;
+    private void startMessageReceived(Long chatId, String firstName) {
+        String responseMessage = "Привет, " + firstName;
         sendMessage(chatId, responseMessage);
     }
-
-    private void saveUserToDB(Long chatId, String userName) {
-        User user = new User(chatId, userName, false);
-        if (!userRepository.findById(chatId).isPresent()) {
+    /**
+     * метод проверяет это новый user, или уже в БД, является ли он усыновителем или нет,
+     * активный или нет
+     */
+    private void checkUserStatus(Long userId, String userName){
+        User user = new User(userId, userName, false);
+        if (userRepository.findById(userId).isPresent()) {
+            if (adoptionRepository.findIdByUserId(userId) != null) {
+                if (adoptionRepository.checkAdoptionsIsActive(userId) == true) {
+                    startMessageReceived(userId, userName + " - is active adopter");
+                } else {
+                    startMessageReceived(userId, userName + " - is not active adopter");
+                }
+            } else {
+                startMessageReceived(userId, userName + " - user in DB");
+            }
+        } else if (!userRepository.findById(userId).equals(user)) {
             userRepository.save(user);
+            startMessageReceived(userId, userName + " - new User");
         }
     }
 }
