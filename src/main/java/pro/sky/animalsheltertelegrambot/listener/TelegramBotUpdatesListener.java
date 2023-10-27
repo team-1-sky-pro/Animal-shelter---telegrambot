@@ -54,7 +54,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                 return;
             }
             Long userId = update.message().chat().id();
-            String userName = update.message().chat().username();
+            String userName = update.message().chat().firstName();
             String messageReceived = update.message().text();
             if (("/start").equals(messageReceived)) {
                 checkUserStatus(userId, userName);
