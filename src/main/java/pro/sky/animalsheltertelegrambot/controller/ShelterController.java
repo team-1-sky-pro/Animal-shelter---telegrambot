@@ -122,7 +122,7 @@ public class ShelterController {
     )
     @PutMapping("{id}")
     public ResponseEntity<Shelter> updateShelter(@PathVariable Long id,
-                                           @RequestBody Shelter shelter) {
+                                                 @RequestBody Shelter shelter) {
         Shelter changeShelter = shelterService.updateShelter(id, shelter);
         if (changeShelter == null) {
             return ResponseEntity.notFound().build();

@@ -22,11 +22,16 @@ import java.util.Objects;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id",nullable = false)
+    @JoinColumn(name = "adoptions", referencedColumnName = "user_id")
     private Long id;
-    private String userName;
+    @Column(name = "user_name")
+    private String name;
+    @Column(name = "phone", unique = true)
     private String phone;
+    @Column(name = "email", unique = true)
     private String email;
+    @Column(name = "is_volunteer", nullable = false)
     private boolean isVolunteer;
 
     @Override
@@ -40,5 +45,11 @@ public class User {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    public User(Long id, String name, boolean isVolunteer) {
+        this.id = id;
+        this.name = name;
+        this.isVolunteer = isVolunteer;
     }
 }

@@ -22,7 +22,10 @@ public class Adoption {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "adoption_date")
+    /**
+     * Адрес электронной почты, связанный с данным принятием на усыновление.
+     * Должен быть действительным адресом электронной почты и уникальным для каждой записи Adoption.
+     */
     private LocalDate adoptionDate;
 
     @Column(name = "trial_end_date")

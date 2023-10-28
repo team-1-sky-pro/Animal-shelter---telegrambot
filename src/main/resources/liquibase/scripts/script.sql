@@ -68,3 +68,15 @@ RENAME COLUMN isAdopted TO is_adopted;
 -- changeSet Rnd-mi:30.1
 ALTER TABLE pets
 ALTER COLUMN birthday TYPE DATE;
+
+-- changeset annabelousova:38
+alter table users
+alter column email drop not null;
+alter table users
+alter column phone drop not null;
+alter table pets
+alter column birthday drop not null;
+alter table adoptions
+alter column adoption_date drop not null;
+alter table adoptions
+alter column trial_end_date drop not null;
