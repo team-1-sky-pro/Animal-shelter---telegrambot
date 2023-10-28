@@ -1,5 +1,7 @@
 package pro.sky.animalsheltertelegrambot.service;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import pro.sky.animalsheltertelegrambot.model.Adoption;
 
 public interface AdoptionService {
