@@ -67,8 +67,8 @@ public class PetController {
     )
     @PutMapping("/{id}")
     public ResponseEntity<?> updatePet(@Parameter(description = "id питомца") @PathVariable Long id,
-                                       @Valid @RequestBody Pet pet,
-                                       BindingResult bindingResult) {
+                          @Valid @RequestBody Pet pet,
+                          BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return new ResponseEntity<>(ErrorUtils.errorsList(bindingResult), HttpStatus.BAD_REQUEST);
         }

@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Objects;
-import java.util.UUID;
 
 /**
  * User - Все зарегестрированные пользователи в том чесле и волонтеры
@@ -16,9 +15,10 @@ import java.util.UUID;
  * @author SyutinS
  */
 
-@Entity(name = "users")
+@Entity
 @Data
 @NoArgsConstructor
+@Table(name = "users")
 public class User {
 
     @Id

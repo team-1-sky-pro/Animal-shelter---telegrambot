@@ -4,17 +4,18 @@ package pro.sky.animalsheltertelegrambot.model;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Locale;
 import java.util.Objects;
 
 @Data
 @AllArgsConstructor
-@Entity(name = "adoptions")
+@Entity
+@NoArgsConstructor
+@Table(name = "adoptions")
 public class Adoption {
 
     @Id
@@ -26,9 +27,14 @@ public class Adoption {
      * Должен быть действительным адресом электронной почты и уникальным для каждой записи Adoption.
      */
     private LocalDate adoptionDate;
+
+    @Column(name = "trial_end_date")
     private LocalDateTime trialEndDate;
+
     @Column(name = "is_active")
     private boolean isActive;
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

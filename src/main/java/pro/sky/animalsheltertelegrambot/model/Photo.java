@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import java.util.Objects;
 
 @Data
-//@AllArgsConstructor
+@AllArgsConstructor
 @Entity
 @NoArgsConstructor
 @Table(name = "photos")
@@ -18,8 +18,15 @@ public class Photo {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private Long reportPhotoId;
+
+    @Column(name = "report_id")
+    private Long reportId;
+
+    @Column(name = "is_initial")
     private boolean isInitial;
+
+    @Column(name = "file_path")
+    private String filePath;
 
     @Override
     public boolean equals(Object o) {
