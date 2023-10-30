@@ -11,9 +11,9 @@ public interface PhotoService {
 
     void addPhotosForReport(Long reportId, MultipartFile[] photos) throws IOException;
 
-    void getPhotosByPetId(Long petId, HttpServletResponse response);
+    void getPhotosByPetId(Long petId, Long photoId, HttpServletResponse response) throws IOException;
 
-    void getPhotosByReportId(Long reportId, HttpServletResponse response);
+    void getPhotosByReportId(Long reportId, Long photoId, HttpServletResponse response) throws IOException;
 
     void deletePhotosByPetId(Long petId);
 
