@@ -39,5 +39,7 @@ public class Report {
      * Внешний ключ: ID питомца, к которому относится данный отчет
      * @see Pet
      */
-    private Long petId;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "pet_id")
+    private Pet petId;
 }
