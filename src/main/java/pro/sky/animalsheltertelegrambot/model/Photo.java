@@ -35,7 +35,7 @@ public class Photo {
     /**
      * Размер фотографии
      */
-    private long fileSize;
+    private Long fileSize;
 
     /**
      * Поле, хранящее тип файла и расширение
