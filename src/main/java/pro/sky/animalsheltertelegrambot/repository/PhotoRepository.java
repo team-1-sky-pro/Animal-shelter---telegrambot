@@ -13,7 +13,7 @@ public interface PhotoRepository extends JpaRepository<Photo, Long> {
     Optional<String> findLastFilePathByPetId(@Param("petId") Long petId);
 
     @Query(value = "SELECT file_path FROM photos WHERE report_id = :reportId ORDER BY file_path DESC LIMIT 1", nativeQuery = true)
-    Optional<String> findLastFilePathByReportId(Long reportId);
+    Optional<String> findLastFilePathByReportId(@Param("reportId") Long reportId);
 
     List<Photo> findByPetId(Long petId);
 
