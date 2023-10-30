@@ -2,7 +2,10 @@ package pro.sky.animalsheltertelegrambot.telegram_bot.listener;
 
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
+import com.pengrad.telegrambot.model.CallbackQuery;
 import com.pengrad.telegrambot.model.Update;
+import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
+import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import com.pengrad.telegrambot.request.SendMessage;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
@@ -12,6 +15,7 @@ import org.springframework.stereotype.Service;
 import pro.sky.animalsheltertelegrambot.model.User;
 import pro.sky.animalsheltertelegrambot.repository.AdoptionRepository;
 import pro.sky.animalsheltertelegrambot.repository.UserRepository;
+import pro.sky.animalsheltertelegrambot.service.CommandService;
 
 import java.util.List;
 
@@ -25,20 +29,17 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     private final Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
     private final TelegramBot telegramBot;
 
+    private final CommandService commandService;
 
-    public TelegramBotUpdatesListener(TelegramBot telegramBot) {
+    public TelegramBotUpdatesListener(TelegramBot telegramBot, CommandService commandService) {
         this.telegramBot = telegramBot;
+        this.commandService = commandService;
     }
 
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private AdoptionRepository adoptionRepository;
-//    static final String HELP_TEXT = "Привет! Я чат-бот приюта для животных.\n\n" +
-//            "Я помогу тебе:\n\n" +
-//            "1. найти доброго и преданного друга,\n\n" +
-//            "2. расскажу как за ним ухаживать,\n\n" +
-//            " Скорее жми ЗАПУСТИТЬ!";
 
     @PostConstruct
     public void init() {
@@ -47,17 +48,20 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
     @Override
     public int process(List<Update> updates) {
+
         updates.forEach(update -> {
             logger.info("Processing update: {}", update);
-            if (update.message() == null) {
-                logger.info("Null message was sent");
-                return;
+            if (update.callbackQuery() != null) {
+                commandService.receivedCallbackMessage(update.callbackQuery());
             }
-            Long userId = update.message().chat().id();
-            String userName = update.message().chat().firstName();
-            String messageReceived = update.message().text();
-            if (("/start").equals(messageReceived)) {
-                checkUserStatus(userId, userName);
+
+            if(update.message() != null){
+                Long userId = update.message().chat().id();
+                String userName = update.message().chat().firstName();
+                String messageReceived = update.message().text();
+                if ((messageReceived).equals("/start")) {
+                    checkUserStatus(userId, userName);
+                }
             }
         });
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
@@ -75,11 +79,12 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         String responseMessage = "Привет, " + firstName;
         sendMessage(chatId, responseMessage);
     }
+
     /**
      * метод проверяет это новый user, или уже в БД, является ли он усыновителем или нет,
      * активный или нет
      */
-    private void checkUserStatus(Long userId, String userName){
+    private void checkUserStatus(Long userId, String userName) {
         User user = new User(userId, userName, false);
         if (userRepository.findById(userId).isPresent()) {
             if (adoptionRepository.findIdByUserId(userId) != null) {
@@ -89,11 +94,13 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                     startMessageReceived(userId, userName + " - is not active adopter");
                 }
             } else {
-                startMessageReceived(userId, userName + " - user in DB");
+                telegramBot.execute(commandService.executeStartCommandIfUserExists(userId));
+
             }
         } else if (!userRepository.findById(userId).equals(user)) {
             userRepository.save(user);
             startMessageReceived(userId, userName + " - new User");
         }
     }
+
 }
