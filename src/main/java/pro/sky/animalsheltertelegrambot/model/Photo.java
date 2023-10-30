@@ -7,8 +7,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import java.util.Objects;
-
 /**
  * Сущность Photo, в соответствующей таблице хранятся фотографии, относящиеся как к питомцам, так и к отчетам.
  * В случае, если сохраняется фотография питомца, которая не относится ни к какому отчету, то в поле report_id записывается null.
