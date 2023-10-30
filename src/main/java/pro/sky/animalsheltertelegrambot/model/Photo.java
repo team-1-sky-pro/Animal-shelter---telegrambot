@@ -4,40 +4,61 @@ package pro.sky.animalsheltertelegrambot.model;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.Objects;
 
+/**
+ * Сущность Photo, в соответствующей таблице хранятся фотографии, относящиеся как к питомцам, так и к отчетам.
+ * В случае, если сохраняется фотография питомца, которая не относится ни к какому отчету, то в поле report_id записывается null.
+ */
+@Entity
 @Data
 @AllArgsConstructor
-@Entity
 @NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(name = "photos")
 public class Photo {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
-    @Column(name = "report_id")
-    private Long reportId;
 
-    @Column(name = "is_initial")
-    private boolean isInitial;
-
-    @Column(name = "file_path")
+    /**
+     * Путь к файлу, куда сохранилась копия отправленной пользователем фотографии
+     */
     private String filePath;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Photo a = (Photo) o;
-        return Objects.equals(id, a.id);
-    }
+    /**
+     * Размер фотографии
+     */
+    private long fileSize;
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
+    /**
+     * Поле, хранящее тип файла и расширение
+     */
+    private String mediaType;
+
+    private boolean isInitial;
+
+    /**
+     * ID питомца, фотографии которого была передана
+     * @see Pet
+     */
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "pet_id")
+    private Pet pet;
+
+    /**
+     * ID отчета, к которому была прикреплена фотография питомца.
+     * <p>
+     * Может быть null.
+     * @see Report
+     */
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "report_id")
+    private Report report;
 }
