@@ -55,7 +55,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                 commandService.receivedCallbackMessage(update.callbackQuery());
             }
 
-            if(update.message() != null){
+            if (update.message() != null) {
                 Long userId = update.message().chat().id();
                 String userName = update.message().chat().firstName();
                 String messageReceived = update.message().text();
@@ -95,11 +95,10 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                 }
             } else {
                 telegramBot.execute(commandService.executeStartCommandIfUserExists(userId));
-
             }
         } else if (!userRepository.findById(userId).equals(user)) {
             userRepository.save(user);
-            startMessageReceived(userId, userName + " - new User");
+            telegramBot.execute(commandService.executeStartCommandIfUserExists(userId));
         }
     }
 }

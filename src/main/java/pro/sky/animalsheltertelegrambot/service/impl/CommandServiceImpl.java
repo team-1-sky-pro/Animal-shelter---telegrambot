@@ -83,8 +83,8 @@ public class CommandServiceImpl implements CommandService {
         InlineKeyboardButton inlineKeyboardButton1 = new InlineKeyboardButton("О приюте").callbackData("INFO_DOG");
         InlineKeyboardButton inlineKeyboardButton2 = new InlineKeyboardButton("Расписание, адрес\nи схема проезда").callbackData("SCHEDULE");
         InlineKeyboardButton inlineKeyboardButton3 = new InlineKeyboardButton("Контакты охраны").callbackData("SECURITY");
-        InlineKeyboardButton inlineKeyboardButton4 = new InlineKeyboardButton("Рекомендации \nпо технике безопасности\nна территории приюта").callbackData("RECOMMENDATION");
-        InlineKeyboardButton inlineKeyboardButton5 = new InlineKeyboardButton("Оставить контактные\nданнные для связи").callbackData("CONTACTS");
+        InlineKeyboardButton inlineKeyboardButton4 = new InlineKeyboardButton("Рекомендации \n по ТБ\nна территории приюта").callbackData("RECOMMENDATION");
+        InlineKeyboardButton inlineKeyboardButton5 = new InlineKeyboardButton("Оставить заявку").callbackData("CONTACTS");
         InlineKeyboardButton inlineKeyboardButton6 = new InlineKeyboardButton("Позвать волонтера").callbackData("VOLONTEER_DOG_SHELTER");
 
         List<InlineKeyboardButton> keyboardButtonsRow1 = new ArrayList<>();
