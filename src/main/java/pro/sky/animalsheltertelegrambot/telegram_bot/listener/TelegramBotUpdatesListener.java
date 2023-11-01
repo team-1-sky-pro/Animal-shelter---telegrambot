@@ -102,5 +102,4 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
             startMessageReceived(userId, userName + " - new User");
         }
     }
-
 }

@@ -7,4 +7,8 @@ public interface CommandService {
     SendMessage executeStartCommandIfUserExists(Long chatId);
 
     void receivedCallbackMessage(CallbackQuery callbackQuery);
+
+    SendMessage displayMenuShelterInfo(Long chatId);
+
+    SendMessage displayAboutShelter(Long chatId);
 }
