@@ -55,12 +55,20 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                 commandService.receivedCallbackMessage(update.callbackQuery());
             }
 
-            if(update.message() != null){
+            if (update.message() != null) {
                 Long userId = update.message().chat().id();
                 String userName = update.message().chat().firstName();
-                String messageReceived = update.message().text();
-                if ((messageReceived).equals("/start")) {
-                    checkUserStatus(userId, userName);
+                String text = update.message().text();
+                if (text.equals("/start")) {
+                    if (checkIsUserIsNew(userId)) {
+                        saveNewUser(userId, userName);
+                        startMessageReceived(userId, userName + " - new User");
+                    }
+                    if (checkIfUserIsAdopter(userId)) {
+                        sendMessage(userId, "flkjflkajflak");
+                    } else {
+                        telegramBot.execute(commandService.executeStartCommandIfUserExists(userId));
+                    }
                 }
             }
         });
@@ -81,26 +89,33 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     }
 
     /**
-     * метод проверяет это новый user, или уже в БД, является ли он усыновителем или нет,
-     * активный или нет
+     * Производится проверка, является ли пользователь усыновителем или нет.
+     *
+     * @param userId chat ID, который также является ID пользователя
+     * @return true - если пользователь является усыновителем, false - если нет
      */
-    private void checkUserStatus(Long userId, String userName) {
-        User user = new User(userId, userName, false);
-        if (userRepository.findById(userId).isPresent()) {
-            if (adoptionRepository.findIdByUserId(userId) != null) {
-                if (adoptionRepository.checkAdoptionsIsActive(userId) == true) {
-                    startMessageReceived(userId, userName + " - is active adopter");
-                } else {
-                    startMessageReceived(userId, userName + " - is not active adopter");
-                }
-            } else {
-                telegramBot.execute(commandService.executeStartCommandIfUserExists(userId));
-
-            }
-        } else if (!userRepository.findById(userId).equals(user)) {
-            userRepository.save(user);
-            startMessageReceived(userId, userName + " - new User");
-        }
+    private boolean checkIfUserIsAdopter(Long userId) {
+        return adoptionRepository.checkAdoptionsIsActive(userId).orElse(false);
     }
 
+    /**
+     * Сохранение нового пользователя в БД.
+     *
+     * @param userId   chat ID, который также является ID пользователя
+     * @param userName имя пользователя
+     */
+    private void saveNewUser(Long userId, String userName) {
+        User user = new User(userId, userName, false);
+        userRepository.save(user);
+    }
+
+    /**
+     * Проверка на существование пользователя в БД.
+     *
+     * @param userId chat ID, который также является ID пользователя
+     * @return true - если пользователя еще нет в базе, false - если есть
+     */
+    private boolean checkIsUserIsNew(Long userId) {
+        return userRepository.findById(userId).isEmpty();
+    }
 }
