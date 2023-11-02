@@ -1,4 +1,4 @@
-package pro.sky.animalsheltertelegrambot.service;
+package pro.sky.animalsheltertelegrambot.telegram_bot.service;
 
 import com.pengrad.telegrambot.model.CallbackQuery;
 import com.pengrad.telegrambot.request.SendMessage;
