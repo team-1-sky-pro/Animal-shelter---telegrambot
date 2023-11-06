@@ -8,6 +8,18 @@ public interface CommandService {
 
     void receivedCallbackMessage(CallbackQuery callbackQuery);
 
+
+    SendMessage runMainMenu(Long chatId, String text);
+
+    SendMessage runMenuShelterInfo(Long chatId);
+
+    SendMessage displayDogShelterContacts(Long chatId);
+
+    SendMessage displayDogShelterSecurityContacts(Long chatId);
+
+    SendMessage displayDogShelterWorkingHours(Long chatId);
+
+
     /**
      * Создает меню выбора действия для пользователя-усыновителя. <p>
      * Возможные действия: <p>
@@ -17,4 +29,5 @@ public interface CommandService {
      * @param chatId ID чата с текущим пользователем
      */
     void runMenuForAdopter(Long chatId);
+
 }
