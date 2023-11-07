@@ -163,6 +163,11 @@ public class PhotoServiceImpl implements PhotoService {
         }
     }
 
+    @Override
+    public void addPhotoForReport(Photo photo) {
+        photoRepository.save(photo);
+    }
+
     /**
      * Метод по поиску хранимых фотографий, относящихся к определенному питомцу
      *

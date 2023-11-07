@@ -57,7 +57,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         Long userId = message.chat().id();
         String userName = message.chat().firstName();
         String text = message.text();
-        if (text.equals("/start")) {
+        if (text != null && text.equals("/start")) {
             if (checkIsUserIsNew(userId)) {
                 saveNewUser(userId, userName);
                 startMessageReceived(userId, userName + " - new User");
