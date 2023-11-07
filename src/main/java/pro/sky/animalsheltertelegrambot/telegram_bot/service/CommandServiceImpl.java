@@ -3,18 +3,13 @@ package pro.sky.animalsheltertelegrambot.telegram_bot.service;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.CallbackQuery;
 
-import com.pengrad.telegrambot.model.Document;
-import com.pengrad.telegrambot.model.File;
+import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 
-import com.pengrad.telegrambot.request.GetFile;
-import com.pengrad.telegrambot.request.SendDocument;
 import com.pengrad.telegrambot.request.SendMessage;
 
-import com.pengrad.telegrambot.response.GetFileResponse;
 import com.pengrad.telegrambot.response.SendResponse;
-import jakarta.xml.bind.DatatypeConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,6 +24,8 @@ import static pro.sky.animalsheltertelegrambot.telegram_bot.button_types.Button.
 @RequiredArgsConstructor
 public class CommandServiceImpl implements CommandService {
 
+    private final String reportInfo = "Чтобы отправить отчет. Вам нужно в одном сообщении прикрепить фото питомца, " +
+            "указать его ID и далее через точку описать его состояние.\n";
     private final TelegramBot telegramBot;
     private final ShelterRepository shelterRepository;
 
@@ -68,6 +65,9 @@ public class CommandServiceImpl implements CommandService {
                 break;
             case "SCHEDULE":
                 telegramBot.execute(displayDogShelterWorkingHours(chatId));
+                break;
+            case "REPORT":
+                telegramBot.execute(displayReportInfo(chatId));
                 break;
         }
     }
@@ -141,6 +141,11 @@ public class CommandServiceImpl implements CommandService {
         return sendMessage;
     }
 
+    @Override
+    public SendMessage displayReportInfo(Long chatId) {
+        return new SendMessage(chatId, reportInfo);
+    }
+
 //    @Override
 //    public String sendFileToUser(Long chatId) {
 //        String file = "C:/Users/user/Desktop/IT/dog_shelter_info_.pdf";
@@ -193,4 +198,8 @@ public class CommandServiceImpl implements CommandService {
         SendResponse sendResponse = telegramBot.execute(sendMessage);
     }
 
+    @Override
+    public void saveReport(Message message) {
+
+    }
 }
