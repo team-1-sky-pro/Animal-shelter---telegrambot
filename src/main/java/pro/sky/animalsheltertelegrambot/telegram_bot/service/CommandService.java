@@ -19,7 +19,6 @@ public interface CommandService {
 
     SendMessage displayDogShelterWorkingHours(Long chatId);
 
-
     /**
      * Создает меню выбора действия для пользователя-усыновителя. <p>
      * Возможные действия: <p>
