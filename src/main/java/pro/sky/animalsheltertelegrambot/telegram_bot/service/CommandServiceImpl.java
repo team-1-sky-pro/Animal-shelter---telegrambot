@@ -16,13 +16,14 @@ import org.springframework.stereotype.Service;
 import pro.sky.animalsheltertelegrambot.model.Pet;
 import pro.sky.animalsheltertelegrambot.model.Photo;
 import pro.sky.animalsheltertelegrambot.model.Report;
-import pro.sky.animalsheltertelegrambot.model.User;
 import pro.sky.animalsheltertelegrambot.repository.ShelterRepository;
 import pro.sky.animalsheltertelegrambot.service.PetService;
 import pro.sky.animalsheltertelegrambot.service.PhotoService;
 import pro.sky.animalsheltertelegrambot.service.ReportService;
 
 import java.time.LocalDateTime;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static pro.sky.animalsheltertelegrambot.telegram_bot.button_types.Button.*;
 
@@ -32,6 +33,7 @@ import static pro.sky.animalsheltertelegrambot.telegram_bot.button_types.Button.
 @RequiredArgsConstructor
 public class CommandServiceImpl implements CommandService {
 
+    private final Pattern reportPattern = Pattern.compile("\\d+\\.\\s?[а-яА-Яa-zA-Z]+");
     private final String reportInfo = "Чтобы отправить отчет. Вам нужно в одном сообщении прикрепить фото питомца, " +
             "указать его ID и далее через точку описать его состояние.\n";
     private final TelegramBot telegramBot;
@@ -213,6 +215,11 @@ public class CommandServiceImpl implements CommandService {
         Long chatId = message.chat().id();
         String text = message.caption();
 
+        Matcher matcher = reportPattern.matcher(text);
+        if (!matcher.matches()) {
+            telegramBot.execute(new SendMessage(chatId, "Ошибка. Убедитесь, что заполнили текст отчета корректно."));
+            return;
+        }
         Long petId = Long.valueOf(text.substring(0, text.indexOf(".")));
         String reportText = text.substring(text.indexOf(".") + 1);
 
