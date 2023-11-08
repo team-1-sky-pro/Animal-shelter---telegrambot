@@ -48,7 +48,9 @@ public class Pet {
      * Внешний ключ: ID фото из таблицы 'photos'
      * @see Photo
      */
-    private Long photoId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "photo_id", referencedColumnName = "id")
+    private Photo photo;
 
     /**
      * Статус, который присвоен питомцу

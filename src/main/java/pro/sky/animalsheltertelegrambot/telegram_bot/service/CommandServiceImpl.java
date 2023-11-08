@@ -104,9 +104,15 @@ public class CommandServiceImpl implements CommandService {
                 path = "src/main/resources/files/dog_safety_recommendation.pdf";
                 sendDocument(path,chatId);
                 break;
+
+            case "APPLICATION":
+                startAdoptionProcess(chatId);
+                break;
+
 //            case "SCHEDULE_CAT":
 //                telegramBot.execute(displayCatShelterWorkingHours(chatId));
 //                break;
+
             case "REPORT":
                 telegramBot.execute(displayReportInfo(chatId));
                 break;
@@ -120,8 +126,8 @@ public class CommandServiceImpl implements CommandService {
         InlineKeyboardButton aboutShelterButton = new InlineKeyboardButton(ABOUT_SHELTER.getText());
         aboutShelterButton.callbackData(ABOUT_SHELTER.toString());
 
-        InlineKeyboardButton adoptAnimalButton = new InlineKeyboardButton(ADOPT_ANIMAL.getText());
-        adoptAnimalButton.callbackData(ADOPT_ANIMAL.toString());
+//        InlineKeyboardButton adoptAnimalButton = new InlineKeyboardButton(ADOPT_ANIMAL.getText());
+//        adoptAnimalButton.callbackData(ADOPT_ANIMAL.toString());
 
         InlineKeyboardButton reportButton = new InlineKeyboardButton(REPORT.getText());
         reportButton.callbackData(REPORT.toString());
@@ -129,7 +135,7 @@ public class CommandServiceImpl implements CommandService {
         InlineKeyboardButton volunteerButton = new InlineKeyboardButton(VOLUNTEER.getText());
         volunteerButton.callbackData(VOLUNTEER.toString());
 
-        inlineKeyboardMarkup.addRow(aboutShelterButton, adoptAnimalButton);
+        inlineKeyboardMarkup.addRow(aboutShelterButton);
         inlineKeyboardMarkup.addRow(reportButton, volunteerButton);
         SendMessage sendMessage = new SendMessage(chatId, text).replyMarkup(inlineKeyboardMarkup);
         return sendMessage;
@@ -343,5 +349,15 @@ public class CommandServiceImpl implements CommandService {
             e.printStackTrace();
             telegramBot.execute(new SendMessage(chatId, "Произошла ошибка. Попробуйте еще раз."));
         }
+    }
+
+    public void handleCallbackQuery(CallbackQuery callbackQuery) {
+        Long chatId = callbackQuery.message().chat().id();
+        String data = callbackQuery.data();
+    }
+
+    public void startAdoptionProcess(Long chatId) {
+        SendMessage requestContact = new SendMessage(chatId, "Пожалуйста, введите ваш email и номер телефона через запятую.");
+        telegramBot.execute(requestContact);
     }
 }

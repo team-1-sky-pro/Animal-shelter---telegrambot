@@ -14,4 +14,6 @@ public interface PetService {
     void deletePet(Long id);
     Pet findOrThrow(Long id);
     boolean existsById(Long id);
+
+    Pet save(Pet pet);
 }

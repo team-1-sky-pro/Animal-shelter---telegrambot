@@ -62,7 +62,13 @@ public class PetServiceImpl implements PetService {
         return petRepository.existsById(id);
     }
 
+    @Override
+    public Pet save(Pet pet) {
+        return petRepository.save(pet);
+    }
+
     private void logWhenMethodInvoked(String methodName) {
         log.info("Method '{}'", methodName);
     }
+
 }

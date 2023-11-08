@@ -1,10 +1,13 @@
 package pro.sky.animalsheltertelegrambot.service.impl;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.unit.DataSize;
+import org.springframework.util.unit.DataUnit;
 import org.springframework.web.multipart.MultipartFile;
 import pro.sky.animalsheltertelegrambot.exception.photos.BadPhotoExtensionException;
 import pro.sky.animalsheltertelegrambot.exception.photos.LimitOfPhotosException;
@@ -18,9 +21,14 @@ import pro.sky.animalsheltertelegrambot.service.PetService;
 import pro.sky.animalsheltertelegrambot.service.PhotoService;
 import pro.sky.animalsheltertelegrambot.service.ReportService;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.rmi.RemoteException;
 import java.util.List;
 
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
@@ -41,37 +49,69 @@ public class PhotoServiceImpl implements PhotoService {
     @Value("${photos.extensions}")
     private String extensions;
 
+    @Value("${spring.servlet.multipart.max-file-size}")
+    private String maxSizeString;
+
+    private Long maxSize;
+
+    @PostConstruct
+    public void init() {
+        maxSize = DataSize.parse(maxSizeString, DataUnit.BYTES).toBytes();
+    }
+
+
     @Override
     public void addPhotosForPet(Long petId, MultipartFile[] photos) throws IOException {
         logWhenMethodInvoked(getMethodName());
+        log.info("Вызов валидации фото");
         validatePhotos(photos);
-        int start = findIndexOfLastPhoto(photoRepository.findLastFilePathByPetId(petId).orElse(null));
+
+        Pet pet = petService.getPet(petId);
 
         for (MultipartFile photoFile : photos) {
-            if (++start == 10) {
-                throw new LimitOfPhotosException();
+            if (photoFile.getSize() > maxSize) {
+                throw new RemoteException("Слишком большая фотография");
             }
-            Pet pet = petService.getPet(petId);
-            Path filePath = Path.of(photosDir, "number=" + start + "petId=" + petId + "." +
-                    getExtension(photoFile.getOriginalFilename()));
-            Files.createDirectories(filePath.getParent());
-            Files.deleteIfExists(filePath);
-            try (
-                    InputStream is = photoFile.getInputStream();
-                    OutputStream os = Files.newOutputStream(filePath, CREATE_NEW);
-                    BufferedInputStream bis = new BufferedInputStream(is, 1024);
-                    BufferedOutputStream bos = new BufferedOutputStream(os, 1024)
-            ) {
-                bis.transferTo(bos);
+
+            BufferedImage originalImage = ImageIO.read(photoFile.getInputStream());
+            if (originalImage == null) {
+                throw new IOException("Не удалось прочитать изображение из файла " + photoFile.getOriginalFilename());
             }
-            log.debug("Filling avatar object with values and saving in repository");
+
+            double ratio = Math.min(1024.0 / originalImage.getWidth(), 1024.0 / originalImage.getHeight());
+            BufferedImage resizedImage = getScaledInstance(originalImage, ratio);
+            String extension = getExtension(photoFile.getOriginalFilename());
+            String fileName = "photo_" + petId + "_" + System.currentTimeMillis() + "." + extension; // Избегаем конфликтов имен
+            Path resizedFilePath = Paths.get(photosDir, fileName);
+
+            File outputFile = new File(resizedFilePath.toUri());
+            ImageIO.write(resizedImage, extension, outputFile);
+
             Photo photo = new Photo();
             photo.setPet(pet);
-            photo.setFilePath(filePath.toString());
-            photo.setFileSize(photoFile.getSize());
+            photo.setFilePath(resizedFilePath.toString());
+            photo.setFileSize(outputFile.length());
             photo.setMediaType(photoFile.getContentType());
-            photoRepository.save(photo);
+
+            photoRepository.save(photo); // Сохраняем фото и получаем ID
+            pet.setPhoto(photo); // Устанавливаем фото питомцу
+            petService.save(pet);
         }
+    }
+
+
+    private BufferedImage getScaledInstance(BufferedImage img, double ratio) {
+        int newWidth = (int) (img.getWidth() * ratio);
+        int newHeight = (int) (img.getHeight() * ratio);
+
+        Image tmp = img.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
+        BufferedImage resized = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
+
+        Graphics2D g2d = resized.createGraphics();
+        g2d.drawImage(tmp, 0, 0, null);
+        g2d.dispose();
+
+        return resized;
     }
 
     @Override

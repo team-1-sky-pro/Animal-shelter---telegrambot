@@ -43,4 +43,6 @@ public interface CommandService {
     void runMenuForAdopter(Long chatId);
 
     void saveReport(Message message);
+
+    public void handleCallbackQuery(CallbackQuery callbackQuery);
 }
