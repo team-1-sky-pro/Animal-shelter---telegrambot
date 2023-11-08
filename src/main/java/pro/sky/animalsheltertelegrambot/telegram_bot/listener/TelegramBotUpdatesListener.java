@@ -13,9 +13,12 @@ import org.springframework.stereotype.Service;
 import pro.sky.animalsheltertelegrambot.model.User;
 import pro.sky.animalsheltertelegrambot.repository.AdoptionRepository;
 import pro.sky.animalsheltertelegrambot.repository.UserRepository;
+import pro.sky.animalsheltertelegrambot.service.AdoptionService;
 import pro.sky.animalsheltertelegrambot.telegram_bot.service.CommandService;
 
 import java.util.List;
+
+import static pro.sky.animalsheltertelegrambot.telegram_bot.button_types.Button.APPLICATION;
 
 /**
  * Сервис, который держит соединение с ботом и постоянно принимает входящие от пользователей сообщения
@@ -31,6 +34,8 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     private final CommandService commandService;
     private final UserRepository userRepository;
     private final AdoptionRepository adoptionRepository;
+    private final AdoptionService adoptionService;
+
 
     @PostConstruct
     public void init() {
@@ -44,9 +49,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
             if (update.callbackQuery() != null) {
                 handleCallback(update.callbackQuery());
-            }
-
-            if (update.message() != null) {
+            } else if (update.message() != null) {
                 handleMessage(update.message());
             }
         });
@@ -57,15 +60,12 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         Long userId = message.chat().id();
         String userName = message.chat().firstName();
         String text = message.text();
-        if (text != null && text.equals("/start")) {
-            if (checkIsUserIsNew(userId)) {
-                saveNewUser(userId, userName);
-                startMessageReceived(userId, userName + " - new User");
-            }
-            if (checkIfUserIsAdopter(userId)) {
-                commandService.runMenuForAdopter(userId);
+
+        if (text != null) {
+            if (text.equals("/start")) {
+                handleStartCommand(userId, userName);
             } else {
-                telegramBot.execute(commandService.executeStartCommandIfUserExists(userId));
+                adoptionService.processContactInfo(userId, text, telegramBot);
             }
         }
 
@@ -74,13 +74,34 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         }
     }
 
+
+
     private void handleCallback(CallbackQuery callbackQuery) {
-        commandService.receivedCallbackMessage(callbackQuery);
+        String callbackData = callbackQuery.data();
+        Long chatId = callbackQuery.message().chat().id();
+        if (callbackData.equals(APPLICATION.toString())) {
+            adoptionService.requestContactInfo(chatId, telegramBot);
+        } else {
+            commandService.receivedCallbackMessage(callbackQuery);
+        }
     }
 
     private void sendMessage(Long chatId, String sendingMessage) {
         SendMessage sendMessage = new SendMessage(String.valueOf(chatId), sendingMessage);
         telegramBot.execute(sendMessage);
+    }
+
+    private void handleStartCommand(Long userId, String userName) {
+        if (checkIsUserIsNew(userId)) {
+            saveNewUser(userId, userName);
+            startMessageReceived(userId, userName + " - new User");
+            // Теперь, когда мы приветствовали нового пользователя, давайте спросим его контактные данные.
+            adoptionService.requestContactInfo(userId, telegramBot);
+        } else if (checkIfUserIsAdopter(userId)) {
+            commandService.runMenuForAdopter(userId);
+        } else {
+            telegramBot.execute(commandService.executeStartCommandIfUserExists(userId));
+        }
     }
 
     /**
