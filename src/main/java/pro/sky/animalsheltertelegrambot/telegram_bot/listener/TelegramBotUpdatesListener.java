@@ -3,6 +3,7 @@ package pro.sky.animalsheltertelegrambot.telegram_bot.listener;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.CallbackQuery;
+import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import jakarta.annotation.PostConstruct;
@@ -46,17 +47,17 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
             }
 
             if (update.message() != null) {
-                handleMessage(update);
+                handleMessage(update.message());
             }
         });
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
 
-    private void handleMessage(Update update) {
-        Long userId = update.message().chat().id();
-        String userName = update.message().chat().firstName();
-        String text = update.message().text();
-        if (text.equals("/start")) {
+    private void handleMessage(Message message) {
+        Long userId = message.chat().id();
+        String userName = message.chat().firstName();
+        String text = message.text();
+        if (text != null && text.equals("/start")) {
             if (checkIsUserIsNew(userId)) {
                 saveNewUser(userId, userName);
                 startMessageReceived(userId, userName + " - new User");
@@ -66,6 +67,10 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
             } else {
                 telegramBot.execute(commandService.executeStartCommandIfUserExists(userId));
             }
+        }
+
+        if (message.photo() != null && message.caption() != null) {
+            commandService.saveReport(message);
         }
     }
 
