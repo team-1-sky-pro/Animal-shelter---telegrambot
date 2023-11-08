@@ -31,7 +31,7 @@ public interface CommandService {
 //    SendMessage displayCatShelterWorkingHours(Long chatId);
 
     SendMessage displayReportInfo(Long chatId);
-
+  
     /**
      * Создает меню выбора действия для пользователя-усыновителя. <p>
      * Возможные действия: <p>
