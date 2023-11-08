@@ -15,5 +15,8 @@ public interface PetService {
     Pet findOrThrow(Long id);
     boolean existsById(Long id);
 
+    public void processAnimalCallback(Long chatId, String callbackData);
+
+    public void sendAnimalDetails(Long chatId, Long animalId);
     Pet save(Pet pet);
 }

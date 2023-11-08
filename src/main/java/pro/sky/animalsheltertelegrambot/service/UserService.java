@@ -23,5 +23,10 @@ public interface UserService {
     void deleteUser(Long id);
     Collection<User> getAllUsers();
 
+    public void saveNewUser(Long userId, String userName);
     public boolean hasContactInfo(Long userId);
+
+    public boolean checkIsUserIsNew(Long userId);
+
+    public boolean checkIfUserIsAdopter(Long userId);
 }
