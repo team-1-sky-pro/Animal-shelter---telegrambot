@@ -6,16 +6,24 @@ import com.pengrad.telegrambot.model.CallbackQuery;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
+import com.pengrad.telegrambot.request.SendPhoto;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import pro.sky.animalsheltertelegrambot.model.Pet;
+import pro.sky.animalsheltertelegrambot.model.Photo;
 import pro.sky.animalsheltertelegrambot.model.User;
 import pro.sky.animalsheltertelegrambot.repository.AdoptionRepository;
+import pro.sky.animalsheltertelegrambot.repository.PetRepository;
 import pro.sky.animalsheltertelegrambot.repository.UserRepository;
 import pro.sky.animalsheltertelegrambot.service.AdoptionService;
+import pro.sky.animalsheltertelegrambot.service.PetService;
 import pro.sky.animalsheltertelegrambot.telegram_bot.service.CommandService;
 
+
+import java.io.File;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static pro.sky.animalsheltertelegrambot.telegram_bot.button_types.Button.APPLICATION;
@@ -35,6 +43,8 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     private final UserRepository userRepository;
     private final AdoptionRepository adoptionRepository;
     private final AdoptionService adoptionService;
+    private final PetRepository petRepository;
+    private final PetService petService;
 
 
     @PostConstruct
@@ -81,10 +91,47 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         Long chatId = callbackQuery.message().chat().id();
         if (callbackData.equals(APPLICATION.toString())) {
             adoptionService.requestContactInfo(chatId, telegramBot);
+        } else if (callbackData.startsWith("ANIMAL_")) {
+            Long animalId = Long.parseLong(callbackData.split("_")[1]);
+            sendAnimalDetails(chatId, animalId);
         } else {
             commandService.receivedCallbackMessage(callbackQuery);
+
         }
     }
+
+    private void sendAnimalDetails(Long chatId, Long animalId) {
+        Pet animal = petRepository.findById(animalId).orElse(null);
+
+        sendText(chatId, animal);
+
+        if (animal != null && animal.getPhoto() != null) {
+            sendPhoto(chatId, animal.getPhoto());
+        }
+    }
+    private void sendText(Long chatId, Pet pet) {
+        if (pet != null) {
+            String text = "Описание: " + pet.getPetName() +
+                    "\n День рождения: " + pet.getBirthday().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+            SendMessage sendMessage = new SendMessage(chatId, text);
+            telegramBot.execute(sendMessage);
+        } else {
+            SendMessage sendMessage = new SendMessage(chatId, "Информация о питомце не найдена.");
+            telegramBot.execute(sendMessage);
+        }
+    }
+    private void sendPhoto(Long chatId, Photo photo) {
+        if (photo != null) {
+            String filePath = photo.getFilePath();
+            File file = new File(filePath);
+            SendPhoto sendPhoto = new SendPhoto(chatId, file);
+            telegramBot.execute(sendPhoto);
+
+        }
+    }
+
+
 
     private void sendMessage(Long chatId, String sendingMessage) {
         SendMessage sendMessage = new SendMessage(String.valueOf(chatId), sendingMessage);
