@@ -7,10 +7,7 @@ import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.model.File;
 import com.pengrad.telegrambot.model.Message;
-import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
-import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import com.pengrad.telegrambot.request.GetFile;
-import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.GetFileResponse;
 import com.pengrad.telegrambot.response.SendResponse;
 import lombok.RequiredArgsConstructor;
@@ -84,12 +81,12 @@ public class CommandServiceImpl implements CommandService {
              * тогда из таблицы shelters можно будет убрать все и оставить только тип животного
              * все данные текст и + файл.pdf или просто .pdf
              */
-            case "DOG_SHELTER_INFO":
+            case "SHELTER_INFO":
                 telegramBot.execute(displayDogShelterContacts(chatId));
                 break;
-            case "CAT_SHELTER_INFO":
-                telegramBot.execute(displayCatShelterContacts(chatId));
-                break;
+//            case "CAT_SHELTER_INFO":
+//                telegramBot.execute(displayCatShelterContacts(chatId));
+//                break;
             case "SECURITY_CONTACTS":
                 telegramBot.execute(displayDogShelterSecurityContacts(chatId));
                 break;
@@ -130,11 +127,12 @@ public class CommandServiceImpl implements CommandService {
         return sendMessage;
     }
 
+    // Основное меню после выбора приюта (dog/cat)
     @Override
     public SendMessage runMainMenuForCat(Long chatId, String text) {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-        InlineKeyboardButton aboutShelterButton = new InlineKeyboardButton(ABOUT_SHELTER_CAT.getText());
-        aboutShelterButton.callbackData(ABOUT_SHELTER_CAT.toString());
+        InlineKeyboardButton aboutShelterButton = new InlineKeyboardButton(ABOUT_SHELTER.getText());
+        aboutShelterButton.callbackData(ABOUT_SHELTER.toString());
 
         InlineKeyboardButton adoptAnimalButton = new InlineKeyboardButton(ADOPT_ANIMAL.getText());
         adoptAnimalButton.callbackData(ADOPT_ANIMAL.toString());
@@ -154,8 +152,8 @@ public class CommandServiceImpl implements CommandService {
     @Override
     public SendMessage runMenuShelterInfo(Long chatId) {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-        InlineKeyboardButton dogShelterInfo = new InlineKeyboardButton(DOG_SHELTER_INFO.getText());
-        dogShelterInfo.callbackData(DOG_SHELTER_INFO.toString());
+        InlineKeyboardButton dogShelterInfo = new InlineKeyboardButton(SHELTER_INFO.getText());
+        dogShelterInfo.callbackData(SHELTER_INFO.toString());
 
         InlineKeyboardButton scheduleButton = new InlineKeyboardButton(SCHEDULE.getText());
         scheduleButton.callbackData(SCHEDULE.toString());
@@ -180,12 +178,13 @@ public class CommandServiceImpl implements CommandService {
         return sendMessage;
     }
 
+    // Меню после нажатия кнопки "О приюте" -> попадаем в меню подробной информации
     @Override
     public SendMessage runMenuShelterInfoForCat(Long chatId) {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
 
-        InlineKeyboardButton catShelterInfo = new InlineKeyboardButton(CAT_SHELTER_INFO.getText());
-        catShelterInfo.callbackData(CAT_SHELTER_INFO.toString());
+        InlineKeyboardButton catShelterInfo = new InlineKeyboardButton(SHELTER_INFO.getText());
+        catShelterInfo.callbackData(SHELTER_INFO.toString());
 
         InlineKeyboardButton scheduleButton = new InlineKeyboardButton(SCHEDULE.getText());
         scheduleButton.callbackData(SCHEDULE.toString());
@@ -217,13 +216,13 @@ public class CommandServiceImpl implements CommandService {
         return sendMessage;
     }
 
-    @Override
-    public SendMessage displayCatShelterContacts(Long chatId) {
-        SendMessage sendMessage = new SendMessage(chatId,
-                shelterRepository.findCatShelterContactsByShelterType()
-        + "\nПодробная информация в файле:");
-        return sendMessage;
-    }
+//    @Override
+//    public SendMessage displayCatShelterContacts(Long chatId) {
+//        SendMessage sendMessage = new SendMessage(chatId,
+//                shelterRepository.findCatShelterContactsByShelterType()
+//        + "\nПодробная информация в файле:");
+//        return sendMessage;
+//    }
 
     @Override
     public SendMessage displayDogShelterSecurityContacts(Long chatId) {
@@ -245,18 +244,19 @@ public class CommandServiceImpl implements CommandService {
         return sendMessage;
     }
 
+//    @Override
+//    public SendMessage displayCatShelterWorkingHours(Long chatId) {
+//        SendMessage sendMessage = new SendMessage(chatId,
+//                shelterRepository.findCatShelterWorkingHoursByShelterType()
+//                        + "\nПодробная информация в файле:");
+//        return sendMessage;
+//    }
+
     @Override
     public SendMessage displayReportInfo(Long chatId) {
         return new SendMessage(chatId, reportInfo);
     }
 
-//    @Override
-//    public SendMessage displayCatShelterWorkingHours(Long chatId) {
-//        SendMessage sendMessage = new SendMessage(chatId,
-//                shelterRepository.findCatShelterWorkingHoursByShelterType()
-//                + "\nПодробная информация в файле:");
-//        return sendMessage;
-//    }
 
 //    @Override
 //    public String sendFileToUser(Long chatId) {

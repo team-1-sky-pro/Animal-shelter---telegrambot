@@ -20,7 +20,7 @@ public interface CommandService {
 
     SendMessage displayDogShelterContacts(Long chatId);
 
-    SendMessage displayCatShelterContacts(Long chatId);
+//    SendMessage displayCatShelterContacts(Long chatId);
 
     SendMessage displayDogShelterSecurityContacts(Long chatId);
 
