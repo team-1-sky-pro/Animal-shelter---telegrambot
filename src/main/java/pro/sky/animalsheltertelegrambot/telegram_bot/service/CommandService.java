@@ -1,6 +1,7 @@
 package pro.sky.animalsheltertelegrambot.telegram_bot.service;
 
 import com.pengrad.telegrambot.model.CallbackQuery;
+import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.request.SendMessage;
 
 public interface CommandService {
@@ -20,6 +21,8 @@ public interface CommandService {
     SendMessage displayDogShelterWorkingHours(Long chatId);
 
 
+    SendMessage displayReportInfo(Long chatId);
+
     /**
      * Создает меню выбора действия для пользователя-усыновителя. <p>
      * Возможные действия: <p>
@@ -30,4 +33,5 @@ public interface CommandService {
      */
     void runMenuForAdopter(Long chatId);
 
+    void saveReport(Message message);
 }
