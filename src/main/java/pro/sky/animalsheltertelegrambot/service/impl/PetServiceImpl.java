@@ -47,13 +47,19 @@ public class PetServiceImpl implements PetService {
         petRepository.delete(findOrThrow(id));
     }
 
-    private Pet findOrThrow(Long id) {
+    @Override
+    public Pet findOrThrow(Long id) {
         Pet pet = petRepository.findById(id).orElse(null);
         if (pet == null) {
             log.error("Pet with id = {} doesn't exist", id);
             throw new PetNotFoundException();
         }
         return pet;
+    }
+
+    @Override
+    public boolean existsById(Long id) {
+        return petRepository.existsById(id);
     }
 
     private void logWhenMethodInvoked(String methodName) {

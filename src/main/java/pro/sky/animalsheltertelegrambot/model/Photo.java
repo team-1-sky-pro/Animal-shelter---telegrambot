@@ -46,7 +46,7 @@ public class Photo {
      * ID питомца, фотографии которого была передана
      * @see Pet
      */
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "pet_id")
     private Pet pet;
 
@@ -56,7 +56,7 @@ public class Photo {
      * Может быть null.
      * @see Report
      */
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "report_id")
     private Report report;
 }

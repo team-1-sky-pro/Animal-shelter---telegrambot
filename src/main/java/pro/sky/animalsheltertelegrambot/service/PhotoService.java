@@ -2,6 +2,7 @@ package pro.sky.animalsheltertelegrambot.service;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.multipart.MultipartFile;
+import pro.sky.animalsheltertelegrambot.model.Photo;
 
 import java.io.IOException;
 
@@ -18,4 +19,6 @@ public interface PhotoService {
     void deletePhotosByPetId(Long petId);
 
     void deletePhotosByReportId(Long reportId);
+
+    void addPhotoForReport(Photo photo);
 }
