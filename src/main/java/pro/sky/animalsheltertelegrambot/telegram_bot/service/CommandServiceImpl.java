@@ -24,7 +24,6 @@ import pro.sky.animalsheltertelegrambot.repository.ShelterRepository;
 import pro.sky.animalsheltertelegrambot.service.PetService;
 import pro.sky.animalsheltertelegrambot.service.PhotoService;
 import pro.sky.animalsheltertelegrambot.service.ReportService;
-import java.io.File;
 import java.time.LocalDateTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -175,30 +174,6 @@ public class CommandServiceImpl implements CommandService {
         return new SendMessage(chatId, reportInfo);
     }
 
-//    @Override
-//    public String sendFileToUser(Long chatId) {
-//        String file = "C:/Users/user/Desktop/IT/dog_shelter_info_.pdf";
-//        String fileLink;
-//        byte[] data = DatatypeConverter.parseBase64Binary(file);
-//        SendDocument sendDocument = new SendDocument(chatId, data).fileName("dog_shelter_info_.pdf");
-//        try {
-//            SendResponse execute = telegramBot.execute(sendDocument);
-//            Document document = execute.message().document();
-//            final String documentId = document.fileId();
-//            fileLink = getFileLink(documentId);
-//            return fileLink;
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-//
-//    private String getFileLink(String fileId) {
-//        GetFile getFile = new GetFile(fileId);
-//        GetFileResponse fileResponse = telegramBot.execute(getFile);
-//        File file = fileResponse.file();
-//        log.info("getRelativeFilePath filePath : {C:/Users/user/Desktop/IT/}", file.filePath());
-//        return telegramBot.getFullFilePath(file);
-//    }
 
     @Override
     public void runMenuForAdopter(Long chatId) {
@@ -228,10 +203,10 @@ public class CommandServiceImpl implements CommandService {
     }
 
     //метод для отправки *.pdf файла юзеру
-    public void sendDocument(String path, Long chatId){
-        SendDocument sendDocument = new SendDocument(chatId, new File(path));
+    public void sendDocument(String path, Long chatId) {
+        SendDocument sendDocument = new SendDocument(chatId, new java.io.File(path));
         telegramBot.execute(sendDocument);
-
+    }
     @Override
     public void saveReport(Message message) {
         Long chatId = message.chat().id();
