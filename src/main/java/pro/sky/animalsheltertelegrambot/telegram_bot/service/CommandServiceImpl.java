@@ -72,15 +72,6 @@ public class CommandServiceImpl implements CommandService {
             case "ABOUT_SHELTER_CAT":
                 telegramBot.execute(runMenuShelterInfoForCat(chatId));
                 break;
-            /** Подумать решить обсудить и после удалить это комментарий
-             * может лучше сделать общие без конкретных питомцев отделив только нужное?
-             * типа SHELTER_INFO,
-             * SECURITY_CONTACTS,
-             * SCHEDULE
-             * и т.п.
-             * тогда из таблицы shelters можно будет убрать все и оставить только тип животного
-             * все данные текст и + файл.pdf или просто .pdf
-             */
             case "SHELTER_INFO":
                 telegramBot.execute(displayDogShelterContacts(chatId));
                 break;
