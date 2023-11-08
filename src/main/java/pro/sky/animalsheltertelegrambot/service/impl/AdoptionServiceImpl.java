@@ -32,6 +32,7 @@ public class AdoptionServiceImpl implements AdoptionService {
     private final AdoptionRepository adoptionRepository;
     private final UserRepository userRepository;
     private final PetRepository petRepository;
+    private final TelegramBot telegramBot;
 
     /**
      * Добавляет новое усыновление.
@@ -222,5 +223,10 @@ public class AdoptionServiceImpl implements AdoptionService {
             // ...
             log.warn("Received unknown callback data: {}", callbackData);
         }
+    }
+
+    public void startAdoptionProcess(Long chatId) {
+        SendMessage requestContact = new SendMessage(chatId, "Пожалуйста, введите ваш email и номер телефона через запятую.");
+        telegramBot.execute(requestContact);
     }
 }

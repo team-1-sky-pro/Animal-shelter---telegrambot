@@ -45,12 +45,13 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
             if (update.callbackQuery() != null) {
                 log.info("Обработка колбэк-запроса от пользователя: {}", update.callbackQuery().from().id());
-                callbackService.handleCallback(update.callbackQuery(), telegramBot);
+                callbackService.handleCallback(update.callbackQuery());
             } else if (update.message() != null) {
                 log.info("Обработка сообщения от пользователя: {}", update.message().chat().id());
-                messageService.handleMessage(update.message(), telegramBot);
+                messageService.handleMessage(update.message());
             }
         });
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
+
 }

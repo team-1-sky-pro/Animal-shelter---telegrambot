@@ -1,5 +1,6 @@
 package pro.sky.animalsheltertelegrambot.service;
 
+import com.pengrad.telegrambot.request.SendMessage;
 import pro.sky.animalsheltertelegrambot.model.Shelter;
 
 import java.util.Collection;
@@ -22,4 +23,8 @@ public interface ShelterService {
     Shelter updateShelter(Long id, Shelter shelter);
     void deleteShelter(Long id);
     Collection<Shelter> getAllShelters();
+
+    public SendMessage displayDogShelterWorkingHours(Long chatId);
+    public SendMessage displayDogShelterSecurityContacts(Long chatId);
+    public SendMessage displayDogShelterContacts(Long chatId);
 }

@@ -28,4 +28,6 @@ public interface AdoptionService {
     public void processContactInfo(Long chatId, String text, TelegramBot telegramBot);
 
     public void requestContactInfo(Long chatId, TelegramBot telegramBot);
+
+    public void startAdoptionProcess(Long chatId);
 }

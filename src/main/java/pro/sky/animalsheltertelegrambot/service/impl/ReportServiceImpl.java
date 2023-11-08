@@ -1,13 +1,23 @@
 package pro.sky.animalsheltertelegrambot.service.impl;
 
+import com.pengrad.telegrambot.model.File;
+import com.pengrad.telegrambot.model.Message;
+import com.pengrad.telegrambot.request.GetFile;
+import com.pengrad.telegrambot.request.SendMessage;
+import com.pengrad.telegrambot.response.GetFileResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pro.sky.animalsheltertelegrambot.exception.AdoptionNotFoundExceptions;
 import pro.sky.animalsheltertelegrambot.exception.ReportNotFoundException;
+import pro.sky.animalsheltertelegrambot.model.Pet;
+import pro.sky.animalsheltertelegrambot.model.Photo;
 import pro.sky.animalsheltertelegrambot.model.Report;
 import pro.sky.animalsheltertelegrambot.repository.ReportRepository;
 import pro.sky.animalsheltertelegrambot.service.ReportService;
+
+import java.time.LocalDateTime;
+import java.util.regex.Matcher;
 
 @Slf4j
 @Service
@@ -94,4 +104,54 @@ public class ReportServiceImpl implements ReportService {
         }
         reportRepository.deleteById(id);
     }
+
+    @Override
+    public SendMessage displayReportInfo(Long chatId) {
+        return new SendMessage(chatId, reportInfo);
+    }
+
+    @Override
+    public void saveReport(Message message) {
+        Long chatId = message.chat().id();
+        String text = message.caption();
+
+        Matcher matcher = reportPattern.matcher(text);
+        if (!matcher.matches()) {
+            telegramBot.execute(new SendMessage(chatId, "Ошибка. Убедитесь, что заполнили текст отчета корректно."));
+            return;
+        }
+        Long petId = Long.valueOf(text.substring(0, text.indexOf(".")));
+        String reportText = text.substring(text.indexOf(".") + 1);
+
+        GetFile getFileRequest = new GetFile(message.photo()[1].fileId());
+        GetFileResponse getFileResponse = telegramBot.execute(getFileRequest);
+        try {
+            File file = getFileResponse.file();
+
+            if (!petService.existsById(petId)) {
+                telegramBot.execute(new SendMessage(chatId, "Ошибка. У вас нет питомца с таким ID."));
+                return;
+            }
+            Pet pet = new Pet();
+            pet.setId(petId);
+            Report report = new Report();
+            report.setPetId(pet);
+            report.setDateTime(LocalDateTime.now());
+            report.setReportText(reportText);
+
+            Photo photo = new Photo();
+            photo.setFilePath(file.filePath());
+            photo.setReport(report);
+            photo.setFileSize(Long.valueOf(file.fileSize()));
+            photo.setMediaType(getFileRequest.getContentType());
+
+            reportService.addReport(report);
+            photoService.addPhotoForReport(photo);
+            telegramBot.execute(new SendMessage(chatId, "Отчет успешно отправлен!"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            telegramBot.execute(new SendMessage(chatId, "Произошла ошибка. Попробуйте еще раз."));
+        }
+    }
+
 }

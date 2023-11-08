@@ -7,6 +7,7 @@ import pro.sky.animalsheltertelegrambot.exception.UserNotFoundException;
 import pro.sky.animalsheltertelegrambot.model.User;
 import pro.sky.animalsheltertelegrambot.repository.AdoptionRepository;
 import pro.sky.animalsheltertelegrambot.repository.UserRepository;
+import pro.sky.animalsheltertelegrambot.service.AdoptionService;
 import pro.sky.animalsheltertelegrambot.service.UserService;
 
 import java.util.Collection;
@@ -31,6 +32,7 @@ public class UserServiceImpl implements UserService {
 
     private final AdoptionRepository adoptionRepository;
     private final UserRepository userRepository;
+    private final AdoptionService adoptionService;
 
     @Override
     public User addUser(User user) {
@@ -104,4 +106,15 @@ public class UserServiceImpl implements UserService {
         return adoptionRepository.checkAdoptionsIsActive(userId).orElse(false);
     }
 
+    // UserService
+    public void handleStart(Long chatId) {
+        User user = findOrCreateUser(chatId);
+        if (user.isNew()) {
+            adoptionService.requestContactInfo(chatId);
+        } else if (user.isAdopter()) {
+            // Показать меню усыновителя
+        } else {
+            // Показать основное меню
+        }
+    }
 }

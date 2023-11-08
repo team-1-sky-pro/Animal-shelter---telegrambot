@@ -22,10 +22,10 @@ import org.springframework.stereotype.Service;
 import pro.sky.animalsheltertelegrambot.model.Pet;
 import pro.sky.animalsheltertelegrambot.model.Photo;
 import pro.sky.animalsheltertelegrambot.model.Report;
+import pro.sky.animalsheltertelegrambot.model.User;
 import pro.sky.animalsheltertelegrambot.repository.ShelterRepository;
-import pro.sky.animalsheltertelegrambot.service.PetService;
-import pro.sky.animalsheltertelegrambot.service.PhotoService;
-import pro.sky.animalsheltertelegrambot.service.ReportService;
+import pro.sky.animalsheltertelegrambot.service.*;
+
 import java.time.LocalDateTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,11 +41,25 @@ public class CommandServiceImpl implements CommandService {
     private final Pattern reportPattern = Pattern.compile("\\d+\\.\\s?[а-яА-Яa-zA-Z]+");
     private final String reportInfo = "Чтобы отправить отчет. Вам нужно в одном сообщении прикрепить фото питомца, " +
             "указать его ID и далее через точку описать его состояние.\n";
+
     private final TelegramBot telegramBot;
-    private final ShelterRepository shelterRepository;
-    private final PetService petService;
-    private final PhotoService photoService;
-    private final ReportService reportService;
+    private final UserService userService;
+    private final CallbackService callbackService;
+
+
+    public void processTextMessage(Long chatId, String text) {
+        if ("/start".equals(text)) {
+            userService.handleStart(chatId);
+        } else {
+            // Обработка других текстовых сообщений
+        }
+    }
+
+    @Override
+    public void receivedCallbackMessage(CallbackQuery callbackQuery) {
+        callbackService.processCallback(callbackQuery);
+    }
+
 
     @Override
     public SendMessage executeStartCommandIfUserExists(Long chatId) {
@@ -56,68 +70,17 @@ public class CommandServiceImpl implements CommandService {
         SendMessage sendMessage = new SendMessage(chatId, testStr).replyMarkup(inlineKeyboard);
         return sendMessage;
     }
-    //метод для обработки callbackQuery
-    @Override
-    public void receivedCallbackMessage(CallbackQuery callbackQuery) {
-        String call_data = callbackQuery.data();
-        Long chatId = callbackQuery.from().id();
-        SendMessage sendMessage;
-        String path = "";
 
-        switch (call_data) {
-            case "CATS":
-                sendMessage = runMainMenuForCat(chatId, " Приют для кошек");
-                telegramBot.execute(sendMessage);
-                break;
-            case "DOGS":
-                sendMessage = runMainMenu(chatId, "Приют для собак");
-                telegramBot.execute(sendMessage);
-                break;
-            case "ABOUT_SHELTER":
-                telegramBot.execute(runMenuShelterInfo(chatId));
-                break;
-            case "ABOUT_SHELTER_CAT":
-                telegramBot.execute(runMenuShelterInfoForCat(chatId));
-                break;
-            case "SHELTER_INFO":
-                telegramBot.execute(displayDogShelterContacts(chatId));
-                path = "src/main/resources/files/dog_shelter_info_.pdf";
-                sendDocument(path,chatId);
-                break;
-//            case "CAT_SHELTER_INFO":
-//                telegramBot.execute(displayCatShelterContacts(chatId));
-//                break;
-            case "SECURITY_CONTACTS":
-                telegramBot.execute(displayDogShelterSecurityContacts(chatId));
-                path = "src/main/resources/files/dog_shelter_security_contacts.pdf";
-                sendDocument(path,chatId);
-                break;
-//            case "SECURITY_CONTACTS_CAT":
-//                telegramBot.execute(displayCatShelterSecurityContacts(chatId));
-//                break;
-            case "SCHEDULE":
-                telegramBot.execute(displayDogShelterWorkingHours(chatId));
-                path = "src/main/resources/files/dog_shelter_schedule_address.pdf";
-                sendDocument(path,chatId);
-                break;
-            case "SAFETY_RECOMMENDATION":
-                path = "src/main/resources/files/dog_safety_recommendation.pdf";
-                sendDocument(path,chatId);
-                break;
-
-            case "APPLICATION":
-                startAdoptionProcess(chatId);
-                break;
-
-//            case "SCHEDULE_CAT":
-//                telegramBot.execute(displayCatShelterWorkingHours(chatId));
-//                break;
-
-            case "REPORT":
-                telegramBot.execute(displayReportInfo(chatId));
-                break;
+    private InlineKeyboardMarkup createShelterInfoMenu(String... buttonLabels) {
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        for (String label : buttonLabels) {
+            InlineKeyboardButton button = new InlineKeyboardButton(label);
+            button.callbackData(label);
+            inlineKeyboardMarkup.addRow(button);
         }
+        return inlineKeyboardMarkup;
     }
+
 
     @Override
     public SendMessage runMainMenu(Long chatId, String text) {
@@ -193,87 +156,50 @@ public class CommandServiceImpl implements CommandService {
         return sendMessage;
     }
 
+//    @Override
+//    public SendMessage runMenuShelterInfoForCat(Long chatId) {
+//        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+//
+//        InlineKeyboardButton catShelterInfo = new InlineKeyboardButton(SHELTER_INFO.getText());
+//        catShelterInfo.callbackData(SHELTER_INFO.toString());
+//
+//        InlineKeyboardButton scheduleButton = new InlineKeyboardButton(SCHEDULE.getText());
+//        scheduleButton.callbackData(SCHEDULE.toString());
+//
+//        InlineKeyboardButton securityContacts = new InlineKeyboardButton(SECURITY_CONTACTS.getText());
+//        securityContacts.callbackData(SECURITY_CONTACTS.toString());
+//
+//        InlineKeyboardButton safetyRecommendationButton = new InlineKeyboardButton(SAFETY_RECOMMENDATION.getText());
+//        safetyRecommendationButton.callbackData(SAFETY_RECOMMENDATION.toString());
+//
+//        InlineKeyboardButton applicationButton = new InlineKeyboardButton(APPLICATION.getText());
+//        applicationButton.callbackData(APPLICATION.toString());
+//
+//        InlineKeyboardButton volunteerButton = new InlineKeyboardButton(VOLUNTEER.getText());
+//        volunteerButton.callbackData(VOLUNTEER.toString());
+//
+//        inlineKeyboardMarkup.addRow(catShelterInfo, scheduleButton);
+//        inlineKeyboardMarkup.addRow(securityContacts, safetyRecommendationButton);
+//        inlineKeyboardMarkup.addRow(applicationButton, volunteerButton);
+//
+//        SendMessage sendMessage = new SendMessage(chatId, "Подробная информация о приюте кошек")
+//                .replyMarkup(inlineKeyboardMarkup);
+//        return sendMessage;
+//    }
+
+
+
     // Меню после нажатия кнопки "О приюте" -> попадаем в меню подробной информации
     @Override
     public SendMessage runMenuShelterInfoForCat(Long chatId) {
-        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-
-        InlineKeyboardButton catShelterInfo = new InlineKeyboardButton(SHELTER_INFO.getText());
-        catShelterInfo.callbackData(SHELTER_INFO.toString());
-
-        InlineKeyboardButton scheduleButton = new InlineKeyboardButton(SCHEDULE.getText());
-        scheduleButton.callbackData(SCHEDULE.toString());
-
-        InlineKeyboardButton securityContacts = new InlineKeyboardButton(SECURITY_CONTACTS.getText());
-        securityContacts.callbackData(SECURITY_CONTACTS.toString());
-
-        InlineKeyboardButton safetyRecommendationButton = new InlineKeyboardButton(SAFETY_RECOMMENDATION.getText());
-        safetyRecommendationButton.callbackData(SAFETY_RECOMMENDATION.toString());
-
-        InlineKeyboardButton applicationButton = new InlineKeyboardButton(APPLICATION.getText());
-        applicationButton.callbackData(APPLICATION.toString());
-
-        InlineKeyboardButton volunteerButton = new InlineKeyboardButton(VOLUNTEER.getText());
-        volunteerButton.callbackData(VOLUNTEER.toString());
-
-        inlineKeyboardMarkup.addRow(catShelterInfo, scheduleButton);
-        inlineKeyboardMarkup.addRow(securityContacts, safetyRecommendationButton);
-        inlineKeyboardMarkup.addRow(applicationButton, volunteerButton);
-
         SendMessage sendMessage = new SendMessage(chatId, "Подробная информация о приюте кошек")
-                .replyMarkup(inlineKeyboardMarkup);
+                .replyMarkup(createShelterInfoMenu(SHELTER_INFO.getText(),
+                        SCHEDULE.getText(), SECURITY_CONTACTS.getText(),
+                        SAFETY_RECOMMENDATION.getText(), APPLICATION.getText(),
+                        VOLUNTEER.getText()));
         return sendMessage;
     }
 
-    //метод для получения информации о приюте из бд
-    @Override
-    public SendMessage displayDogShelterContacts(Long chatId) {
-        SendMessage sendMessage = new SendMessage(chatId,  shelterRepository.findDogShelterContactsByShelterType() +"\nБолее подробная информация о приюте в файле:" );
-        return sendMessage;
-    }
-
-//    @Override
-//    public SendMessage displayCatShelterContacts(Long chatId) {
-//        SendMessage sendMessage = new SendMessage(chatId,
-//                shelterRepository.findCatShelterContactsByShelterType()
-//        + "\nПодробная информация в файле:");
-//        return sendMessage;
-//    }
-
-    //метод для получения информации о контактах охраны из бд
-    @Override
-    public SendMessage displayDogShelterSecurityContacts(Long chatId) {
-        SendMessage sendMessage = new SendMessage(chatId, shelterRepository.findDogShelterSecurityContactsByShelterType() + "\nБолее подробная информация в файле:");
-        return sendMessage;
-    }
-
-//    @Override
-//    public SendMessage displayCatShelterSecurityContacts(Long chatId) {
-//        SendMessage sendMessage = new SendMessage(chatId,
-//                shelterRepository.findCatShelterSecurityContactsByShelterType()
-//                + "\nПодробная информация в файле:");
-//        return sendMessage;
-//    }
-
-    //метод для получения информации о часах работы, схемы проезда и адреса из бд
-    @Override
-    public SendMessage displayDogShelterWorkingHours(Long chatId) {
-        SendMessage sendMessage = new SendMessage(chatId, shelterRepository.findDogShelterWorkingHoursByShelterType() + "\nБолее подробная информация в файле:");
-        return sendMessage;
-    }
-
-//    @Override
-//    public SendMessage displayCatShelterWorkingHours(Long chatId) {
-//        SendMessage sendMessage = new SendMessage(chatId,
-//                shelterRepository.findCatShelterWorkingHoursByShelterType()
-//                        + "\nПодробная информация в файле:");
-//        return sendMessage;
-//    }
-
-    @Override
-    public SendMessage displayReportInfo(Long chatId) {
-        return new SendMessage(chatId, reportInfo);
-    }
 
     @Override
     public void runMenuForAdopter(Long chatId) {
@@ -306,58 +232,5 @@ public class CommandServiceImpl implements CommandService {
     public void sendDocument(String path, Long chatId) {
         SendDocument sendDocument = new SendDocument(chatId, new java.io.File(path));
         telegramBot.execute(sendDocument);
-    }
-    @Override
-    public void saveReport(Message message) {
-        Long chatId = message.chat().id();
-        String text = message.caption();
-
-        Matcher matcher = reportPattern.matcher(text);
-        if (!matcher.matches()) {
-            telegramBot.execute(new SendMessage(chatId, "Ошибка. Убедитесь, что заполнили текст отчета корректно."));
-            return;
-        }
-        Long petId = Long.valueOf(text.substring(0, text.indexOf(".")));
-        String reportText = text.substring(text.indexOf(".") + 1);
-
-        GetFile getFileRequest = new GetFile(message.photo()[1].fileId());
-        GetFileResponse getFileResponse = telegramBot.execute(getFileRequest);
-        try {
-            File file = getFileResponse.file();
-
-            if (!petService.existsById(petId)) {
-                telegramBot.execute(new SendMessage(chatId, "Ошибка. У вас нет питомца с таким ID."));
-                return;
-            }
-            Pet pet = new Pet();
-            pet.setId(petId);
-            Report report = new Report();
-            report.setPetId(pet);
-            report.setDateTime(LocalDateTime.now());
-            report.setReportText(reportText);
-
-            Photo photo = new Photo();
-            photo.setFilePath(file.filePath());
-            photo.setReport(report);
-            photo.setFileSize(Long.valueOf(file.fileSize()));
-            photo.setMediaType(getFileRequest.getContentType());
-
-            reportService.addReport(report);
-            photoService.addPhotoForReport(photo);
-            telegramBot.execute(new SendMessage(chatId, "Отчет успешно отправлен!"));
-        } catch (Exception e) {
-            e.printStackTrace();
-            telegramBot.execute(new SendMessage(chatId, "Произошла ошибка. Попробуйте еще раз."));
-        }
-    }
-
-    public void handleCallbackQuery(CallbackQuery callbackQuery) {
-        Long chatId = callbackQuery.message().chat().id();
-        String data = callbackQuery.data();
-    }
-
-    public void startAdoptionProcess(Long chatId) {
-        SendMessage requestContact = new SendMessage(chatId, "Пожалуйста, введите ваш email и номер телефона через запятую.");
-        telegramBot.execute(requestContact);
     }
 }

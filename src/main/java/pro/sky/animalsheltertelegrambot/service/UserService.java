@@ -29,4 +29,6 @@ public interface UserService {
     public boolean checkIsUserIsNew(Long userId);
 
     public boolean checkIfUserIsAdopter(Long userId);
+
+    public void handleStart(Long chatId);
 }

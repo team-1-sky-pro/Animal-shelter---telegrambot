@@ -1,5 +1,6 @@
 package pro.sky.animalsheltertelegrambot.service.impl;
 
+import com.pengrad.telegrambot.request.SendMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -68,4 +69,56 @@ public class ShelterServiceImpl implements ShelterService {
             throw new ShelterNotFoundException(" Shelter with id not found");
         }
     }
+
+    //метод для получения информации о приюте из бд
+    @Override
+    public SendMessage displayDogShelterContacts(Long chatId) {
+        SendMessage sendMessage = new SendMessage(chatId,
+                shelterRepository.findDogShelterContactsByShelterType() +
+                        "\nБолее подробная информация о приюте в файле:" );
+        return sendMessage;
+    }
+
+    //    @Override
+//    public SendMessage displayCatShelterContacts(Long chatId) {
+//        SendMessage sendMessage = new SendMessage(chatId,
+//                shelterRepository.findCatShelterContactsByShelterType()
+//        + "\nПодробная информация в файле:");
+//        return sendMessage;
+//    }
+
+    //метод для получения информации о контактах охраны из бд
+    @Override
+    public SendMessage displayDogShelterSecurityContacts(Long chatId) {
+        SendMessage sendMessage = new SendMessage(chatId,
+                shelterRepository.findDogShelterSecurityContactsByShelterType() +
+                        "\nБолее подробная информация в файле:");
+        return sendMessage;
+    }
+
+//    @Override
+//    public SendMessage displayCatShelterSecurityContacts(Long chatId) {
+//        SendMessage sendMessage = new SendMessage(chatId,
+//                shelterRepository.findCatShelterSecurityContactsByShelterType()
+//                + "\nПодробная информация в файле:");
+//        return sendMessage;
+//    }
+
+    //метод для получения информации о часах работы, схемы проезда и адреса из бд
+    @Override
+    public SendMessage displayDogShelterWorkingHours(Long chatId) {
+        SendMessage sendMessage = new SendMessage(chatId,
+                shelterRepository.findDogShelterWorkingHoursByShelterType() +
+                        "\nБолее подробная информация в файле:");
+        return sendMessage;
+    }
+
+//    @Override
+//    public SendMessage displayCatShelterWorkingHours(Long chatId) {
+//        SendMessage sendMessage = new SendMessage(chatId,
+//                shelterRepository.findCatShelterWorkingHoursByShelterType()
+//                        + "\nПодробная информация в файле:");
+//        return sendMessage;
+//    }
+
 }
