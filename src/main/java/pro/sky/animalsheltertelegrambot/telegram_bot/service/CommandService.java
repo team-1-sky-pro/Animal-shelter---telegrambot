@@ -11,14 +11,23 @@ public interface CommandService {
 
     SendMessage runMainMenu(Long chatId, String text);
 
+    SendMessage runMainMenuForCat(Long chatId, String text);
+
     SendMessage runMenuShelterInfo(Long chatId);
+
+    SendMessage runMenuShelterInfoForCat(Long chatId);
 
     SendMessage displayDogShelterContacts(Long chatId);
 
+    SendMessage displayCatShelterContacts(Long chatId);
+
     SendMessage displayDogShelterSecurityContacts(Long chatId);
+
+//    SendMessage displayCatShelterSecurityContacts(Long chatId);
 
     SendMessage displayDogShelterWorkingHours(Long chatId);
 
+//    SendMessage displayCatShelterWorkingHours(Long chatId);
 
     /**
      * Создает меню выбора действия для пользователя-усыновителя. <p>

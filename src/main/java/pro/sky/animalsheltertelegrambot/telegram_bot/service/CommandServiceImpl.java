@@ -3,18 +3,12 @@ package pro.sky.animalsheltertelegrambot.telegram_bot.service;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.CallbackQuery;
 
-import com.pengrad.telegrambot.model.Document;
-import com.pengrad.telegrambot.model.File;
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 
-import com.pengrad.telegrambot.request.GetFile;
-import com.pengrad.telegrambot.request.SendDocument;
 import com.pengrad.telegrambot.request.SendMessage;
 
-import com.pengrad.telegrambot.response.GetFileResponse;
 import com.pengrad.telegrambot.response.SendResponse;
-import jakarta.xml.bind.DatatypeConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -50,7 +44,7 @@ public class CommandServiceImpl implements CommandService {
         SendMessage sendMessage;
         switch (call_data) {
             case "CATS":
-                sendMessage = runMainMenu(chatId, " Приют для кошек");
+                sendMessage = runMainMenuForCat(chatId, " Приют для кошек");
                 telegramBot.execute(sendMessage);
                 break;
             case "DOGS":
@@ -60,15 +54,36 @@ public class CommandServiceImpl implements CommandService {
             case "ABOUT_SHELTER":
                 telegramBot.execute(runMenuShelterInfo(chatId));
                 break;
+            case "ABOUT_SHELTER_CAT":
+                telegramBot.execute(runMenuShelterInfoForCat(chatId));
+                break;
+            /** Подумать решить обсудить и после удалить это комментарий
+             * может лучше сделать общие без конкретных питомцев отделив только нужное?
+             * типа SHELTER_INFO,
+             * SECURITY_CONTACTS,
+             * SCHEDULE
+             * и т.п.
+             * тогда из таблицы shelters можно будет убрать все и оставить только тип животного
+             * все данные текст и + файл.pdf или просто .pdf
+             */
             case "DOG_SHELTER_INFO":
                 telegramBot.execute(displayDogShelterContacts(chatId));
+                break;
+            case "CAT_SHELTER_INFO":
+                telegramBot.execute(displayCatShelterContacts(chatId));
                 break;
             case "SECURITY_CONTACTS":
                 telegramBot.execute(displayDogShelterSecurityContacts(chatId));
                 break;
+//            case "SECURITY_CONTACTS_CAT":
+//                telegramBot.execute(displayCatShelterSecurityContacts(chatId));
+//                break;
             case "SCHEDULE":
                 telegramBot.execute(displayDogShelterWorkingHours(chatId));
                 break;
+//            case "SCHEDULE_CAT":
+//                telegramBot.execute(displayCatShelterWorkingHours(chatId));
+//                break;
         }
     }
 
@@ -78,6 +93,27 @@ public class CommandServiceImpl implements CommandService {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         InlineKeyboardButton aboutShelterButton = new InlineKeyboardButton(ABOUT_SHELTER.getText());
         aboutShelterButton.callbackData(ABOUT_SHELTER.toString());
+
+        InlineKeyboardButton adoptAnimalButton = new InlineKeyboardButton(ADOPT_ANIMAL.getText());
+        adoptAnimalButton.callbackData(ADOPT_ANIMAL.toString());
+
+        InlineKeyboardButton reportButton = new InlineKeyboardButton(REPORT.getText());
+        reportButton.callbackData(REPORT.toString());
+
+        InlineKeyboardButton volunteerButton = new InlineKeyboardButton(VOLUNTEER.getText());
+        volunteerButton.callbackData(VOLUNTEER.toString());
+
+        inlineKeyboardMarkup.addRow(aboutShelterButton, adoptAnimalButton);
+        inlineKeyboardMarkup.addRow(reportButton, volunteerButton);
+        SendMessage sendMessage = new SendMessage(chatId, text).replyMarkup(inlineKeyboardMarkup);
+        return sendMessage;
+    }
+
+    @Override
+    public SendMessage runMainMenuForCat(Long chatId, String text) {
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        InlineKeyboardButton aboutShelterButton = new InlineKeyboardButton(ABOUT_SHELTER_CAT.getText());
+        aboutShelterButton.callbackData(ABOUT_SHELTER_CAT.toString());
 
         InlineKeyboardButton adoptAnimalButton = new InlineKeyboardButton(ADOPT_ANIMAL.getText());
         adoptAnimalButton.callbackData(ADOPT_ANIMAL.toString());
@@ -124,8 +160,47 @@ public class CommandServiceImpl implements CommandService {
     }
 
     @Override
+    public SendMessage runMenuShelterInfoForCat(Long chatId) {
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+
+        InlineKeyboardButton catShelterInfo = new InlineKeyboardButton(CAT_SHELTER_INFO.getText());
+        catShelterInfo.callbackData(CAT_SHELTER_INFO.toString());
+
+        InlineKeyboardButton scheduleButton = new InlineKeyboardButton(SCHEDULE.getText());
+        scheduleButton.callbackData(SCHEDULE.toString());
+
+        InlineKeyboardButton securityContacts = new InlineKeyboardButton(SECURITY_CONTACTS.getText());
+        securityContacts.callbackData(SECURITY_CONTACTS.toString());
+
+        InlineKeyboardButton safetyRecommendationButton = new InlineKeyboardButton(SAFETY_RECOMMENDATION.getText());
+        safetyRecommendationButton.callbackData(SAFETY_RECOMMENDATION.toString());
+
+        InlineKeyboardButton applicationButton = new InlineKeyboardButton(APPLICATION.getText());
+        applicationButton.callbackData(APPLICATION.toString());
+
+        InlineKeyboardButton volunteerButton = new InlineKeyboardButton(VOLUNTEER.getText());
+        volunteerButton.callbackData(VOLUNTEER.toString());
+
+        inlineKeyboardMarkup.addRow(catShelterInfo, scheduleButton);
+        inlineKeyboardMarkup.addRow(securityContacts, safetyRecommendationButton);
+        inlineKeyboardMarkup.addRow(applicationButton, volunteerButton);
+
+        SendMessage sendMessage = new SendMessage(chatId, "Подробная информация о приюте кошек")
+                .replyMarkup(inlineKeyboardMarkup);
+        return sendMessage;
+    }
+
+    @Override
     public SendMessage displayDogShelterContacts(Long chatId) {
         SendMessage sendMessage = new SendMessage(chatId, shelterRepository.findDogShelterContactsByShelterType());
+        return sendMessage;
+    }
+
+    @Override
+    public SendMessage displayCatShelterContacts(Long chatId) {
+        SendMessage sendMessage = new SendMessage(chatId,
+                shelterRepository.findCatShelterContactsByShelterType()
+        + "\nПодробная информация в файле:");
         return sendMessage;
     }
 
@@ -135,11 +210,27 @@ public class CommandServiceImpl implements CommandService {
         return sendMessage;
     }
 
+//    @Override
+//    public SendMessage displayCatShelterSecurityContacts(Long chatId) {
+//        SendMessage sendMessage = new SendMessage(chatId,
+//                shelterRepository.findCatShelterSecurityContactsByShelterType()
+//                + "\nПодробная информация в файле:");
+//        return sendMessage;
+//    }
+
     @Override
     public SendMessage displayDogShelterWorkingHours(Long chatId) {
         SendMessage sendMessage = new SendMessage(chatId, shelterRepository.findDogShelterWorkingHoursByShelterType());
         return sendMessage;
     }
+
+//    @Override
+//    public SendMessage displayCatShelterWorkingHours(Long chatId) {
+//        SendMessage sendMessage = new SendMessage(chatId,
+//                shelterRepository.findCatShelterWorkingHoursByShelterType()
+//                + "\nПодробная информация в файле:");
+//        return sendMessage;
+//    }
 
 //    @Override
 //    public String sendFileToUser(Long chatId) {
