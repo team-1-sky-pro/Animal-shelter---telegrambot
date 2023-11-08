@@ -50,6 +50,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public boolean hasContactInfo(Long userId) {
+        return userRepository.existsByIdAndEmailIsNotNullAndPhoneIsNotNull(userId);
+    }
+
+    @Override
     public User updateUser(Long id, User user) {
         log.info("Was invoked method " + getMethodName());
         findOrThrow(id);

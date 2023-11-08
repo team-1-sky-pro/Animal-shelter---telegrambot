@@ -176,7 +176,7 @@ public class AdoptionServiceImpl implements AdoptionService {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         for (Pet animal : availableAnimals) {
             InlineKeyboardButton button = new InlineKeyboardButton(animal.getPetName())
-                    .callbackData("ADOPT_" + animal.getId());
+                    .callbackData("ANIMAL_" + animal.getId());
             inlineKeyboardMarkup.addRow(button);
         }
 
@@ -185,6 +185,7 @@ public class AdoptionServiceImpl implements AdoptionService {
                 .replyMarkup(inlineKeyboardMarkup);
         telegramBot.execute(message);
     }
+
 
     @Override
     public void handleAnimalAdoption(Long chatId, Long petId, TelegramBot telegramBot) {

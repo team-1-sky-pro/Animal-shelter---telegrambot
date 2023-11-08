@@ -88,6 +88,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
     private void handleCallback(CallbackQuery callbackQuery) {
         String callbackData = callbackQuery.data();
+        log.info("Received callback data: {}", callbackData);
         Long chatId = callbackQuery.message().chat().id();
         if (callbackData.equals(APPLICATION.toString())) {
             adoptionService.requestContactInfo(chatId, telegramBot);
@@ -101,7 +102,8 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     }
 
     private void sendAnimalDetails(Long chatId, Long animalId) {
-        Pet animal = petRepository.findById(animalId).orElse(null);
+        log.info("Looking for animal with ID: {}", animalId);
+        Pet animal = petRepository.findByIdAndFetchPhoto(animalId).orElse(null);
 
         sendText(chatId, animal);
 
@@ -111,8 +113,9 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     }
     private void sendText(Long chatId, Pet pet) {
         if (pet != null) {
-            String text = "Описание: " + pet.getPetName() +
-                    "\n День рождения: " + pet.getBirthday().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            String text = "Кличка: " + pet.getPetName() +
+                    "\nОписание : " + pet.getDescription() +
+                    "\nДень рождения: " + pet.getBirthday().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
             SendMessage sendMessage = new SendMessage(chatId, text);
             telegramBot.execute(sendMessage);
@@ -142,7 +145,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         if (checkIsUserIsNew(userId)) {
             saveNewUser(userId, userName);
             startMessageReceived(userId, userName + " - new User");
-            // Теперь, когда мы приветствовали нового пользователя, давайте спросим его контактные данные.
+            // мы приветствовали нового пользователя, спросим его контактные данные.
             adoptionService.requestContactInfo(userId, telegramBot);
         } else if (checkIfUserIsAdopter(userId)) {
             commandService.runMenuForAdopter(userId);
