@@ -79,13 +79,6 @@ public class ShelterServiceImpl implements ShelterService {
         return sendMessage;
     }
 
-    //    @Override
-//    public SendMessage displayCatShelterContacts(Long chatId) {
-//        SendMessage sendMessage = new SendMessage(chatId,
-//                shelterRepository.findCatShelterContactsByShelterType()
-//        + "\nПодробная информация в файле:");
-//        return sendMessage;
-//    }
 
     //метод для получения информации о контактах охраны из бд
     @Override
@@ -96,14 +89,6 @@ public class ShelterServiceImpl implements ShelterService {
         return sendMessage;
     }
 
-//    @Override
-//    public SendMessage displayCatShelterSecurityContacts(Long chatId) {
-//        SendMessage sendMessage = new SendMessage(chatId,
-//                shelterRepository.findCatShelterSecurityContactsByShelterType()
-//                + "\nПодробная информация в файле:");
-//        return sendMessage;
-//    }
-
     //метод для получения информации о часах работы, схемы проезда и адреса из бд
     @Override
     public SendMessage displayDogShelterWorkingHours(Long chatId) {
@@ -113,13 +98,6 @@ public class ShelterServiceImpl implements ShelterService {
         return sendMessage;
     }
 
-//    @Override
-//    public SendMessage displayCatShelterWorkingHours(Long chatId) {
-//        SendMessage sendMessage = new SendMessage(chatId,
-//                shelterRepository.findCatShelterWorkingHoursByShelterType()
-//                        + "\nПодробная информация в файле:");
-//        return sendMessage;
-//    }
 
     public String infoSheltonContact() {
         return shelterRepository.findDogShelterContactsByShelterType();

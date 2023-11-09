@@ -1,4 +1,4 @@
-package pro.sky.animalsheltertelegrambot.telegram_bot.service;
+package pro.sky.animalsheltertelegrambot.telegram_bot.service.MediaService;
 
 import com.pengrad.telegrambot.model.Message;
 

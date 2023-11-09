@@ -1,18 +1,10 @@
-package pro.sky.animalsheltertelegrambot.telegram_bot.service;
+package pro.sky.animalsheltertelegrambot.telegram_bot.service.CallbackService;
 
-import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.CallbackQuery;
-import com.pengrad.telegrambot.request.SendMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import pro.sky.animalsheltertelegrambot.model.Report;
-import pro.sky.animalsheltertelegrambot.service.AdoptionService;
-import pro.sky.animalsheltertelegrambot.service.PetService;
-import pro.sky.animalsheltertelegrambot.service.ReportService;
-import pro.sky.animalsheltertelegrambot.service.ShelterService;
-
-import static pro.sky.animalsheltertelegrambot.telegram_bot.button_types.Button.APPLICATION;
+import pro.sky.animalsheltertelegrambot.telegram_bot.service.InteractionService.InteractionService;
 
 @Service
 @Slf4j

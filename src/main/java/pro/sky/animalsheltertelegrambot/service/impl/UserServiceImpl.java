@@ -1,6 +1,5 @@
 package pro.sky.animalsheltertelegrambot.service.impl;
 
-import com.pengrad.telegrambot.request.SendMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -12,8 +11,7 @@ import pro.sky.animalsheltertelegrambot.repository.AdoptionRepository;
 import pro.sky.animalsheltertelegrambot.repository.UserRepository;
 import pro.sky.animalsheltertelegrambot.service.UserService;
 import pro.sky.animalsheltertelegrambot.telegram_bot.events.StartCommandEvent;
-import pro.sky.animalsheltertelegrambot.telegram_bot.service.CommandService;
-import pro.sky.animalsheltertelegrambot.telegram_bot.service.MessageSendingService;
+import pro.sky.animalsheltertelegrambot.telegram_bot.service.MessageSendingService.MessageSendingService;
 
 import java.util.Collection;
 import java.util.Optional;

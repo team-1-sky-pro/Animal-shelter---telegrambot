@@ -1,4 +1,4 @@
-package pro.sky.animalsheltertelegrambot.telegram_bot.service;
+package pro.sky.animalsheltertelegrambot.telegram_bot.service.CommandService;
 
 import com.pengrad.telegrambot.model.CallbackQuery;
 import com.pengrad.telegrambot.request.SendMessage;
@@ -16,11 +16,8 @@ public interface CommandService {
 
     public SendMessage runMenuShelterInfo(Long chatId);
 
-    public SendMessage runMenuShelterInfoForCat(Long chatId);
-
     public void runMenuForAdopter(Long chatId);
 
     public void sendDocument(String path, Long chatId);
 
-    public void onApplicationEvent(CallbackEvent event);
 }

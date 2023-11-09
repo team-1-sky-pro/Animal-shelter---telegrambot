@@ -7,8 +7,8 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import pro.sky.animalsheltertelegrambot.telegram_bot.service.CallbackService;
-import pro.sky.animalsheltertelegrambot.telegram_bot.service.MessageService;
+import pro.sky.animalsheltertelegrambot.telegram_bot.service.CallbackService.CallbackService;
+import pro.sky.animalsheltertelegrambot.telegram_bot.service.MessageService.MessageService;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package pro.sky.animalsheltertelegrambot.telegram_bot.service;
+package pro.sky.animalsheltertelegrambot.telegram_bot.service.CommandService;
 
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.CallbackQuery;
@@ -12,11 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import pro.sky.animalsheltertelegrambot.telegram_bot.button_types.Button;
-import pro.sky.animalsheltertelegrambot.telegram_bot.events.CallbackEvent;
-import pro.sky.animalsheltertelegrambot.service.AdoptionService;
-import pro.sky.animalsheltertelegrambot.service.ReportService;
-import pro.sky.animalsheltertelegrambot.service.ShelterService;
 import pro.sky.animalsheltertelegrambot.telegram_bot.events.StartCommandEvent;
+import pro.sky.animalsheltertelegrambot.telegram_bot.service.CallbackService.CallbackService;
+import pro.sky.animalsheltertelegrambot.telegram_bot.service.MessageSendingService.MessageSendingService;
 
 import static pro.sky.animalsheltertelegrambot.telegram_bot.button_types.Button.*;
 
@@ -28,10 +26,6 @@ public class CommandServiceImpl implements CommandService {
 
     private final TelegramBot telegramBot;
     private final CallbackService callbackService;
-    private final ShelterService shelterService;
-    private final MessageService messageService;
-    private final AdoptionService adoptionService;
-    private final ReportService reportService;
     private final MessageSendingService messageSendingService;
 
 
@@ -40,67 +34,6 @@ public class CommandServiceImpl implements CommandService {
         // Реакция на событие, например, показать меню приюта
         firstMenuDog(event.getChatId(), "Выберите приют:");
     }
-
-
-    @Override
-    @EventListener
-    public void onApplicationEvent(CallbackEvent event) {
-        CallbackQuery callbackQuery = event.getCallbackQuery();
-        String callbackData = callbackQuery.data();
-        Long chatId = callbackQuery.message().chat().id();
-        log.info("Обработка колбэк-запроса с данными: {} для чата: {}", callbackData, chatId);
-
-        switch (callbackData) {
-            case "CATS":
-                log.info("Обработка выбора приюта для кошек для chatId: {}", chatId);
-                SendMessage messageForCats = firsMenuCat(chatId, "Приют для кошечек:");
-                messageSendingService.sendMessage(messageForCats);
-                break;
-            case "DOGS":
-                log.info("Обработка выбора приюта для собак для chatId: {}", chatId);
-                SendMessage messageForDogs = firstMenuDog(chatId, "Приют для собачек:");
-                messageSendingService.sendMessage(messageForDogs);
-                break;
-            case "ABOUT_SHELTER":
-                log.info("Обработка выбора информация о приюте для собак для chatId: {}", chatId);
-                SendMessage shelterInfo = runMenuShelterInfo(chatId);
-                messageSendingService.sendMessage(shelterInfo);
-                break;
-            case "ABOUT_SHELTER_CAT":
-                log.info("Обработка выбора информация о приюте для Котов для chatId: {}", chatId);
-                SendMessage shelterInfoCat = runMenuShelterInfo(chatId);
-                messageSendingService.sendMessage(shelterInfoCat);
-                break;
-            case "SHELTER_INFO":
-                log.info("Обработка информации о приюте для chatId: {}", chatId);
-                String sheltorInfo = shelterService.infoSheltonContact();
-                messageSendingService.sendMessage(chatId, sheltorInfo);
-                sendDocument("src/main/resources/files/dog_shelter_info_.pdf", chatId);
-                break;
-            case "SECURITY_CONTACTS":
-                shelterService.displayDogShelterSecurityContacts(chatId);
-                messageService.sendDocument("src/main/resources/files/dog_shelter_security_contacts.pdf", chatId);
-                break;
-            case "SCHEDULE":
-                shelterService.displayDogShelterWorkingHours(chatId);
-                messageService.sendDocument("src/main/resources/files/dog_shelter_schedule_address.pdf", chatId);
-                break;
-            case "SAFETY_RECOMMENDATION":
-                messageService.sendDocument("src/main/resources/files/dog_safety_recommendation.pdf", chatId);
-                break;
-            case "APPLICATION":
-                adoptionService.startAdoptionProcess(chatId);
-                break;
-            case "REPORT":
-                reportService.displayReportInfo(chatId);
-                break;
-            default:
-                log.warn("Получены неизвестные данные колбэка: {}", callbackData);
-                // Здесь могут быть дополнительные обработчики для других типов колбэков
-                break;
-        }
-    }
-
 
     @Override
     public void receivedCallbackMessage(CallbackQuery callbackQuery) {
@@ -119,11 +52,11 @@ public class CommandServiceImpl implements CommandService {
         return sendMessage;
     }
 
-    private InlineKeyboardMarkup createShelterInfoMenu(Button... buttons) {
+    public InlineKeyboardMarkup createShelterInfoMenu(Button... buttons) {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         for (Button button : buttons) {
             InlineKeyboardButton inlineButton = new InlineKeyboardButton(button.getText())
-                    .callbackData(button.getCommand()); // Используйте команду в качестве callbackData
+                    .callbackData(button.getCommand());
             inlineKeyboardMarkup.addRow(inlineButton);
         }
         return inlineKeyboardMarkup;
@@ -146,15 +79,16 @@ public class CommandServiceImpl implements CommandService {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         InlineKeyboardButton aboutShelterButton = new InlineKeyboardButton(ABOUT_SHELTER.getText());
         aboutShelterButton.callbackData(ABOUT_SHELTER.toString());
-
+        InlineKeyboardButton applicationButton = new InlineKeyboardButton(Button.APPLICATION.getText());
+        applicationButton.callbackData(Button.APPLICATION.getCommand());
         InlineKeyboardButton adoptAnimalButton = new InlineKeyboardButton(ADOPT_ANIMAL.getText());
         adoptAnimalButton.callbackData(ADOPT_ANIMAL.toString());
 
         InlineKeyboardButton volunteerButton = new InlineKeyboardButton(VOLUNTEER.getText());
         volunteerButton.callbackData(VOLUNTEER.toString());
 
-        inlineKeyboardMarkup.addRow(aboutShelterButton);
-        inlineKeyboardMarkup.addRow(adoptAnimalButton, volunteerButton);
+        inlineKeyboardMarkup.addRow(aboutShelterButton, adoptAnimalButton);
+        inlineKeyboardMarkup.addRow(applicationButton, volunteerButton);
         return new SendMessage(chatId, text).replyMarkup(inlineKeyboardMarkup);
     }
 
@@ -163,15 +97,15 @@ public class CommandServiceImpl implements CommandService {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         InlineKeyboardButton aboutShelterButton = new InlineKeyboardButton(ABOUT_SHELTER_CAT.getText());
         aboutShelterButton.callbackData(ABOUT_SHELTER_CAT.toString());
-
+        InlineKeyboardButton applicationButton = new InlineKeyboardButton(Button.APPLICATION.getText());
+        applicationButton.callbackData(Button.APPLICATION.getCommand());
         InlineKeyboardButton adoptAnimalButton = new InlineKeyboardButton(ADOPT_ANIMAL.getText());
         adoptAnimalButton.callbackData(ADOPT_ANIMAL.toString());
-
         InlineKeyboardButton volunteerButton = new InlineKeyboardButton(VOLUNTEER.getText());
         volunteerButton.callbackData(VOLUNTEER.toString());
 
-        inlineKeyboardMarkup.addRow(aboutShelterButton);
-        inlineKeyboardMarkup.addRow(adoptAnimalButton, volunteerButton);
+        inlineKeyboardMarkup.addRow(aboutShelterButton, adoptAnimalButton);
+        inlineKeyboardMarkup.addRow(applicationButton, volunteerButton);
         return new SendMessage(chatId, text).replyMarkup(inlineKeyboardMarkup);
     }
 
@@ -180,37 +114,22 @@ public class CommandServiceImpl implements CommandService {
     public SendMessage runMenuShelterInfo(Long chatId) {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
 
-        InlineKeyboardButton shelterInfoButton = new InlineKeyboardButton(Button.SHELTER_INFO.getText());
-        shelterInfoButton.callbackData(Button.SHELTER_INFO.toString());
-        InlineKeyboardButton scheduleButton = new InlineKeyboardButton(Button.SCHEDULE.getText());
-        scheduleButton.callbackData(Button.SCHEDULE.getCommand());
-        InlineKeyboardButton securityContactsButton = new InlineKeyboardButton(Button.SECURITY_CONTACTS.getText());
-        securityContactsButton.callbackData(Button.SECURITY_CONTACTS.getCommand());
-        InlineKeyboardButton safetyRecommendationButton = new InlineKeyboardButton(Button.SAFETY_RECOMMENDATION.getText());
-        safetyRecommendationButton.callbackData(Button.SAFETY_RECOMMENDATION.getCommand());
-        InlineKeyboardButton applicationButton = new InlineKeyboardButton(Button.APPLICATION.getText());
-        applicationButton.callbackData(Button.APPLICATION.getCommand());
-        InlineKeyboardButton volunteerButton = new InlineKeyboardButton(Button.VOLUNTEER.getText());
-        volunteerButton.callbackData(Button.VOLUNTEER.getCommand());
+        InlineKeyboardButton shelterInfoButton = new InlineKeyboardButton(SHELTER_INFO.getText());
+        shelterInfoButton.callbackData(SHELTER_INFO.toString());
+        InlineKeyboardButton scheduleButton = new InlineKeyboardButton(SCHEDULE.getText());
+        scheduleButton.callbackData(Button.SCHEDULE.toString());
+        InlineKeyboardButton securityContactsButton = new InlineKeyboardButton(SECURITY_CONTACTS.getText());
+        securityContactsButton.callbackData(SECURITY_CONTACTS.toString());
+        InlineKeyboardButton safetyRecommendationButton = new InlineKeyboardButton(SAFETY_RECOMMENDATION.getText());
+        safetyRecommendationButton.callbackData(SAFETY_RECOMMENDATION.toString());
+        InlineKeyboardButton volunteerButton = new InlineKeyboardButton(VOLUNTEER.getText());
+        volunteerButton.callbackData(VOLUNTEER.toString());
 
         inlineKeyboardMarkup.addRow(shelterInfoButton, scheduleButton);
         inlineKeyboardMarkup.addRow(securityContactsButton, safetyRecommendationButton);
-        inlineKeyboardMarkup.addRow(applicationButton, volunteerButton);
+        inlineKeyboardMarkup.addRow(volunteerButton);
 
         return new SendMessage(chatId, "Подробное меню о приюте").replyMarkup(inlineKeyboardMarkup);
-    }
-    // Основное меню после выбора приюта (dog/cat)
-
-    @Override
-    public SendMessage runMenuShelterInfoForCat(Long chatId) {
-        log.info("Вызов метода runMenuShelterInfoForCat для чата: {}", chatId);
-        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-        InlineKeyboardButton catShelterInfo = new InlineKeyboardButton(SHELTER_INFO.getText());
-        catShelterInfo.callbackData(SHELTER_INFO.toString());
-
-
-        return new SendMessage(chatId.toString(), "Подробная информация о приюте")
-                .replyMarkup(inlineKeyboardMarkup);
     }
 
 

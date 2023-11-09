@@ -1,4 +1,4 @@
-package pro.sky.animalsheltertelegrambot.telegram_bot.service;
+package pro.sky.animalsheltertelegrambot.telegram_bot.service.InteractionService;
 
 import com.pengrad.telegrambot.model.CallbackQuery;
 import lombok.RequiredArgsConstructor;
