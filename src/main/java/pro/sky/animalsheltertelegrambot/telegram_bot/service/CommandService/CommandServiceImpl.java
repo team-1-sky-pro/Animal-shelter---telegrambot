@@ -79,8 +79,8 @@ public class CommandServiceImpl implements CommandService {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         InlineKeyboardButton aboutShelterButton = new InlineKeyboardButton(ABOUT_SHELTER.getText());
         aboutShelterButton.callbackData(ABOUT_SHELTER.toString());
-        InlineKeyboardButton applicationButton = new InlineKeyboardButton(Button.APPLICATION.getText());
-        applicationButton.callbackData(Button.APPLICATION.toString());
+        InlineKeyboardButton applicationButton = new InlineKeyboardButton(APPLICATION_DOG.getText());
+        applicationButton.callbackData(APPLICATION_DOG.toString());
         InlineKeyboardButton adoptAnimalButton = new InlineKeyboardButton(ADOPT_ANIMAL_DOG.getText());
         adoptAnimalButton.callbackData(ADOPT_ANIMAL_DOG.toString());
 
@@ -97,8 +97,9 @@ public class CommandServiceImpl implements CommandService {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         InlineKeyboardButton aboutShelterButton = new InlineKeyboardButton(ABOUT_SHELTER_CAT.getText());
         aboutShelterButton.callbackData(ABOUT_SHELTER_CAT.toString());
-        InlineKeyboardButton applicationButton = new InlineKeyboardButton(Button.APPLICATION.getText());
-        applicationButton.callbackData(Button.APPLICATION.toString());
+        log.info("Вызов кнопки Приют для кошек");
+        InlineKeyboardButton applicationButton = new InlineKeyboardButton(APPLICATION_CAT.getText());
+        applicationButton.callbackData(APPLICATION_CAT.toString());
         InlineKeyboardButton adoptAnimalButton = new InlineKeyboardButton(ADOPT_ANIMAL_CAT.getText());
         adoptAnimalButton.callbackData(ADOPT_ANIMAL_CAT.toString());
         InlineKeyboardButton volunteerButton = new InlineKeyboardButton(VOLUNTEER.getText());

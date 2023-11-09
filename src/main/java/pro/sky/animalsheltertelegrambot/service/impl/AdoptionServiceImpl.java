@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import pro.sky.animalsheltertelegrambot.exception.AdoptionNotFoundExceptions;
+import pro.sky.animalsheltertelegrambot.exception.PetNotFoundException;
 import pro.sky.animalsheltertelegrambot.exception.UserNotFoundException;
 import pro.sky.animalsheltertelegrambot.model.Adoption;
 import pro.sky.animalsheltertelegrambot.model.Pet;
@@ -22,7 +23,9 @@ import pro.sky.animalsheltertelegrambot.service.AdoptionService;
 import pro.sky.animalsheltertelegrambot.service.PetService;
 import pro.sky.animalsheltertelegrambot.service.PhotoService;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Реализация сервиса по управлению усыновлением.
@@ -37,6 +40,8 @@ public class AdoptionServiceImpl implements AdoptionService {
     private final PetRepository petRepository;
     private final TelegramBot telegramBot;
     private final PetService petService;
+
+    private final Map<Long, Long> userShelterPreference = new HashMap<>();
 
     /**
      * Добавляет новое усыновление.
@@ -128,7 +133,8 @@ public class AdoptionServiceImpl implements AdoptionService {
 
     //===================================start Adoption =================================================================
 
-    public void startAdoptionProcess(Long chatId) {
+    public void startAdoptionProcess(Long chatId, Long shelterId) {
+        userShelterPreference.put(chatId, shelterId);
         SendMessage requestContact = new SendMessage(chatId, "Пожалуйста, введите ваш email и номер телефона через запятую (например, email@example.com, +1234567890)");
         telegramBot.execute(requestContact);
     }
@@ -150,8 +156,14 @@ public class AdoptionServiceImpl implements AdoptionService {
             SendMessage responseMessage = new SendMessage(chatId, responseText);
             telegramBot.execute(responseMessage);
 
+            Long shelterId = userShelterPreference.get(chatId);
+            if (shelterId != null) {
+                offerAnimalsToAdopt(chatId, telegramBot, shelterId);
+                log.info("Вызов метода offerAnimalsToAdopt в методе processContactInfo" + chatId);
+            } else {
+                throw new PetNotFoundException();
+            }
             // Предложение выбрать животное
-            offerAnimalsToAdopt(chatId, telegramBot);
         } else {
             // Если текст не соответствует шаблону, просим ввести данные ещё раз
             String responseText = "Пожалуйста, проверьте данные и введите их в правильном формате.";
@@ -177,9 +189,10 @@ public class AdoptionServiceImpl implements AdoptionService {
     }
 
     @Override
-    public void offerAnimalsToAdopt(Long chatId, TelegramBot telegramBot) {
+    public void offerAnimalsToAdopt(Long chatId, TelegramBot telegramBot, Long shelterId) {
         // Получение списка доступных животных для усыновления
-        List<Pet> availableAnimals = petRepository.findAllAvailableForAdoption();
+        log.info("Вызвали метод offerAnimalsToAdopt для: " + chatId + " ");
+        List<Pet> availableAnimals = petRepository.findAllByShelterIdAndIsAdoptedFalse(shelterId);
 
         // Создание кнопок для каждого доступного животного
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
@@ -217,6 +230,7 @@ public class AdoptionServiceImpl implements AdoptionService {
     }
 
     public void handleAdoptionCallback(CallbackQuery callbackQuery, TelegramBot telegramBot) {
+        log.info("Вызываем метод handleAdoptionCallback " + callbackQuery);
         String callbackData = callbackQuery.data();
         Long chatId = callbackQuery.message().chat().id();
 

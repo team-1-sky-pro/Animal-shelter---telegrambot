@@ -86,8 +86,15 @@ public class CallbackListener {
                     messageSendingService.sendMessage(chatId, safetyRecommendationText);
                     messageService.sendDocument("src/main/resources/files/dog_safety_recommendation.pdf", chatId);
                     break;
-                case "APPLICATION":
-                    adoptionService.startAdoptionProcess(chatId);
+                case "APPLICATION_CAT":
+                    log.info("Обработка заявки на усыновление кошки для chatId: {}", chatId);
+                    // Вызов метода, который начнет процесс усыновления кошки
+                    adoptionService.startAdoptionProcess(chatId, 1L); // 1 для кошек
+                    break;
+                case "APPLICATION_DOG":
+                    log.info("Обработка заявки на усыновление собаки для chatId: {}", chatId);
+                    // Вызов метода, который начнет процесс усыновления собаки
+                    adoptionService.startAdoptionProcess(chatId, 2L);
                     break;
                 case "REPORT":
                     reportService.displayReportInfo(chatId);

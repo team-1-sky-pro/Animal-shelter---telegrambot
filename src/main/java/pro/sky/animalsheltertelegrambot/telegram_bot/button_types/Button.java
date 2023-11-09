@@ -19,7 +19,8 @@ public enum Button {
     SECURITY_CONTACTS("/security_contacts", "Контакты охраны"),
     SCHEDULE("/schedule", "Расписание, адрес и тд."),
     SAFETY_RECOMMENDATION("/recommendation", "Безопасность в приюте."),
-    APPLICATION("/application", "Оставить заявку");
+    APPLICATION_CAT("/application_cat", "Оставить заявку"),
+    APPLICATION_DOG("/application_dog", "Оставить заявку");
 
     private final String command;
     private final String text;
