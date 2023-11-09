@@ -3,7 +3,10 @@ package pro.sky.animalsheltertelegrambot.repository;
 import com.pengrad.telegrambot.request.SendMessage;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import pro.sky.animalsheltertelegrambot.model.Pet;
 import pro.sky.animalsheltertelegrambot.model.Shelter;
+
+import java.util.List;
 
 public interface ShelterRepository extends JpaRepository<Shelter, Long> {
     /**
@@ -24,7 +27,7 @@ public interface ShelterRepository extends JpaRepository<Shelter, Long> {
     @Query(value = "SELECT working_hours FROM shelters WHERE shelter_type = 'dog'", nativeQuery = true)
     String findDogShelterWorkingHoursByShelterType();
 
-//    @Query(value = "SELECT working_hours FROM shelters WHERE shelter_type = 'cat'", nativeQuery = true)
+    //    @Query(value = "SELECT working_hours FROM shelters WHERE shelter_type = 'cat'", nativeQuery = true)
 //    String findCatShelterWorkingHoursByShelterType();
 
 }

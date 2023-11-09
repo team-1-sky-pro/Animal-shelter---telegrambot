@@ -15,5 +15,6 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
 
     @Query("SELECT p FROM Pet p LEFT JOIN FETCH p.photo WHERE p.id = :id")
     Optional<Pet> findByIdAndFetchPhoto(@Param("id") Long id);
+    List<Pet> findAllByIdAndIsAdoptedFalse(Long shelterId);
 
 }
