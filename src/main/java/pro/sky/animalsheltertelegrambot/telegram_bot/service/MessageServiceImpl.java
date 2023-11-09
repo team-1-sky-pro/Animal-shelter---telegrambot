@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pro.sky.animalsheltertelegrambot.service.AdoptionService;
-import pro.sky.animalsheltertelegrambot.service.CommandService;
+
 
 /**
  * Сервис для обработки входящих текстовых сообщений и фотографий.
@@ -20,6 +20,7 @@ public class MessageServiceImpl implements MessageService {
     private final TelegramBot telegramBot;
     private final CommandService commandService;
     private final AdoptionService adoptionService;
+    private final MediaService mediaService;
 
     /**
      * Обрабатывает входящее сообщение от пользователя.
@@ -40,7 +41,7 @@ public class MessageServiceImpl implements MessageService {
             }
         } else if (message.photo() != null && message.caption() != null) {
             log.info("Сообщение с фото от пользователя {}: {}", chatId, message.caption());
-            commandService.processPhotoMessage(message);
+            mediaService.processPhotoMessage(message);
         } else {
             log.warn("Получено сообщение без текста и фото от пользователя {}", chatId);
         }

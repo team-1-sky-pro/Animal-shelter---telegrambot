@@ -4,7 +4,5 @@ import com.pengrad.telegrambot.model.CallbackQuery;
 
 public interface CallbackService {
 
-    public void handleCallback(CallbackQuery callbackQuery);
-
     public void processCallback(CallbackQuery callbackQuery);
 }

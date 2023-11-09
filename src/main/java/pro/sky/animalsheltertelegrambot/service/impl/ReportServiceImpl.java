@@ -1,5 +1,6 @@
 package pro.sky.animalsheltertelegrambot.service.impl;
 
+import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.File;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.request.GetFile;
@@ -14,10 +15,13 @@ import pro.sky.animalsheltertelegrambot.model.Pet;
 import pro.sky.animalsheltertelegrambot.model.Photo;
 import pro.sky.animalsheltertelegrambot.model.Report;
 import pro.sky.animalsheltertelegrambot.repository.ReportRepository;
+import pro.sky.animalsheltertelegrambot.service.PetService;
+import pro.sky.animalsheltertelegrambot.service.PhotoService;
 import pro.sky.animalsheltertelegrambot.service.ReportService;
 
 import java.time.LocalDateTime;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Service
@@ -25,6 +29,13 @@ import java.util.regex.Matcher;
 public class ReportServiceImpl implements ReportService {
 
     private final ReportRepository reportRepository;
+    private final TelegramBot telegramBot;
+    private final PetService petService;
+    private final PhotoService photoService;
+    private final Pattern reportPattern = Pattern.compile("\\d+\\.\\s?[а-яА-Яa-zA-Z]+");
+
+    private final String reportInfo = "Чтобы отправить отчет. Вам нужно в одном сообщении прикрепить фото питомца, " +
+            "указать его ID и далее через точку описать его состояние.\n";
 
     /**
      * Добавление отчета.
@@ -145,7 +156,7 @@ public class ReportServiceImpl implements ReportService {
             photo.setFileSize(Long.valueOf(file.fileSize()));
             photo.setMediaType(getFileRequest.getContentType());
 
-            reportService.addReport(report);
+            addReport(report);
             photoService.addPhotoForReport(photo);
             telegramBot.execute(new SendMessage(chatId, "Отчет успешно отправлен!"));
         } catch (Exception e) {

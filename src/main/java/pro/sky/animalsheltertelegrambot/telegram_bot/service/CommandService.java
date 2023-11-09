@@ -5,44 +5,23 @@ import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.request.SendMessage;
 
 public interface CommandService {
-    SendMessage executeStartCommandIfUserExists(Long chatId);
+    public void processTextMessage(Long chatId, String text);
 
-    void receivedCallbackMessage(CallbackQuery callbackQuery);
+    public void receivedCallbackMessage(CallbackQuery callbackQuery);
 
+    public SendMessage executeStartCommandIfUserExists(Long chatId);
 
-    SendMessage runMainMenu(Long chatId, String text);
+    public SendMessage runMainMenu(Long chatId, String text);
 
-    SendMessage runMainMenuForCat(Long chatId, String text);
+    public SendMessage runMainMenuForCat(Long chatId, String text);
 
-    SendMessage runMenuShelterInfo(Long chatId);
+    public SendMessage runMenuShelterInfo(Long chatId);
 
-    SendMessage runMenuShelterInfoForCat(Long chatId);
+    public SendMessage runMenuShelterInfoForCat(Long chatId);
 
-    SendMessage displayDogShelterContacts(Long chatId);
+    public void runMenuForAdopter(Long chatId);
 
-//    SendMessage displayCatShelterContacts(Long chatId);
+    public void processStartCommand(Long chatId, String s);
 
-    SendMessage displayDogShelterSecurityContacts(Long chatId);
-
-//    SendMessage displayCatShelterSecurityContacts(Long chatId);
-
-    SendMessage displayDogShelterWorkingHours(Long chatId);
-
-//    SendMessage displayCatShelterWorkingHours(Long chatId);
-
-    SendMessage displayReportInfo(Long chatId);
-  
-    /**
-     * Создает меню выбора действия для пользователя-усыновителя. <p>
-     * Возможные действия: <p>
-     * - отправить отчет; <p>
-     * - выбрать еще одного питомца; <p>
-     * - помощь волонтера.
-     * @param chatId ID чата с текущим пользователем
-     */
-    void runMenuForAdopter(Long chatId);
-
-    void saveReport(Message message);
-
-    public void handleCallbackQuery(CallbackQuery callbackQuery);
+    public void sendDocument(String path, Long chatId);
 }

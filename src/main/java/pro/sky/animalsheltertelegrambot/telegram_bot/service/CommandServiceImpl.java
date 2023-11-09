@@ -6,28 +6,14 @@ import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import com.pengrad.telegrambot.request.SendDocument;
 import com.pengrad.telegrambot.request.SendMessage;
-import com.pengrad.telegrambot.model.File;
-import com.pengrad.telegrambot.model.Message;
-import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
-import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
-import com.pengrad.telegrambot.request.SendMessage;
-import com.pengrad.telegrambot.model.File;
-import com.pengrad.telegrambot.model.Message;
-import com.pengrad.telegrambot.request.GetFile;
-import com.pengrad.telegrambot.response.GetFileResponse;
 import com.pengrad.telegrambot.response.SendResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import pro.sky.animalsheltertelegrambot.model.Pet;
-import pro.sky.animalsheltertelegrambot.model.Photo;
-import pro.sky.animalsheltertelegrambot.model.Report;
-import pro.sky.animalsheltertelegrambot.model.User;
-import pro.sky.animalsheltertelegrambot.repository.ShelterRepository;
+
 import pro.sky.animalsheltertelegrambot.service.*;
 
-import java.time.LocalDateTime;
-import java.util.regex.Matcher;
+
 import java.util.regex.Pattern;
 
 import static pro.sky.animalsheltertelegrambot.telegram_bot.button_types.Button.*;
@@ -38,15 +24,12 @@ import static pro.sky.animalsheltertelegrambot.telegram_bot.button_types.Button.
 @RequiredArgsConstructor
 public class CommandServiceImpl implements CommandService {
 
-    private final Pattern reportPattern = Pattern.compile("\\d+\\.\\s?[а-яА-Яa-zA-Z]+");
-    private final String reportInfo = "Чтобы отправить отчет. Вам нужно в одном сообщении прикрепить фото питомца, " +
-            "указать его ID и далее через точку описать его состояние.\n";
-
     private final TelegramBot telegramBot;
     private final UserService userService;
     private final CallbackService callbackService;
 
 
+    @Override
     public void processTextMessage(Long chatId, String text) {
         if ("/start".equals(text)) {
             userService.handleStart(chatId);
@@ -89,10 +72,7 @@ public class CommandServiceImpl implements CommandService {
         InlineKeyboardButton aboutShelterButton = new InlineKeyboardButton(ABOUT_SHELTER.getText());
         aboutShelterButton.callbackData(ABOUT_SHELTER.toString());
 
-//        InlineKeyboardButton adoptAnimalButton = new InlineKeyboardButton(ADOPT_ANIMAL.getText());
-//        adoptAnimalButton.callbackData(ADOPT_ANIMAL.toString());
-
-        InlineKeyboardButton reportButton = new InlineKeyboardButton(REPORT.getText());
+            InlineKeyboardButton reportButton = new InlineKeyboardButton(REPORT.getText());
         reportButton.callbackData(REPORT.toString());
 
         InlineKeyboardButton volunteerButton = new InlineKeyboardButton(VOLUNTEER.getText());
@@ -156,49 +136,21 @@ public class CommandServiceImpl implements CommandService {
         return sendMessage;
     }
 
-//    @Override
-//    public SendMessage runMenuShelterInfoForCat(Long chatId) {
-//        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-//
-//        InlineKeyboardButton catShelterInfo = new InlineKeyboardButton(SHELTER_INFO.getText());
-//        catShelterInfo.callbackData(SHELTER_INFO.toString());
-//
-//        InlineKeyboardButton scheduleButton = new InlineKeyboardButton(SCHEDULE.getText());
-//        scheduleButton.callbackData(SCHEDULE.toString());
-//
-//        InlineKeyboardButton securityContacts = new InlineKeyboardButton(SECURITY_CONTACTS.getText());
-//        securityContacts.callbackData(SECURITY_CONTACTS.toString());
-//
-//        InlineKeyboardButton safetyRecommendationButton = new InlineKeyboardButton(SAFETY_RECOMMENDATION.getText());
-//        safetyRecommendationButton.callbackData(SAFETY_RECOMMENDATION.toString());
-//
-//        InlineKeyboardButton applicationButton = new InlineKeyboardButton(APPLICATION.getText());
-//        applicationButton.callbackData(APPLICATION.toString());
-//
-//        InlineKeyboardButton volunteerButton = new InlineKeyboardButton(VOLUNTEER.getText());
-//        volunteerButton.callbackData(VOLUNTEER.toString());
-//
-//        inlineKeyboardMarkup.addRow(catShelterInfo, scheduleButton);
-//        inlineKeyboardMarkup.addRow(securityContacts, safetyRecommendationButton);
-//        inlineKeyboardMarkup.addRow(applicationButton, volunteerButton);
-//
-//        SendMessage sendMessage = new SendMessage(chatId, "Подробная информация о приюте кошек")
-//                .replyMarkup(inlineKeyboardMarkup);
-//        return sendMessage;
-//    }
-
-
 
     // Меню после нажатия кнопки "О приюте" -> попадаем в меню подробной информации
     @Override
     public SendMessage runMenuShelterInfoForCat(Long chatId) {
+        // Подробная информация о приюте кошек
+        InlineKeyboardMarkup inlineKeyboardMarkup = createShelterInfoMenu(
+                SHELTER_INFO.getText(), SCHEDULE.getText(), SECURITY_CONTACTS.getText(),
+                SAFETY_RECOMMENDATION.getText(), APPLICATION.getText(), VOLUNTEER.getText()
+        );
+
         SendMessage sendMessage = new SendMessage(chatId, "Подробная информация о приюте кошек")
-                .replyMarkup(createShelterInfoMenu(SHELTER_INFO.getText(),
-                        SCHEDULE.getText(), SECURITY_CONTACTS.getText(),
-                        SAFETY_RECOMMENDATION.getText(), APPLICATION.getText(),
-                        VOLUNTEER.getText()));
+                .replyMarkup(inlineKeyboardMarkup);
         return sendMessage;
     }
+
 
 
     @Override
@@ -228,7 +180,13 @@ public class CommandServiceImpl implements CommandService {
         SendResponse sendResponse = telegramBot.execute(sendMessage);
     }
 
+    @Override
+    public void processStartCommand(Long chatId, String s) {
+
+    }
+
     //метод для отправки *.pdf файла юзеру
+    @Override
     public void sendDocument(String path, Long chatId) {
         SendDocument sendDocument = new SendDocument(chatId, new java.io.File(path));
         telegramBot.execute(sendDocument);
