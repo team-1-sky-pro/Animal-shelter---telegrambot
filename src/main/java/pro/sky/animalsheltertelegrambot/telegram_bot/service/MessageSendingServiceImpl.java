@@ -17,4 +17,9 @@ public class MessageSendingServiceImpl implements MessageSendingService {
         SendMessage sendMessage = new SendMessage(String.valueOf(chatId), sendingMessage);
         telegramBot.execute(sendMessage);
     }
+
+    @Override
+    public void sendMessage(SendMessage sendMessage) {
+        telegramBot.execute(sendMessage);
+    }
 }

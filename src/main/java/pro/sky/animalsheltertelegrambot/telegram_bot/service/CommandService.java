@@ -1,11 +1,10 @@
 package pro.sky.animalsheltertelegrambot.telegram_bot.service;
 
 import com.pengrad.telegrambot.model.CallbackQuery;
-import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.request.SendMessage;
+import pro.sky.animalsheltertelegrambot.telegram_bot.events.CallbackEvent;
 
 public interface CommandService {
-    public void processTextMessage(Long chatId, String text);
 
     public void receivedCallbackMessage(CallbackQuery callbackQuery);
 
@@ -21,7 +20,7 @@ public interface CommandService {
 
     public void runMenuForAdopter(Long chatId);
 
-    public void processStartCommand(Long chatId, String s);
-
     public void sendDocument(String path, Long chatId);
+
+    public void onApplicationEvent(CallbackEvent event);
 }

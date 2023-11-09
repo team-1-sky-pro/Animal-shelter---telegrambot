@@ -14,6 +14,7 @@ import pro.sky.animalsheltertelegrambot.exception.ReportNotFoundException;
 import pro.sky.animalsheltertelegrambot.model.Pet;
 import pro.sky.animalsheltertelegrambot.model.Photo;
 import pro.sky.animalsheltertelegrambot.model.Report;
+import pro.sky.animalsheltertelegrambot.repository.PhotoRepository;
 import pro.sky.animalsheltertelegrambot.repository.ReportRepository;
 import pro.sky.animalsheltertelegrambot.service.PetService;
 import pro.sky.animalsheltertelegrambot.service.PhotoService;
@@ -31,9 +32,10 @@ public class ReportServiceImpl implements ReportService {
     private final ReportRepository reportRepository;
     private final TelegramBot telegramBot;
     private final PetService petService;
-    private final PhotoService photoService;
-    private final Pattern reportPattern = Pattern.compile("\\d+\\.\\s?[а-яА-Яa-zA-Z]+");
+    private final PhotoRepository photoRepository;
 
+
+    private final Pattern reportPattern = Pattern.compile("\\d+\\.\\s?[а-яА-Яa-zA-Z]+");
     private final String reportInfo = "Чтобы отправить отчет. Вам нужно в одном сообщении прикрепить фото питомца, " +
             "указать его ID и далее через точку описать его состояние.\n";
 
@@ -157,12 +159,11 @@ public class ReportServiceImpl implements ReportService {
             photo.setMediaType(getFileRequest.getContentType());
 
             addReport(report);
-            photoService.addPhotoForReport(photo);
+            photoRepository.save(photo);
             telegramBot.execute(new SendMessage(chatId, "Отчет успешно отправлен!"));
         } catch (Exception e) {
             e.printStackTrace();
             telegramBot.execute(new SendMessage(chatId, "Произошла ошибка. Попробуйте еще раз."));
         }
     }
-
 }

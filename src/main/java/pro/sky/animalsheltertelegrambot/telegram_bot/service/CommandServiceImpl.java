@@ -9,12 +9,14 @@ import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
-
-import pro.sky.animalsheltertelegrambot.service.*;
-
-
-import java.util.regex.Pattern;
+import pro.sky.animalsheltertelegrambot.telegram_bot.events.CallbackEvent;
+import pro.sky.animalsheltertelegrambot.service.AdoptionService;
+import pro.sky.animalsheltertelegrambot.service.ReportService;
+import pro.sky.animalsheltertelegrambot.service.ShelterService;
+import pro.sky.animalsheltertelegrambot.service.UserService;
+import pro.sky.animalsheltertelegrambot.telegram_bot.events.StartCommandEvent;
 
 import static pro.sky.animalsheltertelegrambot.telegram_bot.button_types.Button.*;
 
@@ -25,18 +27,70 @@ import static pro.sky.animalsheltertelegrambot.telegram_bot.button_types.Button.
 public class CommandServiceImpl implements CommandService {
 
     private final TelegramBot telegramBot;
-    private final UserService userService;
     private final CallbackService callbackService;
+    private final ShelterService shelterService;
+    private final MessageService messageService;
+    private final AdoptionService adoptionService;
+    private final ReportService reportService;
+    private final MessageSendingService messageSendingService;
+
+
+    @EventListener
+    public void onUserCreated(StartCommandEvent event) {
+        // Реакция на событие, например, показать меню приюта
+        runMainMenu(event.getChatId(), "Выберите приют:");
+    }
 
 
     @Override
-    public void processTextMessage(Long chatId, String text) {
-        if ("/start".equals(text)) {
-            userService.handleStart(chatId);
-        } else {
-            // Обработка других текстовых сообщений
+    public void onApplicationEvent(CallbackEvent event) {
+        CallbackQuery callbackQuery = event.getCallbackQuery();
+        String callbackData = callbackQuery.data();
+        Long chatId = callbackQuery.message().chat().id();
+        log.info("Обработка колбэк-запроса с данными: {} для чата: {}", callbackData, chatId);
+
+        switch (callbackData) {
+            case "CATS":
+                runMainMenuForCat(chatId, "Приют для кошек");
+                break;
+            case "DOGS":
+                runMainMenu(chatId, "Приют для собак");
+                break;
+            case "ABOUT_SHELTER":
+                runMenuShelterInfo(chatId);
+                break;
+            case "ABOUT_SHELTER_CAT":
+                runMenuShelterInfoForCat(chatId);
+                break;
+            case "SHELTER_INFO":
+                shelterService.displayDogShelterContacts(chatId);
+                sendDocument("src/main/resources/files/dog_shelter_info_.pdf", chatId);
+                break;
+            // Случаи "CAT_SHELTER_INFO" и "SECURITY_CONTACTS_CAT" закомментированы, если они не нужны, удалите их.
+            case "SECURITY_CONTACTS":
+                shelterService.displayDogShelterSecurityContacts(chatId);
+                messageService.sendDocument("src/main/resources/files/dog_shelter_security_contacts.pdf", chatId);
+                break;
+            case "SCHEDULE":
+                shelterService.displayDogShelterWorkingHours(chatId);
+                messageService.sendDocument("src/main/resources/files/dog_shelter_schedule_address.pdf", chatId);
+                break;
+            case "SAFETY_RECOMMENDATION":
+                messageService.sendDocument("src/main/resources/files/dog_safety_recommendation.pdf", chatId);
+                break;
+            case "APPLICATION":
+                adoptionService.startAdoptionProcess(chatId);
+                break;
+            case "REPORT":
+                reportService.displayReportInfo(chatId);
+                break;
+            default:
+                log.warn("Получены неизвестные данные колбэка: {}", callbackData);
+                // Здесь могут быть дополнительные обработчики для других типов колбэков
+                break;
         }
     }
+
 
     @Override
     public void receivedCallbackMessage(CallbackQuery callbackQuery) {
@@ -64,6 +118,14 @@ public class CommandServiceImpl implements CommandService {
         return inlineKeyboardMarkup;
     }
 
+
+    @EventListener
+    public void handleStartCommandEvent(StartCommandEvent event) {
+        log.info("Показ основного меню для chatId: {}", event.getChatId());
+        SendMessage sendMessage = executeStartCommandIfUserExists(event.getChatId());
+        // Отправка основного меню пользователю через MessageSendingService
+        messageSendingService.sendMessage(sendMessage);
+    }
 
     @Override
     public SendMessage runMainMenu(Long chatId, String text) {
@@ -178,11 +240,6 @@ public class CommandServiceImpl implements CommandService {
 
         // Отправка сообщения
         SendResponse sendResponse = telegramBot.execute(sendMessage);
-    }
-
-    @Override
-    public void processStartCommand(Long chatId, String s) {
-
     }
 
     //метод для отправки *.pdf файла юзеру

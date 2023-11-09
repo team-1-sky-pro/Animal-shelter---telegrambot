@@ -5,8 +5,9 @@ import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.request.SendDocument;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
-import pro.sky.animalsheltertelegrambot.service.AdoptionService;
+import pro.sky.animalsheltertelegrambot.telegram_bot.events.StartCommandEvent;
 
 
 /**
@@ -18,34 +19,33 @@ import pro.sky.animalsheltertelegrambot.service.AdoptionService;
 public class MessageServiceImpl implements MessageService {
 
     private final TelegramBot telegramBot;
-    private final CommandService commandService;
-    private final AdoptionService adoptionService;
-    private final MediaService mediaService;
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * Обрабатывает входящее сообщение от пользователя.
      *
      * @param message сообщение от пользователя
      */
+
+
     public void handleMessage(Message message) {
         Long chatId = message.chat().id();
         String text = message.text();
+        String username = message.from().username(); // Получаем username из объекта Message
         log.info("Обработка сообщения от пользователя: {}", chatId);
 
-        if (text != null) {
-            log.info("Текстовое сообщение от пользователя {}: {}", chatId, text);
-            if (text.equals("/start")) {
-                commandService.processStartCommand(chatId, message.chat().firstName());
-            } else {
-                adoptionService.processContactInfo(chatId, text, telegramBot);
+        if (text != null && "/start".equals(text)) {
+            // Проверяем, что username не null и не пустой
+            if (username == null || username.isEmpty()) {
+                username = "defaultUsername";  // Вы можете установить значение по умолчанию
             }
-        } else if (message.photo() != null && message.caption() != null) {
-            log.info("Сообщение с фото от пользователя {}: {}", chatId, message.caption());
-            mediaService.processPhotoMessage(message);
+            eventPublisher.publishEvent(new StartCommandEvent(chatId, username));
+            log.info("Обработка события /start от пользователя: {}", chatId);
         } else {
-            log.warn("Получено сообщение без текста и фото от пользователя {}", chatId);
+            // ... обработка других сообщений ...
         }
     }
+
 
     //метод для отправки *.pdf файла юзеру
     public void sendDocument(String path, Long chatId) {

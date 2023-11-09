@@ -5,7 +5,9 @@ import com.pengrad.telegrambot.request.SendDocument;
 
 public interface MessageService {
 
-    public void handleMessage(Message message);
+    public default void handleMessage(Message message) {
+
+    }
 
     //метод для отправки *.pdf файла юзеру
     public void sendDocument(String path, Long chatId);

@@ -1,15 +1,19 @@
 package pro.sky.animalsheltertelegrambot.service.impl;
 
-import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.request.SendMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import pro.sky.animalsheltertelegrambot.exception.UserNotFoundException;
 import pro.sky.animalsheltertelegrambot.model.User;
 import pro.sky.animalsheltertelegrambot.repository.AdoptionRepository;
 import pro.sky.animalsheltertelegrambot.repository.UserRepository;
-import pro.sky.animalsheltertelegrambot.service.AdoptionService;
 import pro.sky.animalsheltertelegrambot.service.UserService;
+import pro.sky.animalsheltertelegrambot.telegram_bot.events.StartCommandEvent;
+import pro.sky.animalsheltertelegrambot.telegram_bot.service.CommandService;
+import pro.sky.animalsheltertelegrambot.telegram_bot.service.MessageSendingService;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -33,9 +37,8 @@ public class UserServiceImpl implements UserService {
 
     private final AdoptionRepository adoptionRepository;
     private final UserRepository userRepository;
-    private final AdoptionService adoptionService;
-    private final TelegramBot telegramBot;
-
+    private final MessageSendingService messageSendingService;
+    private final ApplicationEventPublisher eventPublisher;
     @Override
     public User addUser(User user) {
         log.info("Was invoked method " + getMethodName());
@@ -114,43 +117,48 @@ public class UserServiceImpl implements UserService {
      * @param chatId идентификатор чата пользователя в Telegram
      * @return найденный или созданный пользователь
      */
-    public User findOrCreateUser(Long chatId) {
+    @Override
+    public User findOrCreateUser(Long chatId, String userName) {
         log.info("Поиск пользователя с chatId: {}", chatId);
         return userRepository.findById(chatId)
                 .orElseGet(() -> {
-                    log.info("Создание нового пользователя с chatId: {}", chatId);
-                    User newUser = new User(chatId, null, false);
+                    log.info("Создание нового пользователя с chatId: {} и username: {}", chatId, userName);
+                    User newUser = new User(chatId, userName, false);
+                    log.info("Новый пользователь создан с chatId: {} и username: {}", chatId, userName);
                     // Установите другие начальные свойства newUser по мере необходимости
                     return userRepository.save(newUser);
                 });
     }
 
-    // UserService
+    @Override
+    @EventListener
+    public void onApplicationEvent(StartCommandEvent event) {
+        log.info("Получено событие /start для chatId: {}", event.getChatId());
+        handleStart(event.getChatId(), event.getUsername());
+        log.info("Событие /start обработано для chatId: {}", event.getChatId());
+    }
+
     /**
      * Обрабатывает начальную команду "/start" от пользователя.
      *
      * @param chatId идентификатор чата пользователя в Telegram
      */
-    public void handleStart(Long chatId) {
+    public void handleStart(Long chatId, String userName) {
         log.info("Обработка команды /start для chatId: {}", chatId);
         Optional<User> userOptional = userRepository.findById(chatId);
         if (userOptional.isPresent()) {
-            // Пользователь существует, проверяем его статус усыновления
-            Optional<Boolean> isAdopter = adoptionRepository.checkAdoptionsIsActive(chatId);
-            if (isAdopter.isPresent() && isAdopter.get()) {
-                log.info("Пользователь chatId: {} является усыновителем. Показ меню усыновителя.", chatId);
-                // Показать меню усыновителя
+            User user = userOptional.get();
+            if (checkIfUserIsAdopter(user.getId())) {
+                log.info("Пользователь chatId: {} уже существует. Пользователь является усыновителем.", chatId);
+                messageSendingService.sendMessage(chatId, "Меню усыновителя");
             } else {
-                log.info("Пользователь chatId: {} существует, но не является усыновителем. Показ основного меню.", chatId);
-                // Показать основное меню
+                log.info("Пользователь chatId: {} уже существует. Не усыновитель.", chatId);
             }
         } else {
-            log.info("Пользователь chatId: {} новый. Запрос контактной информации.", chatId);
-            // Создание нового пользователя
-            User newUser = new User(chatId, null, false); // Или другие начальные свойства
+            log.info("Создание нового пользователя с chatId: {} и userName: {}", chatId, userName);
+            User newUser = new User(chatId, userName, false);
             userRepository.save(newUser);
-            // Запрос контактной информации
-            adoptionService.requestContactInfo(chatId, telegramBot);
+            eventPublisher.publishEvent(new StartCommandEvent(chatId, userName));
         }
     }
 

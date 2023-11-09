@@ -1,6 +1,7 @@
 package pro.sky.animalsheltertelegrambot.service;
 
 import pro.sky.animalsheltertelegrambot.model.User;
+import pro.sky.animalsheltertelegrambot.telegram_bot.events.StartCommandEvent;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -30,5 +31,10 @@ public interface UserService {
 
     public boolean checkIfUserIsAdopter(Long userId);
 
-    public void handleStart(Long chatId);
+    public void handleStart(Long chatId, String userName);
+
+    public void onApplicationEvent(StartCommandEvent event);
+
+    public User findOrCreateUser(Long chatId, String userName);
+
 }
