@@ -81,8 +81,8 @@ public class CommandServiceImpl implements CommandService {
         aboutShelterButton.callbackData(ABOUT_SHELTER.toString());
         InlineKeyboardButton applicationButton = new InlineKeyboardButton(Button.APPLICATION.getText());
         applicationButton.callbackData(Button.APPLICATION.toString());
-        InlineKeyboardButton adoptAnimalButton = new InlineKeyboardButton(ADOPT_ANIMAL.getText());
-        adoptAnimalButton.callbackData(ADOPT_ANIMAL.toString());
+        InlineKeyboardButton adoptAnimalButton = new InlineKeyboardButton(ADOPT_ANIMAL_DOG.getText());
+        adoptAnimalButton.callbackData(ADOPT_ANIMAL_DOG.toString());
 
         InlineKeyboardButton volunteerButton = new InlineKeyboardButton(VOLUNTEER.getText());
         volunteerButton.callbackData(VOLUNTEER.toString());
@@ -99,8 +99,8 @@ public class CommandServiceImpl implements CommandService {
         aboutShelterButton.callbackData(ABOUT_SHELTER_CAT.toString());
         InlineKeyboardButton applicationButton = new InlineKeyboardButton(Button.APPLICATION.getText());
         applicationButton.callbackData(Button.APPLICATION.toString());
-        InlineKeyboardButton adoptAnimalButton = new InlineKeyboardButton(ADOPT_ANIMAL.getText());
-        adoptAnimalButton.callbackData(ADOPT_ANIMAL.toString());
+        InlineKeyboardButton adoptAnimalButton = new InlineKeyboardButton(ADOPT_ANIMAL_CAT.getText());
+        adoptAnimalButton.callbackData(ADOPT_ANIMAL_CAT.toString());
         InlineKeyboardButton volunteerButton = new InlineKeyboardButton(VOLUNTEER.getText());
         volunteerButton.callbackData(VOLUNTEER.toString());
 
