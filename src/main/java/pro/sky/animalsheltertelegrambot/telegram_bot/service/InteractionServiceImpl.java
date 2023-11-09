@@ -23,6 +23,7 @@ public class InteractionServiceImpl implements InteractionService {
      */
     public void processCallback(CallbackQuery callbackQuery) {
         // Публикация события вместо прямого вызова метода
+        log.info("Информация пришла в метод processCallback");
         eventPublisher.publishEvent(new CallbackEvent(callbackQuery));
     }
 }

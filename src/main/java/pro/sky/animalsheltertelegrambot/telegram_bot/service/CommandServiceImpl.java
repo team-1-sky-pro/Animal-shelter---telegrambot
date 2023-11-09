@@ -43,6 +43,7 @@ public class CommandServiceImpl implements CommandService {
 
 
     @Override
+    @EventListener
     public void onApplicationEvent(CallbackEvent event) {
         CallbackQuery callbackQuery = event.getCallbackQuery();
         String callbackData = callbackQuery.data();
@@ -51,10 +52,14 @@ public class CommandServiceImpl implements CommandService {
 
         switch (callbackData) {
             case "CATS":
-                runMainMenuForCat(chatId, "Приют для кошек");
+                log.info("Обработка выбора приюта для кошек для chatId: {}", chatId);
+                SendMessage messageForCats = runMainMenuForCat(chatId, "Приют для кошек:");
+                messageSendingService.sendMessage(messageForCats);
                 break;
             case "DOGS":
-                runMainMenu(chatId, "Приют для собак");
+                log.info("Обработка выбора приюта для собак для chatId: {}", chatId);
+                SendMessage messageForDogs = runMainMenu(chatId, "Приют для собак");
+                messageSendingService.sendMessage(messageForDogs);
                 break;
             case "ABOUT_SHELTER":
                 runMenuShelterInfo(chatId);
@@ -105,6 +110,7 @@ public class CommandServiceImpl implements CommandService {
                 new InlineKeyboardButton("CATS \uD83D\uDC31").callbackData("CATS"));
         String testStr = "Выберите приют: \uD83D\uDC3E";
         SendMessage sendMessage = new SendMessage(chatId, testStr).replyMarkup(inlineKeyboard);
+        log.info("Отправили сообщение о выборе приюта chatId: {}" , chatId);
         return sendMessage;
     }
 
@@ -129,6 +135,7 @@ public class CommandServiceImpl implements CommandService {
 
     @Override
     public SendMessage runMainMenu(Long chatId, String text) {
+        log.info("Вызывается метод runMainMenu");
         //кнопки для основного меню
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         InlineKeyboardButton aboutShelterButton = new InlineKeyboardButton(ABOUT_SHELTER.getText());

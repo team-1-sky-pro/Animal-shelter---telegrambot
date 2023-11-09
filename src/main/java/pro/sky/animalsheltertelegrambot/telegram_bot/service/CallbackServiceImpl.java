@@ -23,6 +23,7 @@ public class CallbackServiceImpl implements CallbackService {
 
     @Override
     public void processCallback(CallbackQuery callbackQuery) {
+        log.info("Метод processCallback получил запрос на обработку callbackQuery");
         interactionService.processCallback(callbackQuery);
     }
 }
