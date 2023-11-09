@@ -8,6 +8,7 @@ import com.pengrad.telegrambot.request.SendMessage;
 import jakarta.persistence.EntityExistsException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import pro.sky.animalsheltertelegrambot.exception.AdoptionNotFoundExceptions;
 import pro.sky.animalsheltertelegrambot.exception.UserNotFoundException;
@@ -18,6 +19,8 @@ import pro.sky.animalsheltertelegrambot.repository.AdoptionRepository;
 import pro.sky.animalsheltertelegrambot.repository.PetRepository;
 import pro.sky.animalsheltertelegrambot.repository.UserRepository;
 import pro.sky.animalsheltertelegrambot.service.AdoptionService;
+import pro.sky.animalsheltertelegrambot.service.PetService;
+import pro.sky.animalsheltertelegrambot.service.PhotoService;
 
 import java.util.List;
 
@@ -33,6 +36,7 @@ public class AdoptionServiceImpl implements AdoptionService {
     private final UserRepository userRepository;
     private final PetRepository petRepository;
     private final TelegramBot telegramBot;
+    private final PetService petService;
 
     /**
      * Добавляет новое усыновление.
@@ -197,8 +201,7 @@ public class AdoptionServiceImpl implements AdoptionService {
         // Проверка существования животного
         Pet animal = petRepository.findById(petId).orElse(null);
         if (animal != null && !animal.isAdopted()) {
-            // Логика по усыновлению животного
-            // ...
+            petService.sendAnimalDetails(chatId, animal.getId());
             log.info("User {} started adoption process for animalId: {}", chatId, petId);
         } else {
             // Животное не найдено или уже усыновлено
@@ -210,22 +213,24 @@ public class AdoptionServiceImpl implements AdoptionService {
 
     @Override
     public boolean isAdoptionCallback(String data) {
-        return data != null && data.startsWith("ADOPT_");
+        return data != null && data.startsWith("ANIMAL_");
     }
 
-    @Override
     public void handleAdoptionCallback(CallbackQuery callbackQuery, TelegramBot telegramBot) {
         String callbackData = callbackQuery.data();
         Long chatId = callbackQuery.message().chat().id();
 
+        log.info("Обрабатываем колбек для чата ID: {}", chatId);
+
         if (isAdoptionCallback(callbackData)) {
-            // Извлекаем ID животного из callbackData
-            Long animalId = Long.parseLong(callbackData.substring(6)); // Удаляем "ADOPT_"
+            // Извлекаем ID животного из callbackData и вызываем метод отправки информации
+            Long animalId = Long.parseLong(callbackData.split("_")[1]);
             handleAnimalAdoption(chatId, animalId, telegramBot);
         } else {
-            // Обработка других callback'ов, если они есть
-            // ...
             log.warn("Received unknown callback data: {}", callbackData);
+            SendMessage message = new SendMessage(chatId, "Извините, мы не смогли распознать запрос.");
+            telegramBot.execute(message);
         }
     }
+
 }
