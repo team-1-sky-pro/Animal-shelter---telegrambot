@@ -80,7 +80,7 @@ public class CommandServiceImpl implements CommandService {
         InlineKeyboardButton aboutShelterButton = new InlineKeyboardButton(ABOUT_SHELTER.getText());
         aboutShelterButton.callbackData(ABOUT_SHELTER.toString());
         InlineKeyboardButton applicationButton = new InlineKeyboardButton(Button.APPLICATION.getText());
-        applicationButton.callbackData(Button.APPLICATION.getCommand());
+        applicationButton.callbackData(Button.APPLICATION.toString());
         InlineKeyboardButton adoptAnimalButton = new InlineKeyboardButton(ADOPT_ANIMAL.getText());
         adoptAnimalButton.callbackData(ADOPT_ANIMAL.toString());
 
@@ -98,7 +98,7 @@ public class CommandServiceImpl implements CommandService {
         InlineKeyboardButton aboutShelterButton = new InlineKeyboardButton(ABOUT_SHELTER_CAT.getText());
         aboutShelterButton.callbackData(ABOUT_SHELTER_CAT.toString());
         InlineKeyboardButton applicationButton = new InlineKeyboardButton(Button.APPLICATION.getText());
-        applicationButton.callbackData(Button.APPLICATION.getCommand());
+        applicationButton.callbackData(Button.APPLICATION.toString());
         InlineKeyboardButton adoptAnimalButton = new InlineKeyboardButton(ADOPT_ANIMAL.getText());
         adoptAnimalButton.callbackData(ADOPT_ANIMAL.toString());
         InlineKeyboardButton volunteerButton = new InlineKeyboardButton(VOLUNTEER.getText());
@@ -162,6 +162,7 @@ public class CommandServiceImpl implements CommandService {
         // Отправка сообщения
         SendResponse sendResponse = telegramBot.execute(sendMessage);
     }
+
 
     //метод для отправки *.pdf файла юзеру
     @Override

@@ -29,22 +29,5 @@ public class Shelter {
     private String securityContacts;
     private String workingHours;
 
-    /**
-     * животные живущие в определенном приюте
-     * !! проверить правильность и установить связь !!
-     * private Set<Pet> pets
-     */
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Shelter shelter = (Shelter) o;
-        return id.equals(shelter.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
 }

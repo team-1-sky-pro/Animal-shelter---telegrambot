@@ -120,6 +120,16 @@ public class AdoptionServiceImpl implements AdoptionService {
         adoptionRepository.deleteById(id);
     }
 
+
+
+    //===================================start Adoption =================================================================
+
+    public void startAdoptionProcess(Long chatId) {
+        SendMessage requestContact = new SendMessage(chatId, "Пожалуйста, введите ваш email и номер телефона через запятую (например, email@example.com, +1234567890)");
+        telegramBot.execute(requestContact);
+    }
+
+
     public void processContactInfo(Long chatId, String text, TelegramBot telegramBot) {
         // Проверяем, соответствует ли введённый текст шаблону email и номера телефона
         if (text.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,},\\s*\\+?\\d{10,15}$")) {
@@ -148,12 +158,6 @@ public class AdoptionServiceImpl implements AdoptionService {
     }
 
 
-    public void requestContactInfo(Long chatId, TelegramBot telegramBot) {
-        // Сообщение, которое просит пользователя ввести контактные данные
-        String messageText = "Пожалуйста, введите ваш email и номер телефона через запятую (например, email@example.com, +1234567890):";
-        SendMessage requestMessage = new SendMessage(chatId, messageText);
-        telegramBot.execute(requestMessage);
-    }
 
     @Override
     public void saveUserContactInfo(Long userId, String email, String phoneNumber) {
@@ -223,10 +227,5 @@ public class AdoptionServiceImpl implements AdoptionService {
             // ...
             log.warn("Received unknown callback data: {}", callbackData);
         }
-    }
-
-    public void startAdoptionProcess(Long chatId) {
-        SendMessage requestContact = new SendMessage(chatId, "Пожалуйста, введите ваш email и номер телефона через запятую.");
-        telegramBot.execute(requestContact);
     }
 }

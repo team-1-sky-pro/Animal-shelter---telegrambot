@@ -33,18 +33,4 @@ public class Adoption {
 
     @Column(name = "is_active")
     private boolean isActive;
-
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Adoption a = (Adoption) o;
-        return Objects.equals(id, a.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
 }

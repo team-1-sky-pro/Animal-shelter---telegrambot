@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import pro.sky.animalsheltertelegrambot.service.AdoptionService;
 import pro.sky.animalsheltertelegrambot.telegram_bot.events.StartCommandEvent;
 
 
@@ -20,6 +21,7 @@ public class MessageServiceImpl implements MessageService {
 
     private final TelegramBot telegramBot;
     private final ApplicationEventPublisher eventPublisher;
+    private final AdoptionService adoptionService;
 
     /**
      * Обрабатывает входящее сообщение от пользователя.
@@ -32,19 +34,21 @@ public class MessageServiceImpl implements MessageService {
         Long chatId = message.chat().id();
         String text = message.text();
         String username = message.from().username(); // Получаем username из объекта Message
-        log.info("Обработка сообщения от пользователя: {}", chatId);
+        log.info("Обработка сообщения в методе handleMessage от пользователя: {}", chatId);
 
         if (text != null && "/start".equals(text)) {
-            // Проверяем, что username не null и не пустой
             if (username == null || username.isEmpty()) {
-                username = "defaultUsername";  // Вы можете установить значение по умолчанию
+                username = "defaultUsername";
             }
             eventPublisher.publishEvent(new StartCommandEvent(chatId, username));
             log.info("Обработка события /start от пользователя: {}", chatId);
         } else {
-            // ... обработка других сообщений ...
+            // Все текстовые сообщения, которые не являются командой /start, отправляем в processContactInfo
+            adoptionService.processContactInfo(chatId, text, telegramBot);
+            log.info("Передача текста в метод processContactInfo от пользователя: {}", chatId);
         }
     }
+
 
 
     //метод для отправки *.pdf файла юзеру
