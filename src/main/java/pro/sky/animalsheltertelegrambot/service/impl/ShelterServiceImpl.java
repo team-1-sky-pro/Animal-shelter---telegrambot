@@ -121,4 +121,7 @@ public class ShelterServiceImpl implements ShelterService {
 //        return sendMessage;
 //    }
 
+    public String infoSheltonContact() {
+        return shelterRepository.findDogShelterContactsByShelterType();
+    }
 }

@@ -27,4 +27,6 @@ public interface ShelterService {
     public SendMessage displayDogShelterWorkingHours(Long chatId);
     public SendMessage displayDogShelterSecurityContacts(Long chatId);
     public SendMessage displayDogShelterContacts(Long chatId);
+
+    public String infoSheltonContact();
 }

@@ -1,5 +1,6 @@
 package pro.sky.animalsheltertelegrambot.repository;
 
+import com.pengrad.telegrambot.request.SendMessage;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import pro.sky.animalsheltertelegrambot.model.Shelter;

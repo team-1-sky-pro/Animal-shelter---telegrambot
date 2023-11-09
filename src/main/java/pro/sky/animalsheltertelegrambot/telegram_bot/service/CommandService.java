@@ -10,9 +10,9 @@ public interface CommandService {
 
     public SendMessage executeStartCommandIfUserExists(Long chatId);
 
-    public SendMessage runMainMenu(Long chatId, String text);
+    public SendMessage firstMenuDog(Long chatId, String text);
 
-    public SendMessage runMainMenuForCat(Long chatId, String text);
+    public SendMessage firsMenuCat(Long chatId, String text);
 
     public SendMessage runMenuShelterInfo(Long chatId);
 
