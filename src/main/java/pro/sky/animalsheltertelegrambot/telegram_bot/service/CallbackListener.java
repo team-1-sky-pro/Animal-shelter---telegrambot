@@ -17,7 +17,10 @@ import pro.sky.animalsheltertelegrambot.telegram_bot.service.CommandService.Comm
 import pro.sky.animalsheltertelegrambot.telegram_bot.service.MessageSendingService.MessageSendingService;
 import pro.sky.animalsheltertelegrambot.telegram_bot.service.MessageService.MessageService;
 
-
+/**
+ * Компонент, слушающий колбэк-события от Telegram бота.
+ * Распределяет колбэк-запросы по соответствующим обработчикам в зависимости от содержащихся в них данных.
+ */
 @Slf4j
 @RequiredArgsConstructor
 @Component
@@ -31,19 +34,21 @@ public class CallbackListener {
     private final CommandService commandService;
     private final TelegramBot telegramBot;
 
+    /**
+     * Обработчик колбэк-событий, получаемых от inline-кнопок в сообщениях Telegram бота.
+     *
+     * @param event Событие, содержащее колбэк-запрос от пользователя.
+     */
     @EventListener
     public void onApplicationEvent(CallbackEvent event) {
         CallbackQuery callbackQuery = event.getCallbackQuery();
         String callbackData = callbackQuery.data();
         Long chatId = callbackQuery.message().chat().id();
-        log.info("Обработка колбэк-запроса с данными: {} для чата: {}", callbackData, chatId);
+        log.info("Обработка колбэк-запроса: '{}' для chatId: {}", callbackData, chatId);
 
-        // Проверяем, начинаются ли данные колбэка с "ANIMAL_"
         if (adoptionService.isAdoptionCallback(callbackData)) {
-            // Если да, то перенаправляем обработку в метод handleAdoptionCallback класса AdoptionService
             adoptionService.handleAdoptionCallback(callbackQuery, telegramBot);
         } else {
-            // Все остальные колбэки обрабатываем как раньше
             switch (callbackData) {
                 case "CATS":
                     log.info("Обработка выбора приюта для кошек для chatId: {}", chatId);
@@ -69,19 +74,22 @@ public class CallbackListener {
                     log.info("Обработка информации о приюте для chatId: {}", chatId);
                     SendMessage shelterInfoPro = shelterService.displayDogShelterContacts(chatId);
                     messageSendingService.sendMessage(shelterInfoPro);
-                    commandService.sendDocument("src/main/resources/files/dog_shelter_info_.pdf", chatId);
+                    messageService.sendDocument("src/main/resources/files/dog_shelter_info_.pdf", chatId);
                     break;
                 case "SECURITY_CONTACTS":
+                    log.info("Обработка информации о securityContacts для chatId: {}", chatId);
                     SendMessage securityContacts = shelterService.displayDogShelterSecurityContacts(chatId);
                     messageSendingService.sendMessage(securityContacts);
                     messageService.sendDocument("src/main/resources/files/dog_shelter_security_contacts.pdf", chatId);
                     break;
                 case "SCHEDULE":
+                    log.info("Обработка информации о schedule для chatId: {}", chatId);
                     SendMessage schedule = shelterService.displayDogShelterWorkingHours(chatId);
                     messageSendingService.sendMessage(schedule);
                     messageService.sendDocument("src/main/resources/files/dog_shelter_schedule_address.pdf", chatId);
                     break;
                 case "SAFETY_RECOMMENDATION":
+                    log.info("Обработка информации о safetyRecommendationText для chatId: {}", chatId);
                     String safetyRecommendationText = "Подробности по безопасности на территории приюта.";
                     messageSendingService.sendMessage(chatId, safetyRecommendationText);
                     messageService.sendDocument("src/main/resources/files/dog_safety_recommendation.pdf", chatId);

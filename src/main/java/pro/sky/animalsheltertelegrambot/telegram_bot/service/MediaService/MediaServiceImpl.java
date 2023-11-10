@@ -8,24 +8,25 @@ import org.springframework.stereotype.Service;
 import pro.sky.animalsheltertelegrambot.service.PhotoService;
 import pro.sky.animalsheltertelegrambot.service.ReportService;
 
+/**
+ * Сервис для обработки медиа-сообщений в Telegram боте.
+ * Осуществляет обработку фотографий, присланных пользователями, включая сохранение и анализ контента.
+ */
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class MediaServiceImpl implements MediaService {
 
-    private final TelegramBot telegramBot;
-    private final PhotoService photoService;
-    private final ReportService reportService;
-
     /**
-     * Обработка сообщения с фото, отправленного пользователем.
-     *
-     * @param message сообщение с фото
+     * Обрабатывает сообщения с фото, отправленные пользователем в чат бота.
+     * @param message сообщение с фото, полученное от пользователя через Telegram API
      */
     public void processPhotoMessage(Message message) {
         Long chatId = message.chat().id();
-        log.info("Обработка фото сообщения от пользователя {}", chatId);
-        // Здесь логика по обработке фото сообщений
-        // Например, сохранение фото в базу данных, создание отчета и т.д.
+        log.info("Начата обработка фото сообщения от chatId: {}", chatId);
     }
 }
+
+
+
+

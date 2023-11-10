@@ -10,7 +10,9 @@ import pro.sky.animalsheltertelegrambot.model.User;
 import pro.sky.animalsheltertelegrambot.repository.AdoptionRepository;
 import pro.sky.animalsheltertelegrambot.repository.UserRepository;
 import pro.sky.animalsheltertelegrambot.service.UserService;
-import pro.sky.animalsheltertelegrambot.telegram_bot.events.StartCommandEvent;
+import pro.sky.animalsheltertelegrambot.telegram_bot.events.AdopterStartEvent;
+import pro.sky.animalsheltertelegrambot.telegram_bot.events.RegularUserStartEvent;
+import pro.sky.animalsheltertelegrambot.telegram_bot.service.CommandService.CommandService;
 import pro.sky.animalsheltertelegrambot.telegram_bot.service.MessageSendingService.MessageSendingService;
 
 import java.util.Collection;
@@ -37,9 +39,17 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final MessageSendingService messageSendingService;
     private final ApplicationEventPublisher eventPublisher;
+    private final CommandService commandService;
+
+    /**
+     * Добавляет нового пользователя в репозиторий.
+     *
+     * @param user объект пользователя для сохранения
+     * @return сохраненный пользователь
+     */
     @Override
     public User addUser(User user) {
-        log.info("Was invoked method " + getMethodName());
+        log.info("Добавлен новый пользователь с ID: {}", user.getId());
         return userRepository.save(user);
     }
 
@@ -89,6 +99,13 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+
+    /*
+    =============================additional methods==============================================================
+    дополнительная логика для работы с пользователями в системе усыновления животных.
+     */
+
+
     /**
      * Проверка на существование пользователя в БД.
      *
@@ -101,7 +118,6 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Производится проверка, является ли пользователь усыновителем или нет.
-     *
      * @param userId chat ID, который также является ID пользователя
      * @return true - если пользователь является усыновителем, false - если нет
      */
@@ -111,7 +127,6 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Находит существующего пользователя по chatId или создает нового, если такой не найден.
-     *
      * @param chatId идентификатор чата пользователя в Telegram
      * @return найденный или созданный пользователь
      */
@@ -128,37 +143,53 @@ public class UserServiceImpl implements UserService {
                 });
     }
 
-    @Override
+    /**
+     * Обрабатывает событие /start, которое генерируется, когда пользователь начинает взаимодействие с ботом.
+     * Этот метод инициирует процесс регистрации пользователя или представляет меню, если пользователь уже зарегистрирован.
+     *
+     * @param event Событие, содержащее информацию о пользователе и его чате.
+     */
     @EventListener
-    public void onApplicationEvent(StartCommandEvent event) {
-        log.info("Получено событие /start для chatId: {}", event.getChatId());
+    public void onApplicationEvent(RegularUserStartEvent event) {
+        log.info("Начало обработки команды /start для chatId: {}", event.getChatId());
         handleStart(event.getChatId(), event.getUsername());
-        log.info("Событие /start обработано для chatId: {}", event.getChatId());
+    }
+
+    @EventListener
+    public void onAdopterStartEventAdoption(AdopterStartEvent event) {
+        log.info("Обработка AdopterStartEvent для chatId: {}", event.getChatId());
+        commandService.runMenuForAdopter(event.getChatId(), event.getUsername());
     }
 
     /**
-     * Обрабатывает начальную команду "/start" от пользователя.
-     *
-     * @param chatId идентификатор чата пользователя в Telegram
+     * Обрабатывает команду /start, регистрируя нового пользователя или предоставляя меню существующему.
+     * @param chatId Идентификатор чата пользователя в Telegram.
+     * @param userName Имя пользователя в Telegram.
      */
     public void handleStart(Long chatId, String userName) {
-        log.info("Обработка команды /start для chatId: {}", chatId);
-        Optional<User> userOptional = userRepository.findById(chatId);
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            if (checkIfUserIsAdopter(user.getId())) {
-                log.info("Пользователь chatId: {} уже существует. Пользователь является усыновителем.", chatId);
-                messageSendingService.sendMessage(chatId, "Меню усыновителя");
-            } else {
-                log.info("Пользователь chatId: {} уже существует. Не усыновитель.", chatId);
-            }
+        log.info("Обработка /start для chatId: {}", chatId);
+        User user = userRepository.findById(chatId)
+                .orElseGet(() -> createUser(chatId, userName));
+
+        if (checkIfUserIsAdopter(chatId)) {
+            log.info("Пользователь с chatId: {} является усыновителем.", chatId);
+            commandService.runMenuForAdopter(chatId, userName);
         } else {
-            log.info("Создание нового пользователя с chatId: {} и userName: {}", chatId, userName);
-            User newUser = new User(chatId, userName, false);
-            userRepository.save(newUser);
-            eventPublisher.publishEvent(new StartCommandEvent(chatId, userName));
+            commandService.executeStartCommandIfUserExists(chatId);
+            log.info("Пользователь с chatId: {} не является усыновителем.", chatId);
         }
     }
 
-
+    /**
+     * Создает нового пользователя и сохраняет его в репозитории.
+     * @param chatId Идентификатор чата пользователя в Telegram.
+     * @param userName Имя пользователя в Telegram.
+     * @return Созданный пользователь.
+     */
+    private User createUser(Long chatId, String userName) {
+        log.info("Создание нового пользователя с chatId: {} и userName: {}", chatId, userName);
+        User newUser = new User(chatId, userName, false);
+        // Установите другие начальные свойства newUser по мере необходимости
+        return userRepository.save(newUser);
+    }
 }
