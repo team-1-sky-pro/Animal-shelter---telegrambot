@@ -32,8 +32,4 @@ public interface UserService {
 
     public void handleStart(Long chatId, String userName);
 
-    public void onApplicationEvent(RegularUserStartEvent event);
-
-    public User findOrCreateUser(Long chatId, String userName);
-
 }

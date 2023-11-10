@@ -125,23 +125,6 @@ public class UserServiceImpl implements UserService {
         return adoptionRepository.checkAdoptionsIsActive(userId).orElse(false);
     }
 
-    /**
-     * Находит существующего пользователя по chatId или создает нового, если такой не найден.
-     * @param chatId идентификатор чата пользователя в Telegram
-     * @return найденный или созданный пользователь
-     */
-    @Override
-    public User findOrCreateUser(Long chatId, String userName) {
-        log.info("Поиск пользователя с chatId: {}", chatId);
-        return userRepository.findById(chatId)
-                .orElseGet(() -> {
-                    log.info("Создание нового пользователя с chatId: {} и username: {}", chatId, userName);
-                    User newUser = new User(chatId, userName, false);
-                    log.info("Новый пользователь создан с chatId: {} и username: {}", chatId, userName);
-                    // Установите другие начальные свойства newUser по мере необходимости
-                    return userRepository.save(newUser);
-                });
-    }
 
     /**
      * Обрабатывает событие /start, которое генерируется, когда пользователь начинает взаимодействие с ботом.
@@ -150,13 +133,13 @@ public class UserServiceImpl implements UserService {
      * @param event Событие, содержащее информацию о пользователе и его чате.
      */
     @EventListener
-    public void onApplicationEvent(RegularUserStartEvent event) {
+    private void onApplicationEventUser(RegularUserStartEvent event) {
         log.info("Начало обработки команды /start для chatId: {}", event.getChatId());
         handleStart(event.getChatId(), event.getUsername());
     }
 
     @EventListener
-    public void onAdopterStartEventAdoption(AdopterStartEvent event) {
+    private void onAdopterStartEventAdoption(AdopterStartEvent event) {
         log.info("Обработка AdopterStartEvent для chatId: {}", event.getChatId());
         commandService.runMenuForAdopter(event.getChatId(), event.getUsername());
     }
@@ -166,18 +149,19 @@ public class UserServiceImpl implements UserService {
      * @param chatId Идентификатор чата пользователя в Telegram.
      * @param userName Имя пользователя в Telegram.
      */
+    @Override
     public void handleStart(Long chatId, String userName) {
         log.info("Обработка /start для chatId: {}", chatId);
-        User user = userRepository.findById(chatId)
-                .orElseGet(() -> createUser(chatId, userName));
 
-        if (checkIfUserIsAdopter(chatId)) {
-            log.info("Пользователь с chatId: {} является усыновителем.", chatId);
-            commandService.runMenuForAdopter(chatId, userName);
-        } else {
-            commandService.executeStartCommandIfUserExists(chatId);
-            log.info("Пользователь с chatId: {} не является усыновителем.", chatId);
+        Optional<User> existingUser = userRepository.findById(chatId);
+        if (existingUser.isEmpty()) {
+            createUser(chatId, userName);
+            sendWelcomeMessage(chatId, userName);
         }
+    }
+    private void sendWelcomeMessage(Long chatId, String userName) {
+        String messageText = "Привет, " + userName + "! Добро пожаловать в нашу систему.";
+        messageSendingService.sendMessage(chatId, messageText);
     }
 
     /**
@@ -186,10 +170,9 @@ public class UserServiceImpl implements UserService {
      * @param userName Имя пользователя в Telegram.
      * @return Созданный пользователь.
      */
-    private User createUser(Long chatId, String userName) {
+    private void createUser(Long chatId, String userName) {
         log.info("Создание нового пользователя с chatId: {} и userName: {}", chatId, userName);
         User newUser = new User(chatId, userName, false);
-        // Установите другие начальные свойства newUser по мере необходимости
-        return userRepository.save(newUser);
+        userRepository.save(newUser);
     }
 }

@@ -33,4 +33,10 @@ public class Adoption {
 
     @Column(name = "is_active")
     private boolean isActive;
+
+    @Column(name = "pet_id")
+    private Long petId;
+
+    @Column(name = "user_id")
+    private Long userId;
 }

@@ -168,7 +168,7 @@ public class CommandServiceImpl implements CommandService {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         inlineKeyboardMarkup.addRow(reportButton).addRow(anotherPetButton).addRow(volunteerButton);
 
-        String greeting = "Привет, " + userName + "! ";
+        String greeting = userName + "! ";
         String menuText = greeting + "Меню действующего усыновителя.";
 
         SendMessage sendMessage = new SendMessage(chatId, menuText).replyMarkup(inlineKeyboardMarkup);
