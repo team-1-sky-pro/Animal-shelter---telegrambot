@@ -132,14 +132,6 @@ public class CommandServiceImpl implements CommandService {
     }
 
     @Override
-    public void sendVolunteerChat(Long chatId) {
-        Long toChatId = userRepository.findUserIdIfUserIsVolunteer();
-        String phone = userRepository.findPhoneById(chatId);
-        SendMessage sendMessage = new SendMessage(toChatId, "Привет! \nМеня зовут " + userRepository.findNameById(chatId) +  "\nМне нужна помощь волонтера \nПрошу со мной связаться. Мои контакты: " + phone);
-        telegramBot.execute(sendMessage);
-    }
-
-    @Override
     public SendMessage runMenuShelterInfo(Long chatId) {
         //кнопки для подробного меню
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
@@ -272,5 +264,13 @@ public class CommandServiceImpl implements CommandService {
             e.printStackTrace();
             telegramBot.execute(new SendMessage(chatId, "Произошла ошибка. Попробуйте еще раз."));
         }
+    }
+
+    @Override
+    public void sendVolunteerChat(Long chatId) {
+        Long toChatId = userRepository.findUserIdIfUserIsVolunteer();
+        String phone = userRepository.findPhoneById(chatId);
+        SendMessage sendMessage = new SendMessage(toChatId, "Привет! \nМеня зовут " + userRepository.findNameById(chatId) +  "\nМне нужна помощь волонтера \nПрошу со мной связаться. Мои контакты: " + phone);
+        telegramBot.execute(sendMessage);
     }
 }
