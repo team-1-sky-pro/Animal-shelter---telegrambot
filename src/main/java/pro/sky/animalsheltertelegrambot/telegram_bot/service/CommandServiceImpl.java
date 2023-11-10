@@ -2,16 +2,12 @@ package pro.sky.animalsheltertelegrambot.telegram_bot.service;
 
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.CallbackQuery;
+import com.pengrad.telegrambot.model.InlineQuery;
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
-import com.pengrad.telegrambot.request.SendDocument;
-import com.pengrad.telegrambot.request.SendMessage;
+import com.pengrad.telegrambot.request.*;
 import com.pengrad.telegrambot.model.File;
 import com.pengrad.telegrambot.model.Message;
-import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
-import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
-import com.pengrad.telegrambot.request.GetFile;
-import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.GetFileResponse;
 import com.pengrad.telegrambot.response.SendResponse;
 import lombok.RequiredArgsConstructor;
@@ -21,9 +17,11 @@ import pro.sky.animalsheltertelegrambot.model.Pet;
 import pro.sky.animalsheltertelegrambot.model.Photo;
 import pro.sky.animalsheltertelegrambot.model.Report;
 import pro.sky.animalsheltertelegrambot.repository.ShelterRepository;
+import pro.sky.animalsheltertelegrambot.repository.UserRepository;
 import pro.sky.animalsheltertelegrambot.service.PetService;
 import pro.sky.animalsheltertelegrambot.service.PhotoService;
 import pro.sky.animalsheltertelegrambot.service.ReportService;
+
 import java.time.LocalDateTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,6 +42,7 @@ public class CommandServiceImpl implements CommandService {
     private final PetService petService;
     private final PhotoService photoService;
     private final ReportService reportService;
+    private final UserRepository userRepository;
 
     @Override
     public SendMessage executeStartCommandIfUserExists(Long chatId) {
@@ -54,6 +53,7 @@ public class CommandServiceImpl implements CommandService {
         SendMessage sendMessage = new SendMessage(chatId, testStr).replyMarkup(inlineKeyboard);
         return sendMessage;
     }
+
     //метод для обработки callbackQuery
     @Override
     public void receivedCallbackMessage(CallbackQuery callbackQuery) {
@@ -77,26 +77,35 @@ public class CommandServiceImpl implements CommandService {
             case "DOG_SHELTER_INFO":
                 telegramBot.execute(displayDogShelterContacts(chatId));
                 path = "src/main/resources/files/dog_shelter_info_.pdf";
-                sendDocument(path,chatId);
+                sendDocument(path, chatId);
                 break;
             case "SECURITY_CONTACTS":
                 telegramBot.execute(displayDogShelterSecurityContacts(chatId));
                 path = "src/main/resources/files/dog_shelter_security_contacts.pdf";
-                sendDocument(path,chatId);
+                sendDocument(path, chatId);
                 break;
             case "SCHEDULE":
                 telegramBot.execute(displayDogShelterWorkingHours(chatId));
                 path = "src/main/resources/files/dog_shelter_schedule_address.pdf";
-                sendDocument(path,chatId);
+                sendDocument(path, chatId);
                 break;
             case "SAFETY_RECOMMENDATION":
                 path = "src/main/resources/files/dog_safety_recommendation.pdf";
-                sendDocument(path,chatId);
+                sendDocument(path, chatId);
                 break;
             case "REPORT":
                 telegramBot.execute(displayReportInfo(chatId));
                 break;
+            case "VOLUNTEER":
+                sendVolunteerChat(chatId);
+                break;
         }
+    }
+
+    @Override
+    public void receivedSwitchCallBackData(InlineQuery inlineQuery) {
+        String inline_data = inlineQuery.query();
+
     }
 
     @Override
@@ -116,9 +125,18 @@ public class CommandServiceImpl implements CommandService {
         volunteerButton.callbackData(VOLUNTEER.toString());
 
         inlineKeyboardMarkup.addRow(aboutShelterButton, adoptAnimalButton);
-        inlineKeyboardMarkup.addRow(reportButton, volunteerButton);
+        inlineKeyboardMarkup.addRow(reportButton);
+        inlineKeyboardMarkup.addRow(volunteerButton);
         SendMessage sendMessage = new SendMessage(chatId, text).replyMarkup(inlineKeyboardMarkup);
         return sendMessage;
+    }
+
+    @Override
+    public void sendVolunteerChat(Long chatId) {
+        Long toChatId = userRepository.findUserIdIfUserIsVolunteer();
+        String phone = userRepository.findPhoneById(chatId);
+        SendMessage sendMessage = new SendMessage(toChatId, "Привет! \nМеня зовут " + userRepository.findNameById(chatId) +  "\nМне нужна помощь волонтера \nПрошу со мной связаться. Мои контакты: " + phone);
+        telegramBot.execute(sendMessage);
     }
 
     @Override
@@ -150,18 +168,21 @@ public class CommandServiceImpl implements CommandService {
         SendMessage sendMessage = new SendMessage(chatId, "Подробная информация о приюте").replyMarkup(inlineKeyboardMarkup);
         return sendMessage;
     }
+
     //метод для получения информации о приюте из бд
     @Override
     public SendMessage displayDogShelterContacts(Long chatId) {
-        SendMessage sendMessage = new SendMessage(chatId,  shelterRepository.findDogShelterContactsByShelterType() +"\nБолее подробная информация о приюте в файле:" );
+        SendMessage sendMessage = new SendMessage(chatId, shelterRepository.findDogShelterContactsByShelterType() + "\nБолее подробная информация о приюте в файле:");
         return sendMessage;
     }
+
     //метод для получения информации о контактах охраны из бд
     @Override
     public SendMessage displayDogShelterSecurityContacts(Long chatId) {
         SendMessage sendMessage = new SendMessage(chatId, shelterRepository.findDogShelterSecurityContactsByShelterType() + "\nБолее подробная информация в файле:");
         return sendMessage;
     }
+
     //метод для получения информации о часах работы, схемы проезда и адреса из бд
     @Override
     public SendMessage displayDogShelterWorkingHours(Long chatId) {
@@ -207,6 +228,8 @@ public class CommandServiceImpl implements CommandService {
         SendDocument sendDocument = new SendDocument(chatId, new java.io.File(path));
         telegramBot.execute(sendDocument);
     }
+
+
     @Override
     public void saveReport(Message message) {
         Long chatId = message.chat().id();

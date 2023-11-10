@@ -14,8 +14,8 @@ public enum Button {
     ADOPT_ANIMAL("/adopt_animal","Взять животное"),
     DOG_SHELTER_INFO("/dog_shelter_info", "О приюте"),
     SECURITY_CONTACTS("/security_contacts", "Контакты охраны"),
-    SCHEDULE("/schedule", "Расписание, адрес\nи схема проезда"),
-    SAFETY_RECOMMENDATION("/recommendation", "Рекомендации \n по ТБ\nна территории приюта"),
+    SCHEDULE("/schedule", "Расписание, адрес и схема проезда"),
+    SAFETY_RECOMMENDATION("/recommendation", "Рекомендации  по ТБна территории приюта"),
     APPLICATION("/application", "Оставить заявку");
 
     private final String command;

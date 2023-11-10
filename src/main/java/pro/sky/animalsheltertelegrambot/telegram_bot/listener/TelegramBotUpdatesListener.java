@@ -3,6 +3,7 @@ package pro.sky.animalsheltertelegrambot.telegram_bot.listener;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.CallbackQuery;
+import com.pengrad.telegrambot.model.InlineQuery;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
@@ -49,6 +50,9 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
             if (update.message() != null) {
                 handleMessage(update.message());
             }
+            if(update.inlineQuery() != null){
+                handleInline(update.inlineQuery());
+            }
         });
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
@@ -76,6 +80,9 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
     private void handleCallback(CallbackQuery callbackQuery) {
         commandService.receivedCallbackMessage(callbackQuery);
+    }
+    private void handleInline(InlineQuery inlineQuery) {
+        commandService.receivedSwitchCallBackData(inlineQuery);
     }
 
     private void sendMessage(Long chatId, String sendingMessage) {
