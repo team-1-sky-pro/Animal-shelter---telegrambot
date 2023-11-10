@@ -30,6 +30,8 @@ import java.util.Optional;
 @RequestMapping("/users")
 @Tag(name = " Пользователи ", description = "Возможные операции (просмотр, изменение, удаление)")
 public class UserController {
+
+
     private final UserService userService;
 
     @Operation(

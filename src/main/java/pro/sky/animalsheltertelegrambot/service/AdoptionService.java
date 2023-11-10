@@ -18,7 +18,7 @@ public interface AdoptionService {
 
     public void saveUserContactInfo(Long userId, String email, String phoneNumber);
 
-    public void offerAnimalsToAdopt(Long chatId, TelegramBot telegramBot);
+    public void offerAnimalsToAdopt(Long chatId, TelegramBot telegramBot, Long shelterId);
 
     public void handleAnimalAdoption(Long chatId, Long animalId, TelegramBot telegramBot);
 
@@ -27,5 +27,5 @@ public interface AdoptionService {
 
     public void processContactInfo(Long chatId, String text, TelegramBot telegramBot);
 
-    public void requestContactInfo(Long chatId, TelegramBot telegramBot);
+    public void startAdoptionProcess(Long chatId, Long shelterId);
 }

@@ -11,4 +11,7 @@ public interface AdoptionRepository extends JpaRepository<Adoption,Long> {
     Long findIdByUserId(Long userId);
     @Query(value = "SELECT is_active FROM adoptions WHERE user_id=?1", nativeQuery = true)
     Optional<Boolean> checkAdoptionsIsActive(Long userId);
+
+    boolean existsByUserIdAndPetId(Long chatId, Long animalId);
+
 }

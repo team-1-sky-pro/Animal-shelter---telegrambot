@@ -20,6 +20,9 @@ import java.io.IOException;
 @Tag(name = "Фотографии", description = "Возможные операции с фотографиями, могут относиться либо к питомцу, либо к отчету")
 @RequestMapping("/photos")
 public class PhotoController {
+
+
+
     private final PhotoService photoService;
 
     @Operation(

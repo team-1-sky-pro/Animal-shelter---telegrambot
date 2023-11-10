@@ -39,6 +39,7 @@ import static pro.sky.animalsheltertelegrambot.utils.MethodNameRetriever.getMeth
 @RequiredArgsConstructor
 @Slf4j
 public class PhotoServiceImpl implements PhotoService {
+
     private final PhotoRepository photoRepository;
     private final PetService petService;
     private final ReportService reportService;

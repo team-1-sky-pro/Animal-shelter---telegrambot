@@ -1,6 +1,7 @@
 package pro.sky.animalsheltertelegrambot.service;
 
 import pro.sky.animalsheltertelegrambot.model.User;
+import pro.sky.animalsheltertelegrambot.telegram_bot.events.RegularUserStartEvent;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -24,4 +25,11 @@ public interface UserService {
     Collection<User> getAllUsers();
 
     public boolean hasContactInfo(Long userId);
+
+    public boolean checkIsUserIsNew(Long userId);
+
+    public boolean checkIfUserIsAdopter(Long userId);
+
+    public void handleStart(Long chatId, String userName);
+
 }

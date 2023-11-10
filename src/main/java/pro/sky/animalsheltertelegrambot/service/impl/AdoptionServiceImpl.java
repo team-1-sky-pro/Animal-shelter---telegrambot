@@ -8,8 +8,10 @@ import com.pengrad.telegrambot.request.SendMessage;
 import jakarta.persistence.EntityExistsException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import pro.sky.animalsheltertelegrambot.exception.AdoptionNotFoundExceptions;
+import pro.sky.animalsheltertelegrambot.exception.PetNotFoundException;
 import pro.sky.animalsheltertelegrambot.exception.UserNotFoundException;
 import pro.sky.animalsheltertelegrambot.model.Adoption;
 import pro.sky.animalsheltertelegrambot.model.Pet;
@@ -18,8 +20,12 @@ import pro.sky.animalsheltertelegrambot.repository.AdoptionRepository;
 import pro.sky.animalsheltertelegrambot.repository.PetRepository;
 import pro.sky.animalsheltertelegrambot.repository.UserRepository;
 import pro.sky.animalsheltertelegrambot.service.AdoptionService;
+import pro.sky.animalsheltertelegrambot.service.PetService;
+import pro.sky.animalsheltertelegrambot.service.PhotoService;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Реализация сервиса по управлению усыновлением.
@@ -32,6 +38,10 @@ public class AdoptionServiceImpl implements AdoptionService {
     private final AdoptionRepository adoptionRepository;
     private final UserRepository userRepository;
     private final PetRepository petRepository;
+    private final TelegramBot telegramBot;
+    private final PetService petService;
+
+    private final Map<Long, Long> userShelterPreference = new HashMap<>();
 
     /**
      * Добавляет новое усыновление.
@@ -119,6 +129,22 @@ public class AdoptionServiceImpl implements AdoptionService {
         adoptionRepository.deleteById(id);
     }
 
+
+    //===================================start Adoption =================================================================
+
+    public void startAdoptionProcess(Long chatId, Long shelterId) {
+        User user = userRepository.findById(chatId).orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
+        if (user.getPhone() == null || user.getEmail() == null) {
+            SendMessage requestContact = new SendMessage(chatId, "Пожалуйста, введите ваш email и номер телефона " +
+                    "через запятую (например, email@example.com, +1234567890)");
+            telegramBot.execute(requestContact);
+        } else {
+            offerAnimalsToAdopt(chatId, telegramBot, shelterId);
+        }
+        userShelterPreference.put(chatId, shelterId);
+    }
+
+
     public void processContactInfo(Long chatId, String text, TelegramBot telegramBot) {
         // Проверяем, соответствует ли введённый текст шаблону email и номера телефона
         if (text.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,},\\s*\\+?\\d{10,15}$")) {
@@ -135,8 +161,14 @@ public class AdoptionServiceImpl implements AdoptionService {
             SendMessage responseMessage = new SendMessage(chatId, responseText);
             telegramBot.execute(responseMessage);
 
+            Long shelterId = userShelterPreference.get(chatId);
+            if (shelterId != null) {
+                offerAnimalsToAdopt(chatId, telegramBot, shelterId);
+                log.info("Вызов метода offerAnimalsToAdopt в методе processContactInfo" + chatId);
+            } else {
+                throw new PetNotFoundException();
+            }
             // Предложение выбрать животное
-            offerAnimalsToAdopt(chatId, telegramBot);
         } else {
             // Если текст не соответствует шаблону, просим ввести данные ещё раз
             String responseText = "Пожалуйста, проверьте данные и введите их в правильном формате.";
@@ -146,13 +178,6 @@ public class AdoptionServiceImpl implements AdoptionService {
         }
     }
 
-
-    public void requestContactInfo(Long chatId, TelegramBot telegramBot) {
-        // Сообщение, которое просит пользователя ввести контактные данные
-        String messageText = "Пожалуйста, введите ваш email и номер телефона через запятую (например, email@example.com, +1234567890):";
-        SendMessage requestMessage = new SendMessage(chatId, messageText);
-        telegramBot.execute(requestMessage);
-    }
 
     @Override
     public void saveUserContactInfo(Long userId, String email, String phoneNumber) {
@@ -168,9 +193,10 @@ public class AdoptionServiceImpl implements AdoptionService {
     }
 
     @Override
-    public void offerAnimalsToAdopt(Long chatId, TelegramBot telegramBot) {
+    public void offerAnimalsToAdopt(Long chatId, TelegramBot telegramBot, Long shelterId) {
         // Получение списка доступных животных для усыновления
-        List<Pet> availableAnimals = petRepository.findAllAvailableForAdoption();
+        log.info("Вызвали метод offerAnimalsToAdopt для: " + chatId + " ");
+        List<Pet> availableAnimals = petRepository.findAllByShelterIdAndIsAdoptedFalse(shelterId);
 
         // Создание кнопок для каждого доступного животного
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
@@ -179,7 +205,6 @@ public class AdoptionServiceImpl implements AdoptionService {
                     .callbackData("ANIMAL_" + animal.getId());
             inlineKeyboardMarkup.addRow(button);
         }
-
         // Отправка сообщения с кнопками
         SendMessage message = new SendMessage(chatId, "Выберите животное для усыновления:")
                 .replyMarkup(inlineKeyboardMarkup);
@@ -191,36 +216,72 @@ public class AdoptionServiceImpl implements AdoptionService {
     public void handleAnimalAdoption(Long chatId, Long petId, TelegramBot telegramBot) {
         // Проверка существования животного
         Pet animal = petRepository.findById(petId).orElse(null);
-        if (animal != null && !animal.isAdopted()) {
-            // Логика по усыновлению животного
-            // ...
-            log.info("User {} started adoption process for animalId: {}", chatId, petId);
-        } else {
-            // Животное не найдено или уже усыновлено
+
+        if (animal != null && animal.isAdopted()) {
             SendMessage message = new SendMessage(chatId, "Извините, это животное уже усыновлено или не существует.");
-            telegramBot.execute(message);
             log.warn("Adoption attempt for unavailable animalId: {}", petId);
+            telegramBot.execute(message);
+            return;
         }
+        assert animal != null;
+        petService.sendAnimalDetails(chatId, animal.getId());
+        log.info("User {} started adoption process for animalId: {}", chatId, petId);
+
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        InlineKeyboardButton adoptButton = new InlineKeyboardButton("Выбрать")
+                .callbackData("ADOPT_" + animal.getId());
+        inlineKeyboardMarkup.addRow(adoptButton);
+
+        SendMessage message = new SendMessage(chatId, "Если хотите усыновить, нажмите 'Выбрать'")
+                .replyMarkup(inlineKeyboardMarkup);
+        telegramBot.execute(message);
     }
 
     @Override
     public boolean isAdoptionCallback(String data) {
-        return data != null && data.startsWith("ADOPT_");
+        return data != null && (data.startsWith("ANIMAL_") || data.startsWith("ADOPT_"));
     }
 
-    @Override
     public void handleAdoptionCallback(CallbackQuery callbackQuery, TelegramBot telegramBot) {
         String callbackData = callbackQuery.data();
         Long chatId = callbackQuery.message().chat().id();
 
-        if (isAdoptionCallback(callbackData)) {
-            // Извлекаем ID животного из callbackData
-            Long animalId = Long.parseLong(callbackData.substring(6)); // Удаляем "ADOPT_"
+        if (callbackData.startsWith("ANIMAL_")) {
+            // Пользователь выбрал животное, показываем информацию о нем
+            Long animalId = Long.parseLong(callbackData.split("_")[1]);
             handleAnimalAdoption(chatId, animalId, telegramBot);
+        } else if (callbackData.startsWith("ADOPT_")) {
+            // Пользователь нажал кнопку "Выбрать", начинаем процесс усыновления
+            Long animalId = Long.parseLong(callbackData.split("_")[1]);
+            processAdoptionApplication(chatId, animalId);
         } else {
-            // Обработка других callback'ов, если они есть
-            // ...
+            // Обработка неизвестного колбека
             log.warn("Received unknown callback data: {}", callbackData);
+            SendMessage message = new SendMessage(chatId, "Извините, мы не смогли распознать запрос.");
+            telegramBot.execute(message);
         }
+    }
+
+    private void processAdoptionApplication(Long chatId, Long animalId) {
+        boolean alreadyAdopted = adoptionRepository.existsByUserIdAndPetId(chatId, animalId);
+        if (alreadyAdopted) {
+            SendMessage message = new SendMessage(chatId, "Извините, ваша заявка на это животное уже есть");
+            log.warn("Adoption attempt for unavailable animalId: {}", animalId);
+            telegramBot.execute(message);
+        }
+
+        Adoption adoption = new Adoption();
+        adoption.setPetId(animalId);
+        adoption.setUserId(chatId);
+        adoption.setActive(false);
+        adoption.setAdoptionDate(null);
+        adoption.setTrialEndDate(null);
+
+        adoptionRepository.save(adoption);
+
+        String confirmationMessage = "Ваша заявка на усыновление отправлена. Ожидайте сообщения от волонтера приюта.";
+        SendMessage confirmationSendMessage = new SendMessage(chatId.toString(), confirmationMessage);
+        telegramBot.execute(confirmationSendMessage);
+        log.info("Adoption application saved for user: {} and pet: {}", chatId, animalId);
     }
 }
