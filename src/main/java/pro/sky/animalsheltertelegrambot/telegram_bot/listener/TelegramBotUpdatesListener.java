@@ -50,9 +50,6 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
             if (update.message() != null) {
                 handleMessage(update.message());
             }
-            if(update.inlineQuery() != null){
-                handleInline(update.inlineQuery());
-            }
         });
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
@@ -80,9 +77,6 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
     private void handleCallback(CallbackQuery callbackQuery) {
         commandService.receivedCallbackMessage(callbackQuery);
-    }
-    private void handleInline(InlineQuery inlineQuery) {
-        commandService.receivedSwitchCallBackData(inlineQuery);
     }
 
     private void sendMessage(Long chatId, String sendingMessage) {
