@@ -28,6 +28,7 @@ import pro.sky.animalsheltertelegrambot.service.PhotoService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Реализация сервиса по управлению усыновлением.
@@ -44,6 +45,7 @@ public class AdoptionServiceImpl implements AdoptionService {
     private final PetService petService;
 
     private final Map<Long, Long> userShelterPreference = new HashMap<>();
+    private final Map<Long, Long> userSelectedPet = new HashMap<>();
 
     /**
      * Добавляет новое усыновление.
@@ -174,16 +176,12 @@ public class AdoptionServiceImpl implements AdoptionService {
 
             saveUserContactInfo(chatId, email, phoneNumber);
             log.info("Контактная информация для userId: {} успешно сохранена.", chatId);
-            // Переходим к выбору животного.
-            Long shelterId = userShelterPreference.get(chatId);
-            if (shelterId != null) {
-                processAdoptionApplication(chatId, shelterId);
-            } else {
-                String errorText = "Произошла ошибка. Не удалось найти информацию о приюте. Пожалуйста, начните процесс усыновления заново.";
-                SendMessage errorMessage = new SendMessage(chatId.toString(), errorText);
-                telegramBot.execute(errorMessage);
-                log.warn("Информация о приюте для userId: {} не найдена.", chatId);
+
+            Long animalId = userSelectedPet.get(chatId);
+            if (animalId != null) {
+                processAdoptionApplication(chatId, animalId);
             }
+
         } else {
             // Если текст не соответствует шаблону, просим ввести данные ещё раз.
             String responseText = "Некорректный формат данных. Пожалуйста, введите их заново.";
@@ -217,8 +215,12 @@ public class AdoptionServiceImpl implements AdoptionService {
         log.info("Вызвали метод offerAnimalsToAdopt для: " + chatId + " ");
         List<Pet> availableAnimals = petRepository.findAllByShelterIdAndIsAdoptedFalse(shelterId);
 
+        List<Pet> animalsWithoutActiveAdoptions = availableAnimals.stream()
+                .filter(pet -> !adoptionRepository.existsByPetId(pet.getId()))
+                .toList();
+
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-        for (Pet animal : availableAnimals) {
+        for (Pet animal : animalsWithoutActiveAdoptions) {
             InlineKeyboardButton button = new InlineKeyboardButton(animal.getPetName())
                     .callbackData("ANIMAL_" + animal.getId());
             inlineKeyboardMarkup.addRow(button);
@@ -270,11 +272,14 @@ public class AdoptionServiceImpl implements AdoptionService {
             // Пользователь нажал кнопку "Выбрать", начинаем процесс усыновления
             Long animalId = Long.parseLong(callbackData.split("_")[1]);
             User user = userRepository.findById(chatId).orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
+            userSelectedPet.put(chatId, animalId);
+
             if (user.getPhone() == null || user.getEmail() == null) {
                 requestContactInfo(chatId);
             } else {
                 processAdoptionApplication(chatId, animalId);
             }
+
         } else {
             // Обработка неизвестного колбека
             log.warn("Received unknown callback data: {}", callbackData);

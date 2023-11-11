@@ -13,5 +13,6 @@ public interface AdoptionRepository extends JpaRepository<Adoption,Long> {
     Optional<Boolean> checkAdoptionsIsActive(Long userId);
 
     boolean existsByUserIdAndPetId(Long chatId, Long animalId);
+    boolean existsByPetId(Long petId);
 
 }
