@@ -5,15 +5,10 @@ import com.pengrad.telegrambot.model.CallbackQuery;
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import com.pengrad.telegrambot.request.SendMessage;
-import jakarta.persistence.EntityExistsException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.exception.ConstraintViolationException;
-import org.springframework.context.event.EventListener;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import pro.sky.animalsheltertelegrambot.exception.AdoptionNotFoundExceptions;
-import pro.sky.animalsheltertelegrambot.exception.PetNotFoundException;
 import pro.sky.animalsheltertelegrambot.exception.UserNotFoundException;
 import pro.sky.animalsheltertelegrambot.model.Adoption;
 import pro.sky.animalsheltertelegrambot.model.Pet;
@@ -23,12 +18,10 @@ import pro.sky.animalsheltertelegrambot.repository.PetRepository;
 import pro.sky.animalsheltertelegrambot.repository.UserRepository;
 import pro.sky.animalsheltertelegrambot.service.AdoptionService;
 import pro.sky.animalsheltertelegrambot.service.PetService;
-import pro.sky.animalsheltertelegrambot.service.PhotoService;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Реализация сервиса по управлению усыновлением.
@@ -135,20 +128,43 @@ public class AdoptionServiceImpl implements AdoptionService {
 
 
     //===================================start Adoption =================================================================
-
+    /**
+     * Запускает процесс усыновления животного для пользователя в Telegram боте.
+     * Вызывает метод для предложения животных, доступных для усыновления из указанного приюта,
+     * и сохраняет предпочтение пользователя относительно приюта.
+     *
+     * @param chatId Идентификатор чата пользователя, начинающего процесс усыновления.
+     * @param shelterId Идентификатор приюта, из которого пользователь хочет усыновить животное.
+     */
     @Override
     public void startAdoptionProcess(Long chatId, Long shelterId) {
         offerAnimalsToAdopt(chatId, telegramBot, shelterId);
         userShelterPreference.put(chatId, shelterId);
     }
 
+    /**
+     * Запрашивает у пользователя введение контактной информации в Telegram боте.
+     * Отправляет пользователю сообщение с инструкцией о том, как и в каком формате следует предоставить свою контактную информацию.
+     *
+     * @param chatId Идентификатор чата пользователя, у которого запрашивается контактная информация.
+     */
     private void requestContactInfo(Long chatId) {
         String requestText = "Введите ваш email и номер телефона через запятую (например, email@example.com, +1234567890).";
         SendMessage requestMessage = new SendMessage(chatId, requestText);
         telegramBot.execute(requestMessage);
     }
 
-
+    /**
+     * Обрабатывает введенную пользователем контактную информацию в Telegram боте.
+     * Проверяет формат введенных данных, соответствие электронной почты и номера телефона установленным критериям.
+     * Если данные уникальны, сохраняет их и продолжает процесс усыновления животного, если таковой запущен.
+     * В случае обнаружения дубликатов или некорректного формата данных, отправляет сообщение об ошибке пользователю.
+     *
+     * @param chatId Идентификатор чата пользователя, отправившего контактную информацию.
+     * @param text Строка с контактной информацией пользователя.
+     * @param telegramBot Экземпляр бота Telegram, используемый для отправки сообщений.
+     */
+    @Override
     public void processContactInfo(Long chatId, String text, TelegramBot telegramBot) {
         if (text.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,},\\s*\\+?\\d{10,15}$")) {
             String[] parts = text.split(",", 2);
@@ -183,7 +199,6 @@ public class AdoptionServiceImpl implements AdoptionService {
             }
 
         } else {
-            // Если текст не соответствует шаблону, просим ввести данные ещё раз.
             String responseText = "Некорректный формат данных. Пожалуйста, введите их заново.";
             SendMessage responseMessage = new SendMessage(chatId.toString(), responseText);
             telegramBot.execute(responseMessage);
@@ -191,7 +206,15 @@ public class AdoptionServiceImpl implements AdoptionService {
         }
     }
 
-
+    /**
+     * Сохраняет контактную информацию пользователя в базе данных.
+     * Если пользователь с указанным идентификатором существует, обновляет его адрес электронной почты и номер телефона.
+     * В случае отсутствия пользователя в базе данных, отправляет сообщение об ошибке через Telegram бота.
+     *
+     * @param userId      Идентификатор пользователя, чьи контактные данные необходимо обновить.
+     * @param email       Адрес электронной почты пользователя.
+     * @param phoneNumber Номер телефона пользователя.
+     */
     @Override
     public void saveUserContactInfo(Long userId, String email, String phoneNumber) {
 
@@ -209,7 +232,15 @@ public class AdoptionServiceImpl implements AdoptionService {
         }
     }
 
-
+    /**
+     * Предлагает пользователю список животных, доступных для усыновления из указанного приюта.
+     * Метод извлекает список животных, которые еще не усыновлены и для которых нет активных заявок на усыновление,
+     * и отправляет этот список пользователю в виде кнопок в Telegram чате.
+     *
+     * @param chatId      Идентификатор чата пользователя, которому нужно предложить животных.
+     * @param telegramBot Экземпляр бота Telegram, используемый для отправки сообщений.
+     * @param shelterId   Идентификатор приюта, из которого предлагаются животные для усыновления.
+     */
     @Override
     public void offerAnimalsToAdopt(Long chatId, TelegramBot telegramBot, Long shelterId) {
         log.info("Вызвали метод offerAnimalsToAdopt для: " + chatId + " ");
@@ -230,7 +261,16 @@ public class AdoptionServiceImpl implements AdoptionService {
         telegramBot.execute(message);
     }
 
-
+    /**
+     * Обрабатывает процесс усыновления животного в Telegram боте.
+     * Метод проверяет доступность животного для усыновления. Если животное уже усыновлено или не существует,
+     * отправляет соответствующее сообщение пользователю. В противном случае, начинает процесс усыновления,
+     * отправляя пользователю детали о выбранном животном и предоставляя кнопку для подтверждения усыновления.
+     *
+     * @param chatId      Идентификатор чата пользователя, инициировавшего процесс усыновления.
+     * @param petId       Идентификатор животного, выбранного для усыновления.
+     * @param telegramBot Экземпляр бота Telegram, используемый для отправки сообщений.
+     */
     @Override
     public void handleAnimalAdoption(Long chatId, Long petId, TelegramBot telegramBot) {
         Pet animal = petRepository.findById(petId).orElse(null);
@@ -255,21 +295,29 @@ public class AdoptionServiceImpl implements AdoptionService {
         telegramBot.execute(message);
     }
 
+
     @Override
     public boolean isAdoptionCallback(String data) {
         return data != null && (data.startsWith("ANIMAL_") || data.startsWith("ADOPT_"));
     }
 
+    /**
+     * Обрабатывает колбэк-запросы от пользователей в Telegram боте, связанные с усыновлением животных.
+     * Метод анализирует данные колбэка и выполняет соответствующие действия, такие как отображение информации о животном,
+     * начало процесса усыновления, или обработка неизвестных колбэков.
+     *
+     * @param callbackQuery Колбэк запрос от пользователя.
+     * @param telegramBot   Экземпляр бота Telegram, используемый для отправки сообщений.
+     */
+    @Override
     public void handleAdoptionCallback(CallbackQuery callbackQuery, TelegramBot telegramBot) {
         String callbackData = callbackQuery.data();
         Long chatId = callbackQuery.message().chat().id();
 
         if (callbackData.startsWith("ANIMAL_")) {
-            // Пользователь выбрал животное, показываем информацию о нем
             Long animalId = Long.parseLong(callbackData.split("_")[1]);
             handleAnimalAdoption(chatId, animalId, telegramBot);
         } else if (callbackData.startsWith("ADOPT_")) {
-            // Пользователь нажал кнопку "Выбрать", начинаем процесс усыновления
             Long animalId = Long.parseLong(callbackData.split("_")[1]);
             User user = userRepository.findById(chatId).orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
             userSelectedPet.put(chatId, animalId);
@@ -281,13 +329,21 @@ public class AdoptionServiceImpl implements AdoptionService {
             }
 
         } else {
-            // Обработка неизвестного колбека
             log.warn("Received unknown callback data: {}", callbackData);
             SendMessage message = new SendMessage(chatId, "Извините, мы не смогли распознать запрос.");
             telegramBot.execute(message);
         }
     }
 
+    /**
+     * Обрабатывает заявку на усыновление животного.
+     * Метод проверяет, существует ли уже заявка на усыновление данного животного пользователем.
+     * Если заявка уже существует, отправляет пользователю сообщение об этом и регистрирует попытку усыновления.
+     * В противном случае создает новую заявку на усыновление и сохраняет ее в репозитории.
+     *
+     * @param chatId   Идентификатор чата пользователя, отправившего заявку.
+     * @param animalId Идентификатор животного, на которое подается заявка.
+     */
     private void processAdoptionApplication(Long chatId, Long animalId) {
         boolean alreadyAdopted = adoptionRepository.existsByUserIdAndPetId(chatId, animalId);
         if (alreadyAdopted) {
