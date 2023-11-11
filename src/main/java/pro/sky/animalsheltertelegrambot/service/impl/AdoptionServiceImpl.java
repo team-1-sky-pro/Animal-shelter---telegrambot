@@ -127,7 +127,7 @@ public class AdoptionServiceImpl implements AdoptionService {
     }
 
 
-    //===================================start Adoption =================================================================
+    // ================================ Start of Adoption Process Methods ================================
     /**
      * Запускает процесс усыновления животного для пользователя в Telegram боте.
      * Вызывает метод для предложения животных, доступных для усыновления из указанного приюта,
@@ -366,4 +366,5 @@ public class AdoptionServiceImpl implements AdoptionService {
         telegramBot.execute(confirmationSendMessage);
         log.info("Adoption application saved for user: {} and pet: {}", chatId, animalId);
     }
+
 }
