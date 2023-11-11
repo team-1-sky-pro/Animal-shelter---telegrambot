@@ -134,98 +134,95 @@ public class AdoptionServiceImpl implements AdoptionService {
 
     //===================================start Adoption =================================================================
 
+    @Override
     public void startAdoptionProcess(Long chatId, Long shelterId) {
-        User user = userRepository.findById(chatId).orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
-        if (user.getPhone() == null || user.getEmail() == null) {
-            SendMessage requestContact = new SendMessage(chatId, "Пожалуйста, введите ваш email и номер телефона " +
-                    "через запятую (например, email@example.com, +1234567890)");
-            telegramBot.execute(requestContact);
-        } else {
-            offerAnimalsToAdopt(chatId, telegramBot, shelterId);
-        }
+        offerAnimalsToAdopt(chatId, telegramBot, shelterId);
         userShelterPreference.put(chatId, shelterId);
+    }
+
+    private void requestContactInfo(Long chatId) {
+        String requestText = "Введите ваш email и номер телефона через запятую (например, email@example.com, +1234567890).";
+        SendMessage requestMessage = new SendMessage(chatId, requestText);
+        telegramBot.execute(requestMessage);
     }
 
 
     public void processContactInfo(Long chatId, String text, TelegramBot telegramBot) {
-        // Проверяем, соответствует ли введённый текст шаблону email и номера телефона
         if (text.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,},\\s*\\+?\\d{10,15}$")) {
-            // Разделяем текст на email и номер телефона
             String[] parts = text.split(",", 2);
             String email = parts[0].trim();
             String phoneNumber = parts[1].trim();
 
-            // Сохраняем данные
+            boolean emailExists = userRepository.existsByEmail(email);
+            boolean phoneExists = userRepository.existsByPhone(phoneNumber);
+
+            if (emailExists) {
+                String errorMessage = "Этот email уже используется. Пожалуйста, используйте другой.";
+                SendMessage responseMessage = new SendMessage(chatId.toString(), errorMessage);
+                telegramBot.execute(responseMessage);
+                log.warn("Попытка использования существующего email для userId: {}.", chatId);
+                return;
+            }
+
+            if (phoneExists) {
+                String errorMessage = "Этот номер телефона уже используется. Пожалуйста, используйте другой.";
+                SendMessage responseMessage = new SendMessage(chatId.toString(), errorMessage);
+                telegramBot.execute(responseMessage);
+                log.warn("Попытка использования существующего номера телефона для userId: {}.", chatId);
+                return;
+            }
+
             saveUserContactInfo(chatId, email, phoneNumber);
-
-            // Дополнительная логика или сообщение пользователю
-            String responseText = "Спасибо! Ваши контактные данные сохранены.";
-            SendMessage responseMessage = new SendMessage(chatId, responseText);
-            telegramBot.execute(responseMessage);
-
+            log.info("Контактная информация для userId: {} успешно сохранена.", chatId);
+            // Переходим к выбору животного.
             Long shelterId = userShelterPreference.get(chatId);
             if (shelterId != null) {
-                offerAnimalsToAdopt(chatId, telegramBot, shelterId);
-                log.info("Вызов метода offerAnimalsToAdopt в методе processContactInfo" + chatId);
+                processAdoptionApplication(chatId, shelterId);
             } else {
                 String errorText = "Произошла ошибка. Не удалось найти информацию о приюте. Пожалуйста, начните процесс усыновления заново.";
                 SendMessage errorMessage = new SendMessage(chatId.toString(), errorText);
                 telegramBot.execute(errorMessage);
+                log.warn("Информация о приюте для userId: {} не найдена.", chatId);
             }
-            // Предложение выбрать животное
         } else {
-            // Если текст не соответствует шаблону, просим ввести данные ещё раз
-            String responseText = "Пожалуйста, проверьте данные и введите их в правильном формате.";
-            log.info("Ввели данные неккоректно, отправили предупреждение");
-            SendMessage responseMessage = new SendMessage(chatId, responseText);
+            // Если текст не соответствует шаблону, просим ввести данные ещё раз.
+            String responseText = "Некорректный формат данных. Пожалуйста, введите их заново.";
+            SendMessage responseMessage = new SendMessage(chatId.toString(), responseText);
             telegramBot.execute(responseMessage);
+            log.info("Некорректный ввод данных от пользователя с userId: {}.", chatId);
         }
     }
 
 
     @Override
     public void saveUserContactInfo(Long userId, String email, String phoneNumber) {
-        try {
-            User user = userRepository.findById(userId).orElse(null);
-            if (user != null) {
-                user.setEmail(email);
-                user.setPhone(phoneNumber);
-                userRepository.save(user);
-                log.info("Saved user contact info for userId: {}", userId);
-            } else {
-                log.warn("User not found for userId: {}", userId);
-            }
-        } catch (DataIntegrityViolationException e) {
-            if (e.getMostSpecificCause().getMessage().contains("users_email_key")) {
-                String errorMessage = "Этот email уже используется. Пожалуйста, используйте другой email.";
-                SendMessage responseMessage = new SendMessage(userId.toString(), errorMessage);
-                telegramBot.execute(responseMessage);
-                return;
-            } else {
-                String errorMessage = "Ошибка сохранения данных. Пожалуйста, проверьте введённые данные и попробуйте снова.";
-                SendMessage responseMessage = new SendMessage(userId.toString(), errorMessage);
-                telegramBot.execute(responseMessage);
-            }
-            log.error("Data integrity violation when saving contact info for userId: {}", userId, e);
+
+        User user = userRepository.findById(userId).orElse(null);
+        if (user != null) {
+            user.setEmail(email);
+            user.setPhone(phoneNumber);
+            userRepository.save(user);
+            log.info("Контактные данные пользователя с userId: {} сохранены.", userId);
+        } else {
+            String errorMessage = "Ошибка сохранения данных. Проверьте данные и попробуйте снова.";
+            SendMessage responseMessage = new SendMessage(userId.toString(), errorMessage);
+            telegramBot.execute(responseMessage);
+            log.error("Ошибка сохранения данных для userId: {}.", userId);
         }
     }
 
 
-
     @Override
     public void offerAnimalsToAdopt(Long chatId, TelegramBot telegramBot, Long shelterId) {
-        // Получение списка доступных животных для усыновления
         log.info("Вызвали метод offerAnimalsToAdopt для: " + chatId + " ");
         List<Pet> availableAnimals = petRepository.findAllByShelterIdAndIsAdoptedFalse(shelterId);
 
-        // Создание кнопок для каждого доступного животного
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         for (Pet animal : availableAnimals) {
             InlineKeyboardButton button = new InlineKeyboardButton(animal.getPetName())
                     .callbackData("ANIMAL_" + animal.getId());
             inlineKeyboardMarkup.addRow(button);
         }
-        // Отправка сообщения с кнопками
         SendMessage message = new SendMessage(chatId, "Выберите животное для усыновления:")
                 .replyMarkup(inlineKeyboardMarkup);
         telegramBot.execute(message);
@@ -234,7 +231,6 @@ public class AdoptionServiceImpl implements AdoptionService {
 
     @Override
     public void handleAnimalAdoption(Long chatId, Long petId, TelegramBot telegramBot) {
-        // Проверка существования животного
         Pet animal = petRepository.findById(petId).orElse(null);
 
         if (animal != null && animal.isAdopted()) {
@@ -273,7 +269,12 @@ public class AdoptionServiceImpl implements AdoptionService {
         } else if (callbackData.startsWith("ADOPT_")) {
             // Пользователь нажал кнопку "Выбрать", начинаем процесс усыновления
             Long animalId = Long.parseLong(callbackData.split("_")[1]);
-            processAdoptionApplication(chatId, animalId);
+            User user = userRepository.findById(chatId).orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
+            if (user.getPhone() == null || user.getEmail() == null) {
+                requestContactInfo(chatId);
+            } else {
+                processAdoptionApplication(chatId, animalId);
+            }
         } else {
             // Обработка неизвестного колбека
             log.warn("Received unknown callback data: {}", callbackData);
