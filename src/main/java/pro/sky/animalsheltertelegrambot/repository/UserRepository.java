@@ -6,4 +6,5 @@ import pro.sky.animalsheltertelegrambot.model.User;
 public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByIdAndEmailIsNotNullAndPhoneIsNotNull(Long id);
+    User findByEmail(String email);
 }

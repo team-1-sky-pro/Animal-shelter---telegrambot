@@ -8,7 +8,9 @@ import com.pengrad.telegrambot.request.SendMessage;
 import jakarta.persistence.EntityExistsException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.context.event.EventListener;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import pro.sky.animalsheltertelegrambot.exception.AdoptionNotFoundExceptions;
 import pro.sky.animalsheltertelegrambot.exception.PetNotFoundException;
@@ -166,7 +168,9 @@ public class AdoptionServiceImpl implements AdoptionService {
                 offerAnimalsToAdopt(chatId, telegramBot, shelterId);
                 log.info("Вызов метода offerAnimalsToAdopt в методе processContactInfo" + chatId);
             } else {
-                throw new PetNotFoundException();
+                String errorText = "Произошла ошибка. Не удалось найти информацию о приюте. Пожалуйста, начните процесс усыновления заново.";
+                SendMessage errorMessage = new SendMessage(chatId.toString(), errorText);
+                telegramBot.execute(errorMessage);
             }
             // Предложение выбрать животное
         } else {
@@ -181,16 +185,32 @@ public class AdoptionServiceImpl implements AdoptionService {
 
     @Override
     public void saveUserContactInfo(Long userId, String email, String phoneNumber) {
-        User user = userRepository.findById(userId).orElse(null);
-        if (user != null) {
-            user.setEmail(email);
-            user.setPhone(phoneNumber);
-            userRepository.save(user);
-            log.info("Saved user contact info for userId: {}", userId);
-        } else {
-            log.warn("User not found for userId: {}", userId);
+        try {
+            User user = userRepository.findById(userId).orElse(null);
+            if (user != null) {
+                user.setEmail(email);
+                user.setPhone(phoneNumber);
+                userRepository.save(user);
+                log.info("Saved user contact info for userId: {}", userId);
+            } else {
+                log.warn("User not found for userId: {}", userId);
+            }
+        } catch (DataIntegrityViolationException e) {
+            if (e.getMostSpecificCause().getMessage().contains("users_email_key")) {
+                String errorMessage = "Этот email уже используется. Пожалуйста, используйте другой email.";
+                SendMessage responseMessage = new SendMessage(userId.toString(), errorMessage);
+                telegramBot.execute(responseMessage);
+                return;
+            } else {
+                String errorMessage = "Ошибка сохранения данных. Пожалуйста, проверьте введённые данные и попробуйте снова.";
+                SendMessage responseMessage = new SendMessage(userId.toString(), errorMessage);
+                telegramBot.execute(responseMessage);
+            }
+            log.error("Data integrity violation when saving contact info for userId: {}", userId, e);
         }
     }
+
+
 
     @Override
     public void offerAnimalsToAdopt(Long chatId, TelegramBot telegramBot, Long shelterId) {
