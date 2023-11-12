@@ -14,6 +14,7 @@ public enum Button {
     ABOUT_SHELTER_CAT("/about_shelter_cat", "О приюте кошек"),
     ADOPT_ANIMAL_CAT("/adopt_animal_cat","Как взять животное"),
     ADOPT_ANIMAL_DOG("/adopt_animal_dog","Как взять животное"),
+    HOW_TO_TAKE_PET("/how_to_take_pet","Как взять животное"),
     SHELTER_INFO("/shelter_info", "Подробнее о приюте"),
     CAT_SHELTER_INFO("/cat_shelter_info", "О приюте - Кошки"),
     SECURITY_CONTACTS("/security_contacts", "Контакты охраны"),
