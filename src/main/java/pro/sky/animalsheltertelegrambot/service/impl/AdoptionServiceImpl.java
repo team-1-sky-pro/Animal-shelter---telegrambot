@@ -19,6 +19,7 @@ import pro.sky.animalsheltertelegrambot.repository.UserRepository;
 import pro.sky.animalsheltertelegrambot.service.AdoptionService;
 import pro.sky.animalsheltertelegrambot.service.PetService;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -124,6 +125,28 @@ public class AdoptionServiceImpl implements AdoptionService {
 
         log.info("Deleting adoption with ID: {}", id);
         adoptionRepository.deleteById(id);
+    }
+
+    /**
+     * Получает список всех неактивных усыновлений из репозитория усыновлений.
+     * Метод извлекает и возвращает список усыновлений, которые помечены как неактивные.
+     * В случае, если неактивные усыновления отсутствуют, выбрасывает исключение.
+     *
+     * @param shelterId Идентификатор приюта, для которого необходимо найти неактивные усыновления.
+     * @return Список неактивных усыновлений.
+     * @throws AdoptionNotFoundExceptions Если неактивные усыновления не найдены.
+     */
+    @Override
+    public List allAdoptionIsFalse() {
+        List<Adoption> inactiveAdoptions = adoptionRepository.findByIsActiveFalse();
+        log.info("Найдено {} неактивных усыновлений.", inactiveAdoptions.size());
+        if (inactiveAdoptions.isEmpty()) {
+            log.info("Неактивные усыновления не найдены.");
+            throw new AdoptionNotFoundExceptions("Нет не активных усыновлений");
+        }
+
+        log.info("Найдено {} неактивных усыновлений.", inactiveAdoptions.size());
+        return inactiveAdoptions;
     }
 
 

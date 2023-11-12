@@ -40,7 +40,7 @@ public class MessageServiceImpl implements MessageService {
     public void handleMessage(Message message) {
         Long chatId = message.chat().id();
         String text = message.text();
-        String username = message.from().username(); // Получаем username из объекта Message
+        String username = message.from().firstName(); // Получаем username из объекта Message
         log.info("Получено текстовое сообщение от {}: {}", username != null ? username : chatId, text);
 
         if (text != null && "/start".equals(text)) {
