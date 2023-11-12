@@ -180,5 +180,4 @@ public class CommandServiceImpl implements CommandService {
             log.error("Ошибка при отправке меню усыновителя для chatId: {}: {}", chatId, sendResponse.description());
         }
     }
-
 }
