@@ -272,16 +272,21 @@ public class AdoptionServiceImpl implements AdoptionService {
         List<Pet> animalsWithoutActiveAdoptions = availableAnimals.stream()
                 .filter(pet -> !adoptionRepository.existsByPetId(pet.getId()))
                 .toList();
-
-        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-        for (Pet animal : animalsWithoutActiveAdoptions) {
-            InlineKeyboardButton button = new InlineKeyboardButton(animal.getPetName())
-                    .callbackData("ANIMAL_" + animal.getId());
-            inlineKeyboardMarkup.addRow(button);
+        if (animalsWithoutActiveAdoptions.isEmpty()) {
+            String listAnimalIsEmpty = "В приюте нет свободных животных!";
+            SendMessage message = new SendMessage(chatId, listAnimalIsEmpty);
+            telegramBot.execute(message);
+        } else {
+            InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+            for (Pet animal : animalsWithoutActiveAdoptions) {
+                InlineKeyboardButton button = new InlineKeyboardButton(animal.getPetName())
+                        .callbackData("ANIMAL_" + animal.getId());
+                inlineKeyboardMarkup.addRow(button);
+            }
+            SendMessage message = new SendMessage(chatId, "Выберите животное для усыновления:")
+                    .replyMarkup(inlineKeyboardMarkup);
+            telegramBot.execute(message);
         }
-        SendMessage message = new SendMessage(chatId, "Выберите животное для усыновления:")
-                .replyMarkup(inlineKeyboardMarkup);
-        telegramBot.execute(message);
     }
 
     /**

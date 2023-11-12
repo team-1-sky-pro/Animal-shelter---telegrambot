@@ -41,17 +41,18 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public void handleMessage(Message message) {
         Long chatId = message.chat().id();
-        String text = message.caption();
+        String text = message.text();
+        String caption = message.caption();
         PhotoSize[] fileId = message.photo();
         String username = message.from().firstName();
         log.info("Получено текстовое сообщение от {}: {}", username != null ? username : chatId, text);
 
-        if (text != null) {
+        if (text != null || caption !=null) {
             if ("/start".equals(text)) {
                 handleStartCommand(chatId, username);
-            } else if (isReportMessage(text, fileId)) {
+            } else if (isReportMessage(caption, fileId)) {
                 // Обработка сообщения, которое является началом отчета
-                eventPublisher.publishEvent(new ReportStartEvent(this, chatId, text, fileId));
+                eventPublisher.publishEvent(new ReportStartEvent(this, chatId, caption, fileId));
                 log.info("Создано событие для начала процесса отчета для chatId: {}", chatId);
             } else {
                 // Обработка сообщения, которое не является ни командой /start, ни началом отчета
