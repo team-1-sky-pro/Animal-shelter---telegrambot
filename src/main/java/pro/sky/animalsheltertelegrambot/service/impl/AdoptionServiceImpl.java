@@ -189,7 +189,7 @@ public class AdoptionServiceImpl implements AdoptionService {
      */
     @Override
     public void processContactInfo(Long chatId, String text, TelegramBot telegramBot) {
-        if (text.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,},\\s*\\+?\\d{10,15}$")) {
+        if (text != null && text.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,},\\s*\\+?\\d{10,15}$")) {
             String[] parts = text.split(",", 2);
             String email = parts[0].trim();
             String phoneNumber = parts[1].trim();

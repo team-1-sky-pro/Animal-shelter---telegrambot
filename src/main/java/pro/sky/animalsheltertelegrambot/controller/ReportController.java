@@ -12,13 +12,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pro.sky.animalsheltertelegrambot.model.Pet;
 import pro.sky.animalsheltertelegrambot.model.Report;
+import pro.sky.animalsheltertelegrambot.model.ReportDTO;
 import pro.sky.animalsheltertelegrambot.service.ReportService;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "Отчеты", description = "Создание, редактирование и удаление отчетов по питомцам")
 @RequestMapping("/reports")
 public class ReportController {
+
+
     private final ReportService service;
 
     @Operation(
@@ -60,8 +65,13 @@ public class ReportController {
             }
     )
     @GetMapping("/{id}")
-    public ResponseEntity<Report> getReport(@PathVariable Long id) {
-        return new ResponseEntity<>(service.getReport(id), HttpStatus.OK);
+    public ResponseEntity<?> getReport(@PathVariable Long id) {
+        ReportDTO report = service.getReportWithPhotos(id);
+        if (report != null) {
+            return new ResponseEntity<>(report, HttpStatus.OK);
+        }
+        return new ResponseEntity<>("Нет такого отчета с таким id: " + id, HttpStatus.NOT_FOUND);
+
     }
 
     @Operation(
@@ -101,5 +111,14 @@ public class ReportController {
     @DeleteMapping("/{id}")
     public void deleteReport(@PathVariable Long id) {
         service.deleteReport(id);
+    }
+
+    @GetMapping("/allreports")
+    public ResponseEntity<?> getAllReports() {
+        List allReport = service.listAllReport();
+        if (allReport.isEmpty()) {
+            return new ResponseEntity<>("Нет доступных отчетов", HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(allReport, HttpStatus.OK);
     }
 }

@@ -1,5 +1,6 @@
 package pro.sky.animalsheltertelegrambot.telegram_bot.events;
 
+import com.pengrad.telegrambot.model.PhotoSize;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -10,14 +11,16 @@ import java.time.Clock;
 
 
 @Getter
-public class VolunteerStartEvent extends ApplicationEvent {
+public class ReportStartEvent extends ApplicationEvent {
 
     private final Long chatId;
-    private final String username;
+    private final String text;
+    private final PhotoSize[] fileId;
 
-    public VolunteerStartEvent(Object source, Long chatId, String username) {
+    public ReportStartEvent(Object source, Long chatId, String text, PhotoSize[] fileId) {
         super(source);
         this.chatId = chatId;
-        this.username = username;
+        this.text = text;
+        this.fileId = fileId;
     }
 }

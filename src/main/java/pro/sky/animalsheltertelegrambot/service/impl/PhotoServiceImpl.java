@@ -30,6 +30,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.rmi.RemoteException;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 import static pro.sky.animalsheltertelegrambot.utils.MethodNameRetriever.getMethodName;
@@ -149,42 +151,46 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     @Override
-    public void getPhotosByPetId(Long petId, Long photoNumber, HttpServletResponse response) throws IOException {
-        logWhenMethodInvoked(getMethodName());
+    public void getPhotosByPetId(Long petId, HttpServletResponse response) throws IOException {
+        log.info("Invoked method to get photos for petId: {}", petId);
         List<Photo> photos = findPhotosByPetId(petId);
         Photo photo = photos.stream()
-                .filter(e -> e.getFilePath().contains("number=" + photoNumber))
                 .findAny()
-                .orElseThrow(() -> new PhotoNotFoundException());
-        try (
-                InputStream is = Files.newInputStream(Path.of(photo.getFilePath()));
-                BufferedInputStream bis = new BufferedInputStream(is, 1024);
-                BufferedOutputStream bos = new BufferedOutputStream(response.getOutputStream(), 1024)
-        ) {
-            response.setContentType(photo.getMediaType());
-            response.setContentLength(photo.getFileSize().intValue());
-            bis.transferTo(bos);
-        }
+                .orElseThrow(() -> new PhotoNotFoundException("No photos found for petId: " + petId));
+
+        Path photoPath = Path.of(photo.getFilePath());
+        response.setContentType(photo.getMediaType());
+        response.setContentLength(photo.getFileSize().intValue());
         response.setStatus(HttpServletResponse.SC_OK);
+
+        try (InputStream is = Files.newInputStream(photoPath)) {
+            is.transferTo(response.getOutputStream());
+        } catch (IOException e) {
+            log.error("Error sending photo with petId: {}", petId, e);
+            throw e;
+        }
     }
 
+
     @Override
-    public void getPhotosByReportId(Long reportId, Long photoNumber, HttpServletResponse response) throws IOException {
-        logWhenMethodInvoked(getMethodName());
+    public void getPhotosByReportId(Long reportId, HttpServletResponse response) throws IOException {
+        log.info("Получение фотографий для отчета с ID: {}", reportId);
         List<Photo> photos = findPhotosByReportId(reportId);
+
         Photo photo = photos.stream()
-                .filter(e -> e.getFilePath().contains("number=" + photoNumber))
                 .findAny()
-                .orElseThrow(() -> new PhotoNotFoundException());
-        try (
-                InputStream is = Files.newInputStream(Path.of(photo.getFilePath()));
-                BufferedInputStream bis = new BufferedInputStream(is, 1024);
-                BufferedOutputStream bos = new BufferedOutputStream(response.getOutputStream(), 1024)
-        ) {
-            response.setContentType(photo.getMediaType());
-            response.setContentLength(photo.getFileSize().intValue());
-            response.setStatus(HttpServletResponse.SC_OK);
-            bis.transferTo(bos);
+                .orElseThrow(() -> new PhotoNotFoundException("Фотографии для отчета с ID " + reportId + " не найдены"));
+
+        Path photoPath = Path.of(photo.getFilePath());
+        response.setContentType(photo.getMediaType());
+        response.setContentLength(photo.getFileSize().intValue());
+        response.setStatus(HttpServletResponse.SC_OK);
+        try (InputStream is = Files.newInputStream(photoPath)) {
+            log.info("Отправка фотографии для отчета с ID: {}", reportId);
+            is.transferTo(response.getOutputStream());
+        } catch (IOException e) {
+            log.error("Ошибка при отправке фотографии для отчета с ID: {}", reportId, e);
+            throw e;
         }
     }
 
@@ -231,7 +237,8 @@ public class PhotoServiceImpl implements PhotoService {
      * @return List сущностей Photo
      * @throws PhotoNotFoundException в случае отсутствия фотографий
      */
-    private List<Photo> findPhotosByReportId(Long reportId) {
+    @Override
+    public List<Photo> findPhotosByReportId(Long reportId) {
         List<Photo> byReportId = photoRepository.findByReportId(reportId);
         if (byReportId.isEmpty()) {
             throw new PhotoNotFoundException();

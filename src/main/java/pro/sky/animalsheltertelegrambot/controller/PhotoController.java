@@ -22,7 +22,6 @@ import java.io.IOException;
 public class PhotoController {
 
 
-
     private final PhotoService photoService;
 
     @Operation(
@@ -77,13 +76,12 @@ public class PhotoController {
     )
     @GetMapping(value = "/for-pet/{petId}/{photoNumber}")
     public void getPhotosForPet(@Parameter(description = "ID питомца") @PathVariable Long petId,
-                                @Parameter(description = "порядковый номер фотографии") @PathVariable Long photoNumber,
                                 HttpServletResponse response) throws IOException {
-        photoService.getPhotosByPetId(petId, photoNumber, response);
+        photoService.getPhotosByPetId(petId, response);
     }
 
     @Operation(
-            summary = "Получение фотографий по ID приюта",
+            summary = "Получение фотографий по ID отчета",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
@@ -97,9 +95,8 @@ public class PhotoController {
     )
     @GetMapping("/for-report/{reportId}/{photoNumber}")
     public void getPhotosForReport(@Parameter(description = "ID отчета") @PathVariable Long reportId,
-                                   @Parameter(description = "порядковый номер фотографии") @PathVariable Long photoNumber,
                                    HttpServletResponse response) throws IOException {
-        photoService.getPhotosByReportId(reportId, photoNumber, response);
+        photoService.getPhotosByReportId(reportId, response);
     }
 
     @Operation(
@@ -139,4 +136,6 @@ public class PhotoController {
         photoService.deletePhotosByReportId(reportId);
         return new ResponseEntity<>("All photos deleted for reportId: " + reportId, HttpStatus.OK);
     }
+
+
 }
