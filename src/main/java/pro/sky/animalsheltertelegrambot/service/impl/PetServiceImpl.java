@@ -27,7 +27,7 @@ public class PetServiceImpl implements PetService {
 
     @Override
     public void addPet(Pet pet) {
-        logWhenMethodInvoked(getMethodName());
+        log.info("Was invoked method " + getMethodName());
         try {
             petRepository.save(pet);
         } catch (Exception e) {
@@ -38,20 +38,20 @@ public class PetServiceImpl implements PetService {
 
     @Override
     public void updatePet(Long id, Pet pet) {
-        logWhenMethodInvoked(getMethodName());
+        log.info("Was invoked method " + getMethodName());
         findOrThrow(id);
         addPet(pet);
     }
 
     @Override
     public Pet getPet(Long id) {
-        logWhenMethodInvoked(getMethodName());
+        log.info("Was invoked method " + getMethodName());
         return findOrThrow(id);
     }
 
     @Override
     public void deletePet(Long id) {
-        logWhenMethodInvoked(getMethodName());
+        log.info("Was invoked method " + getMethodName());
         petRepository.delete(findOrThrow(id));
     }
 
@@ -75,10 +75,6 @@ public class PetServiceImpl implements PetService {
         return petRepository.save(pet);
     }
 
-    private void logWhenMethodInvoked(String methodName) {
-        log.info("Method '{}'", methodName);
-    }
-
     public void processAnimalCallback(Long chatId, String callbackData) {
         Long animalId = Long.parseLong(callbackData.split("_")[1]);
         sendAnimalDetails(chatId, animalId);
@@ -94,6 +90,7 @@ public class PetServiceImpl implements PetService {
             sendPhoto(chatId, animal.getPhoto());
         }
     }
+
     public void sendText(Long chatId, Pet pet) {
         if (pet != null) {
             String text = "Кличка: " + pet.getPetName() +
@@ -107,15 +104,13 @@ public class PetServiceImpl implements PetService {
             telegramBot.execute(sendMessage);
         }
     }
+
     public void sendPhoto(Long chatId, Photo photo) {
         if (photo != null) {
             String filePath = photo.getFilePath();
             File file = new File(filePath);
             SendPhoto sendPhoto = new SendPhoto(chatId, file);
             telegramBot.execute(sendPhoto);
-
         }
     }
-
-
 }

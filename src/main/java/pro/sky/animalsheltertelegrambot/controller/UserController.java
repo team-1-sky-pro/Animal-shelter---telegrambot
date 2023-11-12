@@ -69,13 +69,6 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    /**
-     * получает список всех волонтеров
-     */
-//    @GetMapping("/volunteer")
-//    public Collection<User> getAllVolunteers() {
-//        return userService.getAllVolunteer();
-//    }
     @Operation(
             summary = "Добавление нового пользователя в базу",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody,
