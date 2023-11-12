@@ -18,4 +18,5 @@ public interface PhotoRepository extends JpaRepository<Photo, Long> {
     List<Photo> findByPetId(Long petId);
 
     List<Photo> findByReportId(Long reportId);
+
 }

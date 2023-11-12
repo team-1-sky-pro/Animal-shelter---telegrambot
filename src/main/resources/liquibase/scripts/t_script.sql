@@ -29,10 +29,22 @@ ALTER TABLE photos
 -- changeSet x3imal:50.2
 INSERT INTO pets (pet_name, birthday, description, is_adopted, shelter_id, photo_id)
 VALUES
-    ('Барсик', '2020-01-01', 'Дружелюбный оранжевый кот', false, 1, null),
-    ('Мурка', '2019-05-15', 'Спокойная черная кошка', false, 1, null),
-    ('Рекс', '2018-10-10', 'Энергичный пёс породы лабрадор', false, 1, null),
+    ('Барсик', '2020-01-01', 'Дружелюбный оранжевый кот.', false, 1, null),
+    ('Мурка', '2019-05-15', 'Спокойная черная кошка.', false, 1, null),
+    ('Рекс', '2018-10-10', 'Сиамский котенок.', false, 1, null),
     ('Луна', '2021-03-23', 'Молодая сибирская кошка', false, 1, null);
+
+-- changeSet x3imal:63
+INSERT INTO shelters(
+    id, shelter_type, contacts, security_contacts, working_hours)
+VALUES (2, 'dog', 'г. Астана, ул. Спасская, 8-800-888-88-88', '8(999)999-99-99', 'ежедневно, 09:00–21:00');
+
+INSERT INTO pets (pet_name, birthday, description, is_adopted, shelter_id, photo_id)
+VALUES
+    ('Паф Деди', '2018-11-20', 'Любопытный мопс с веселым характером', false, 2, NULL),
+    ('Иосиф Спалин', '2017-08-18', 'Спокойный и мудрый пес. Порода корги.', false, 2, NULL),
+    ('Лисек', '2020-11-06', 'Жизнерадостный щенок с бесконечной энергией. Порода лайка.', false, 2, NULL),
+    ('Роберт', '2017-07-06', 'Мягкий и ласковый щенок, немецкой авчарки.', false, 2, NULL);
 
 
 
