@@ -4,6 +4,7 @@ import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.PhotoSize;
 import com.pengrad.telegrambot.request.SendDocument;
+import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -103,4 +104,5 @@ public class MessageServiceImpl implements MessageService {
             log.error("Ошибка отправки документа {}: {}", path, response.description());
         }
     }
+
 }

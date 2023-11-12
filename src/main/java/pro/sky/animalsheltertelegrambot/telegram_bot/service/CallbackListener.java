@@ -9,9 +9,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import pro.sky.animalsheltertelegrambot.repository.UserRepository;
 import pro.sky.animalsheltertelegrambot.service.AdoptionService;
 import pro.sky.animalsheltertelegrambot.service.ReportService;
 import pro.sky.animalsheltertelegrambot.service.ShelterService;
+import pro.sky.animalsheltertelegrambot.service.UserService;
 import pro.sky.animalsheltertelegrambot.telegram_bot.events.CallbackEvent;
 import pro.sky.animalsheltertelegrambot.telegram_bot.events.ReportStartEvent;
 import pro.sky.animalsheltertelegrambot.telegram_bot.service.CommandService.CommandService;
@@ -29,6 +31,7 @@ public class CallbackListener {
 
     private final MessageSendingService messageSendingService;
     private final ShelterService shelterService;
+    private final UserService userService;
     private final MessageService messageService;
     private final AdoptionService adoptionService;
     private final ReportService reportService;
@@ -106,6 +109,9 @@ public class CallbackListener {
                 case "REPORT":
                     log.info("Обработка отправки отчета для chatId: {}", chatId);
                     reportService.displayReportInfo(chatId);
+                    break;
+                case "VOLUNTEER":
+                    userService.sendVolunteerChat(chatId);
                     break;
                 default:
                     log.warn("Получены неизвестные данные колбэка: {}", callbackData);

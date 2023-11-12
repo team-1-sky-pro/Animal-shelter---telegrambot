@@ -1,5 +1,6 @@
 package pro.sky.animalsheltertelegrambot.service.impl;
 
+import com.pengrad.telegrambot.request.SendMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -174,5 +175,14 @@ public class UserServiceImpl implements UserService {
         log.info("Создание нового пользователя с chatId: {} и userName: {}", chatId, userName);
         User newUser = new User(chatId, userName, false);
         userRepository.save(newUser);
+    }
+
+    @Override
+    public void sendVolunteerChat(Long chatId) {
+        Long toChatId = userRepository.findUserIdIfUserIsVolunteer();
+        String phone = userRepository.findPhoneById(chatId);
+        SendMessage sendMessage = new SendMessage(toChatId, "Привет! \nМеня зовут @" + userRepository.findNameById(chatId) +  "\nМне нужна помощь волонтера \nПрошу со мной связаться. Мои контакты: " + phone);
+        messageSendingService.sendMessage(sendMessage);
+        messageSendingService.sendMessage(new SendMessage(chatId, "Сообщение отправлено волонтеру. \nОжидайте ответ."));
     }
 }
