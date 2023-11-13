@@ -1,14 +1,13 @@
-package pro.sky.animalsheltertelegrambot.service.impl;
+package pro.sky.animalsheltertelegrambot.service;
 
-import com.pengrad.telegrambot.request.SendMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import pro.sky.animalsheltertelegrambot.model.Report;
-import pro.sky.animalsheltertelegrambot.model.User;
 import pro.sky.animalsheltertelegrambot.repository.ReportRepository;
+import pro.sky.animalsheltertelegrambot.service.ReportServiceImpl;
 
 import java.time.LocalDateTime;
 import java.util.Optional;

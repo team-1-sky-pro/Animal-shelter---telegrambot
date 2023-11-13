@@ -1,79 +1,143 @@
 package pro.sky.animalsheltertelegrambot.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import pro.sky.animalsheltertelegrambot.model.User;
 import pro.sky.animalsheltertelegrambot.service.UserService;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-//@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@ExtendWith(SpringExtension.class)
 public class UserControllerTest {
-    @Autowired
+
+
     private MockMvc mockMvc;
-    @Autowired
-    private ObjectMapper objectMapper;
-    @Autowired
+
+    @Mock
     private UserService userService;
 
-    @Test
-    void testGetUserById() throws Exception {
-        User user = new User(8L, "Sergey", false);
-        mockMvc.perform(get("/users/id/8")//).perform//(get("/user/id/3"))
-                        .accept(String.valueOf(status().is(200)))
-                        .accept(String.valueOf(jsonPath("$.id").value(8)))
-                        .accept(String.valueOf(jsonPath("$.name").value("Sergey"))))
-//                .andExpect(jsonPath("$.isVolunteer").value(false));
+    @InjectMocks
+    private UserController userController;
 
-                .andExpect(status().is(404));
-//                .andExpect(jsonPath("$.id").value(8))
-//                .andExpect(jsonPath("$.name").value("Sergey"))
-//                .andExpect(jsonPath("$.isVolunteer").value(false));
+    @BeforeEach
+    public void setUp() {
+        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
     }
 
     @Test
-    void testUserCreate() throws Exception {
-        User user = new User(10L, "Sergey", false);
-        mockMvc.perform(post("/users/id/10")
-                        .content(objectMapper.writeValueAsString(user))
+    public void testGetUserFound() throws Exception {
+        Long userId = 1L;
+        User mockUser = new User();
+        mockUser.setId(userId);
+
+        when(userService.getUser(userId)).thenReturn(Optional.of(mockUser));
+
+        mockMvc.perform(get("/users/{id}", userId)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().is(404))
-                .andDo(print())
-                .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$.id").value(10))
-                .andExpect(jsonPath("$.name").value("Sergey"))
-                .andExpect(jsonPath("$.isVolunteer").value(false));
-
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(userId));
     }
 
     @Test
-    void testUpdateUser() throws Exception {
-        User user = new User(10L, "Sergey", false);
-        long id = user.getId();
-        mockMvc.perform(put("/users/{id}", id, user)
-                        .content(objectMapper.writeValueAsString(user))
+    public void testGetUserNotFound() throws Exception {
+        Long userId = 2L;
+        when(userService.getUser(userId)).thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/users/{id}", userId)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().is(404))
-                .andExpect(jsonPath("$.id").value(10))
-                .andExpect(jsonPath("$.name").value("Sergey"))
-                .andExpect(jsonPath("$.isVolunteer").value(false));
+                .andExpect(status().isNotFound());
     }
 
     @Test
-    void testDeleteUser() throws Exception {
-        User user = new User(111L, "Sergey", false);
-        Long id = user.getId();
-        mockMvc.perform(delete("/users/id", id))
-                .andExpect(status().is(400));
+    public void testGetAllUsers() throws Exception {
+        List<User> users = Arrays.asList(new User(), new User()); // Создайте список пользователей
+        when(userService.getAllUsers()).thenReturn(users);
+
+        mockMvc.perform(get("/users/all")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(users.size())));
     }
+
+    @Test
+    public void testCreateUser() throws Exception {
+        User newUser = new User();
+
+
+        when(userService.addUser(any(User.class))).thenReturn(newUser);
+
+        mockMvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(newUser)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    public void testUpdateUserSuccess() throws Exception {
+        Long userId = 1L;
+        User updatedUser = new User();
+        updatedUser.setId(userId);
+
+        when(userService.updateUser(eq(userId), any(User.class))).thenReturn(updatedUser);
+
+        mockMvc.perform(put("/users/{id}", userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(updatedUser)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    public void testUpdateUserNotFound() throws Exception {
+        Long userId = 2L;
+        User updatedUser = new User();
+        updatedUser.setId(userId);
+
+        when(userService.updateUser(eq(userId), any(User.class))).thenReturn(null);
+
+        mockMvc.perform(put("/users/{id}", userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(updatedUser)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testRemoveUser() throws Exception {
+        Long userId = 1L;
+
+        doNothing().when(userService).deleteUser(userId);
+
+        mockMvc.perform(delete("/users/{id}", userId))
+                .andExpect(status().isOk());
+
+        verify(userService, times(1)).deleteUser(userId);
+    }
+
 }

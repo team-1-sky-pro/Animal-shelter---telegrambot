@@ -24,4 +24,8 @@ public interface PhotoService {
     void addPhotoForReport(Photo photo);
 
     List<Photo> findPhotosByReportId(Long reportId);
+
+    void validatePhotos(MultipartFile[] photos);
+
+    int findIndexOfLastPhoto(String filePath);
 }

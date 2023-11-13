@@ -1,4 +1,4 @@
-package pro.sky.animalsheltertelegrambot.service.impl;
+package pro.sky.animalsheltertelegrambot.service;
 
 import com.pengrad.telegrambot.TelegramBot;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,6 +9,7 @@ import pro.sky.animalsheltertelegrambot.exception.PetAlreadyExistsException;
 import pro.sky.animalsheltertelegrambot.exception.PetNotFoundException;
 import pro.sky.animalsheltertelegrambot.model.Pet;
 import pro.sky.animalsheltertelegrambot.repository.PetRepository;
+import pro.sky.animalsheltertelegrambot.service.PetServiceImpl;
 
 import java.time.LocalDate;
 import java.util.Optional;

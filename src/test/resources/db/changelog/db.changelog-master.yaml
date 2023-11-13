@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: x3imal
+      context: test
+      changes:
+        - sqlFile:
+            path: test_scripts.sql
+            relativeToChangelogFile: true
+            splitStatements: true
+            stripComments: true

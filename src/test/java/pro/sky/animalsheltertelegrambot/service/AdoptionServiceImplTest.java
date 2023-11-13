@@ -1,5 +1,4 @@
-package pro.sky.animalsheltertelegrambot.service.impl;
-import com.pengrad.telegrambot.TelegramBot;
+package pro.sky.animalsheltertelegrambot.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -7,6 +6,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import pro.sky.animalsheltertelegrambot.model.Adoption;
 import pro.sky.animalsheltertelegrambot.repository.AdoptionRepository;
+import pro.sky.animalsheltertelegrambot.service.AdoptionServiceImpl;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;

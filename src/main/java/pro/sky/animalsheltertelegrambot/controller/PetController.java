@@ -41,13 +41,16 @@ public class PetController {
             }
     )
     @PostMapping
-    public ResponseEntity<?> addPet(@Valid @RequestBody Pet pet, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return new ResponseEntity<>(ErrorUtils.errorsList(bindingResult), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<?> addPet(@Valid @RequestBody Pet pet) {
+        if (pet == null) {
+            return new ResponseEntity<>("Please enter your details", HttpStatus.BAD_REQUEST);
         }
         service.addPet(pet);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+
+
 
     @Operation(
             summary = "Обновление данных существующего в базе питомца",
@@ -67,11 +70,7 @@ public class PetController {
     )
     @PutMapping("/{id}")
     public ResponseEntity<?> updatePet(@Parameter(description = "id питомца") @PathVariable Long id,
-                          @Valid @RequestBody Pet pet,
-                          BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return new ResponseEntity<>(ErrorUtils.errorsList(bindingResult), HttpStatus.BAD_REQUEST);
-        }
+                          @Valid @RequestBody Pet pet) {
         service.updatePet(id, pet);
         return new ResponseEntity<>(HttpStatus.OK);
     }

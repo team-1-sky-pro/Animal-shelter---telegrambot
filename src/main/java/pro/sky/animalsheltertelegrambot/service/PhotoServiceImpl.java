@@ -1,7 +1,8 @@
-package pro.sky.animalsheltertelegrambot.service.impl;
+package pro.sky.animalsheltertelegrambot.service;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,8 +31,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.rmi.RemoteException;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 import static pro.sky.animalsheltertelegrambot.utils.MethodNameRetriever.getMethodName;
@@ -40,6 +39,7 @@ import static pro.sky.animalsheltertelegrambot.utils.MethodNameRetriever.getMeth
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Data
 public class PhotoServiceImpl implements PhotoService {
 
     private final PhotoRepository photoRepository;
@@ -96,9 +96,10 @@ public class PhotoServiceImpl implements PhotoService {
             photo.setFileSize(outputFile.length());
             photo.setMediaType(photoFile.getContentType());
 
-            photoRepository.save(photo); // Сохраняем фото и получаем ID
-            pet.setPhoto(photo); // Устанавливаем фото питомцу
+            photoRepository.save(photo);
+            pet.setPhoto(photo);
             petService.save(pet);
+
         }
     }
 
@@ -264,17 +265,26 @@ public class PhotoServiceImpl implements PhotoService {
      * @throws PhotoIsEmptyException      если один из файлов не был отправлен
      * @throws BadPhotoExtensionException если один из файлов недопустимого расширения
      */
-    private void validatePhotos(MultipartFile[] photos) {
+
+    @Override
+    public void validatePhotos(MultipartFile[] photos) {
         log.info("Was invoked method " + getMethodName());
+
+        if (photos == null) {
+            throw new IllegalArgumentException("Photos array cannot be null");
+        }
+
         for (MultipartFile photo : photos) {
             if (photo == null) {
                 throw new PhotoIsEmptyException();
             }
-            if (!(extensions.contains(getExtension(photo.getOriginalFilename())))) {
+            String filename = photo.getOriginalFilename();
+            if (filename == null || !extensions.contains(getExtension(filename))) {
                 throw new BadPhotoExtensionException();
             }
         }
-    }
+}
+
 
     /**
      * Поиск и возврат порядкового номера последней фотографии.
@@ -285,7 +295,9 @@ public class PhotoServiceImpl implements PhotoService {
      * @return номер текущей по счету фотографии или 0, если список пуст
      * @throws LimitOfPhotosException если превышен лимит по количеству фотографий
      */
-    private int findIndexOfLastPhoto(String filePath) {
+
+    @Override
+    public int findIndexOfLastPhoto(String filePath) {
         log.info("Was invoked method " + getMethodName());
         if (filePath == null) {
             return 0;
@@ -297,4 +309,5 @@ public class PhotoServiceImpl implements PhotoService {
             return curValue;
         }
     }
+
 }

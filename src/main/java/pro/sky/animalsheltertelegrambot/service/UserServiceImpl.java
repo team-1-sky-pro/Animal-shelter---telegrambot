@@ -1,4 +1,4 @@
-package pro.sky.animalsheltertelegrambot.service.impl;
+package pro.sky.animalsheltertelegrambot.service;
 
 import com.pengrad.telegrambot.request.SendMessage;
 import lombok.RequiredArgsConstructor;
