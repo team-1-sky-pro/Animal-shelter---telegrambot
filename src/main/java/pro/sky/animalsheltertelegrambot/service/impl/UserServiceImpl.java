@@ -199,6 +199,7 @@ public class UserServiceImpl implements UserService {
             if (email != null && !email.isEmpty()) {
                 messageText.append("\nМой email: ").append(email);
             }
+            
 
             SendMessage sendMessage = new SendMessage(toChatId, messageText.toString());
             messageSendingService.sendMessage(sendMessage);

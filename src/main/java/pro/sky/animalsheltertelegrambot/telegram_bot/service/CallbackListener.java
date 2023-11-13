@@ -116,7 +116,7 @@ public class CallbackListener {
                     break;
                 case "HOW_TO_TAKE_PET":
                     log.info("Обработка информации об how_to_take_pet для chatId: {}", chatId);
-                    String message = "Подробную информацию, как взять животное вы найдете в файле.";
+                    String message = "Подробную информацию, как взять животное, вы найдете в файле.";
                     messageSendingService.sendMessage(chatId, message);
                     messageService.sendDocument("src/main/resources/files/how_to_take_pet.pdf", chatId);
                     break;

@@ -13,7 +13,7 @@ create TABLE pets (
     id BIGSERIAL PRIMARY KEY,
     pet_name VARCHAR(50) NOT NULL UNIQUE,
     birthday TIMESTAMP NOT NULL,
-    description VARCHAR(250),
+    description VARCHAR(500),
     isAdopted BOOLEAN,
     shelter_id BIGSERIAL,
     photo_id BIGSERIAL
