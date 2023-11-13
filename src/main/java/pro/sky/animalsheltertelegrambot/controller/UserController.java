@@ -82,7 +82,7 @@ public class UserController {
                             }
                     ),
                     @ApiResponse(
-                            responseCode = "400",
+                            responseCode = "405",
                             description = "неправильное заполнение полей пользователя"
                     )
             }
@@ -129,7 +129,7 @@ public class UserController {
                             description = "Пользователь успешно удален"
                     ),
                     @ApiResponse(
-                            responseCode = "404",
+                            responseCode = "400",
                             description = "Пользователь с таким id не найден"
                     )
             }
