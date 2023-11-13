@@ -120,6 +120,10 @@ public class CallbackListener {
                     messageSendingService.sendMessage(chatId, message);
                     messageService.sendDocument("src/main/resources/files/how_to_take_pet.pdf", chatId);
                     break;
+                case "ANOTHER_PET":
+                    commandService.executeStartCommandIfUserExists(chatId);
+                    SendMessage sendMessage = commandService.executeStartCommandIfUserExists(chatId);
+                    messageSendingService.sendMessage(sendMessage);
                 default:
                     log.warn("Получены неизвестные данные колбэка: {}", callbackData);
                     break;
