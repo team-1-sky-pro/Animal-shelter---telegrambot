@@ -28,6 +28,7 @@ import static pro.sky.animalsheltertelegrambot.utils.MethodNameRetriever.getMeth
  * получить список всех волонтеров
  * изменение
  * удаление
+ *
  * @author SyutinS
  */
 
@@ -39,7 +40,6 @@ public class UserServiceImpl implements UserService {
     private final AdoptionRepository adoptionRepository;
     private final UserRepository userRepository;
     private final MessageSendingService messageSendingService;
-    private final ApplicationEventPublisher eventPublisher;
     private final CommandService commandService;
 
     /**
@@ -119,6 +119,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Производится проверка, является ли пользователь усыновителем или нет.
+     *
      * @param userId chat ID, который также является ID пользователя
      * @return true - если пользователь является усыновителем, false - если нет
      */
@@ -147,7 +148,8 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Обрабатывает команду /start, регистрируя нового пользователя или предоставляя меню существующему.
-     * @param chatId Идентификатор чата пользователя в Telegram.
+     *
+     * @param chatId   Идентификатор чата пользователя в Telegram.
      * @param userName Имя пользователя в Telegram.
      */
     @Override
@@ -160,6 +162,7 @@ public class UserServiceImpl implements UserService {
             sendWelcomeMessage(chatId, userName);
         }
     }
+
     private void sendWelcomeMessage(Long chatId, String userName) {
         String messageText = "Привет, " + userName + "! Добро пожаловать в нашу систему.";
         messageSendingService.sendMessage(chatId, messageText);
@@ -167,7 +170,8 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Создает нового пользователя и сохраняет его в репозитории.
-     * @param chatId Идентификатор чата пользователя в Telegram.
+     *
+     * @param chatId   Идентификатор чата пользователя в Telegram.
      * @param userName Имя пользователя в Telegram.
      * @return Созданный пользователь.
      */
@@ -179,10 +183,30 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void sendVolunteerChat(Long chatId) {
-        Long toChatId = userRepository.findUserIdIfUserIsVolunteer();
-        String phone = userRepository.findPhoneById(chatId);
-        SendMessage sendMessage = new SendMessage(toChatId, "Привет! \nМеня зовут @" + userRepository.findNameById(chatId) +  "\nМне нужна помощь волонтера \nПрошу со мной связаться. Мои контакты: " + phone);
-        messageSendingService.sendMessage(sendMessage);
-        messageSendingService.sendMessage(new SendMessage(chatId, "Сообщение отправлено волонтеру. \nОжидайте ответ."));
+        try {
+            Long toChatId = userRepository.findUserIdIfUserIsVolunteer();
+            String name = userRepository.findNameById(chatId);
+            String phone = userRepository.findPhoneById(chatId);
+            String email = userRepository.findEmailById(chatId);
+
+            StringBuilder messageText = new StringBuilder("Привет! \nМеня зовут @").append(name)
+                    .append("\nМне нужна помощь волонтера.");
+
+            // Добавляем телефон и email в сообщение, если они доступны
+            if (phone != null && !phone.isEmpty()) {
+                messageText.append("\nМой телефон: ").append(phone);
+            }
+            if (email != null && !email.isEmpty()) {
+                messageText.append("\nМой email: ").append(email);
+            }
+
+            SendMessage sendMessage = new SendMessage(toChatId, messageText.toString());
+            messageSendingService.sendMessage(sendMessage);
+            messageSendingService.sendMessage(new SendMessage(chatId, "Сообщение отправлено волонтеру. \nОжидайте ответ."));
+
+            log.info("Сообщение отправлено волонтеру с chatId: {}", toChatId);
+        } catch (Exception e) {
+            log.error("Ошибка при отправке сообщения волонтеру", e);
+        }
     }
 }

@@ -19,7 +19,6 @@ import pro.sky.animalsheltertelegrambot.repository.UserRepository;
 import pro.sky.animalsheltertelegrambot.service.AdoptionService;
 import pro.sky.animalsheltertelegrambot.service.PetService;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -171,7 +170,8 @@ public class AdoptionServiceImpl implements AdoptionService {
      *
      * @param chatId Идентификатор чата пользователя, у которого запрашивается контактная информация.
      */
-    private void requestContactInfo(Long chatId) {
+    @Override
+    public void requestContactInfo(Long chatId) {
         String requestText = "Введите ваш email и номер телефона через запятую (например, email@example.com, +1234567890).";
         SendMessage requestMessage = new SendMessage(chatId, requestText);
         telegramBot.execute(requestMessage);

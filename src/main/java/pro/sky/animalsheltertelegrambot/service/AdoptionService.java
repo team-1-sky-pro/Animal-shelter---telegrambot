@@ -66,6 +66,8 @@ public interface AdoptionService {
      */
     void handleAdoptionCallback(CallbackQuery callbackQuery, TelegramBot telegramBot);
 
+    void requestContactInfo(Long chatId);
+
     /**
      * Обрабатывает заявку на усыновление животного.
      * Метод проверяет, существует ли уже заявка на усыновление данного животного пользователем.

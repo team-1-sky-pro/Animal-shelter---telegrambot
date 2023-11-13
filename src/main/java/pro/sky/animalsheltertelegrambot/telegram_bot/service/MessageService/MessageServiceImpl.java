@@ -45,7 +45,7 @@ public class MessageServiceImpl implements MessageService {
         String text = message.text();
         String caption = message.caption();
         PhotoSize[] fileId = message.photo();
-        String username = message.from().firstName();
+        String username = message.from().username();
         log.info("Получено текстовое сообщение от {}: {}", username != null ? username : chatId, text);
 
         if (text != null || caption !=null) {
