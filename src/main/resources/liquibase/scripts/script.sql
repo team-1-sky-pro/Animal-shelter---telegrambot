@@ -4,8 +4,8 @@
 create TABLE users (
     id BIGSERIAL PRIMARY KEY,
     user_name VARCHAR(50) NOT NULL,
-    email VARCHAR(50) NOT NULL UNIQUE,
-    phone VARCHAR(10) NOT NULL UNIQUE,
+    email VARCHAR(50) NOT NULL,
+    phone VARCHAR(10) NOT NULL,
     isVolunteer BOOLEAN,
     CONSTRAINT ch_phone CHECK(phone like '[0-9]*10')
 );

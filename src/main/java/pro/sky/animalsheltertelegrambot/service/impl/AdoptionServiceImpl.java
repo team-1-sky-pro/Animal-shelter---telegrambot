@@ -126,6 +126,28 @@ public class AdoptionServiceImpl implements AdoptionService {
         adoptionRepository.deleteById(id);
     }
 
+    /**
+     * Получает список всех неактивных усыновлений из репозитория усыновлений.
+     * Метод извлекает и возвращает список усыновлений, которые помечены как неактивные.
+     * В случае, если неактивные усыновления отсутствуют, выбрасывает исключение.
+     *
+     * @param shelterId Идентификатор приюта, для которого необходимо найти неактивные усыновления.
+     * @return Список неактивных усыновлений.
+     * @throws AdoptionNotFoundExceptions Если неактивные усыновления не найдены.
+     */
+    @Override
+    public List allAdoptionIsFalse() {
+        List<Adoption> inactiveAdoptions = adoptionRepository.findByIsActiveFalse();
+        log.info("Найдено {} неактивных усыновлений.", inactiveAdoptions.size());
+        if (inactiveAdoptions.isEmpty()) {
+            log.info("Неактивные усыновления не найдены.");
+            throw new AdoptionNotFoundExceptions("Нет не активных усыновлений");
+        }
+
+        log.info("Найдено {} неактивных усыновлений.", inactiveAdoptions.size());
+        return inactiveAdoptions;
+    }
+
 
     // ================================ Start of Adoption Process Methods ================================
     /**
@@ -148,7 +170,8 @@ public class AdoptionServiceImpl implements AdoptionService {
      *
      * @param chatId Идентификатор чата пользователя, у которого запрашивается контактная информация.
      */
-    private void requestContactInfo(Long chatId) {
+    @Override
+    public void requestContactInfo(Long chatId) {
         String requestText = "Введите ваш email и номер телефона через запятую (например, email@example.com, +1234567890).";
         SendMessage requestMessage = new SendMessage(chatId, requestText);
         telegramBot.execute(requestMessage);
@@ -166,7 +189,7 @@ public class AdoptionServiceImpl implements AdoptionService {
      */
     @Override
     public void processContactInfo(Long chatId, String text, TelegramBot telegramBot) {
-        if (text.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,},\\s*\\+?\\d{10,15}$")) {
+        if (text != null && text.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,},\\s*\\+?\\d{10,15}$")) {
             String[] parts = text.split(",", 2);
             String email = parts[0].trim();
             String phoneNumber = parts[1].trim();
@@ -249,16 +272,21 @@ public class AdoptionServiceImpl implements AdoptionService {
         List<Pet> animalsWithoutActiveAdoptions = availableAnimals.stream()
                 .filter(pet -> !adoptionRepository.existsByPetId(pet.getId()))
                 .toList();
-
-        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-        for (Pet animal : animalsWithoutActiveAdoptions) {
-            InlineKeyboardButton button = new InlineKeyboardButton(animal.getPetName())
-                    .callbackData("ANIMAL_" + animal.getId());
-            inlineKeyboardMarkup.addRow(button);
+        if (animalsWithoutActiveAdoptions.isEmpty()) {
+            String listAnimalIsEmpty = "В приюте нет свободных животных!";
+            SendMessage message = new SendMessage(chatId, listAnimalIsEmpty);
+            telegramBot.execute(message);
+        } else {
+            InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+            for (Pet animal : animalsWithoutActiveAdoptions) {
+                InlineKeyboardButton button = new InlineKeyboardButton(animal.getPetName())
+                        .callbackData("ANIMAL_" + animal.getId());
+                inlineKeyboardMarkup.addRow(button);
+            }
+            SendMessage message = new SendMessage(chatId, "Выберите животное для усыновления:")
+                    .replyMarkup(inlineKeyboardMarkup);
+            telegramBot.execute(message);
         }
-        SendMessage message = new SendMessage(chatId, "Выберите животное для усыновления:")
-                .replyMarkup(inlineKeyboardMarkup);
-        telegramBot.execute(message);
     }
 
     /**

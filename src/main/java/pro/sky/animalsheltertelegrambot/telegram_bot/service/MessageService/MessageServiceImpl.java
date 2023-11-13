@@ -2,17 +2,20 @@ package pro.sky.animalsheltertelegrambot.telegram_bot.service.MessageService;
 
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
+import com.pengrad.telegrambot.model.PhotoSize;
 import com.pengrad.telegrambot.request.SendDocument;
+import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import pro.sky.animalsheltertelegrambot.service.AdoptionService;
+import pro.sky.animalsheltertelegrambot.service.ReportService;
 import pro.sky.animalsheltertelegrambot.service.UserService;
 import pro.sky.animalsheltertelegrambot.telegram_bot.events.AdopterStartEvent;
 import pro.sky.animalsheltertelegrambot.telegram_bot.events.RegularUserStartEvent;
-import pro.sky.animalsheltertelegrambot.telegram_bot.events.VolunteerStartEvent;
+import pro.sky.animalsheltertelegrambot.telegram_bot.events.ReportStartEvent;
 
 
 /**
@@ -40,31 +43,46 @@ public class MessageServiceImpl implements MessageService {
     public void handleMessage(Message message) {
         Long chatId = message.chat().id();
         String text = message.text();
-        String username = message.from().username(); // Получаем username из объекта Message
+        String caption = message.caption();
+        PhotoSize[] fileId = message.photo();
+        String username = message.from().username();
         log.info("Получено текстовое сообщение от {}: {}", username != null ? username : chatId, text);
 
-        if (text != null && "/start".equals(text)) {
-            String effectiveUsername = username != null && !username.isEmpty() ? username : "defaultUsername";
-            if (isAdopter(chatId)) {
-                eventPublisher.publishEvent(new AdopterStartEvent(this, chatId, effectiveUsername));
-            } else if (isVolunteer(chatId)) {
-                eventPublisher.publishEvent(new VolunteerStartEvent(this, chatId, effectiveUsername));
+        if (text != null || caption !=null) {
+            if ("/start".equals(text)) {
+                handleStartCommand(chatId, username);
+            } else if (isReportMessage(caption, fileId)) {
+                // Обработка сообщения, которое является началом отчета
+                eventPublisher.publishEvent(new ReportStartEvent(this, chatId, caption, fileId));
+                log.info("Создано событие для начала процесса отчета для chatId: {}", chatId);
             } else {
-                eventPublisher.publishEvent(new RegularUserStartEvent(this, chatId, effectiveUsername));
+                // Обработка сообщения, которое не является ни командой /start, ни началом отчета
+                adoptionService.processContactInfo(chatId, text, telegramBot);
             }
-            log.info("Инициировано событие /start для пользователя {}", effectiveUsername);
         } else {
-            adoptionService.processContactInfo(chatId, text, telegramBot);
-            log.info("Текст сообщения передан на дальнейшую обработку: {}", text);
+            log.info("Сообщение без текста от пользователя с userId: {}.", chatId);
+            // Здесь может быть логика обработки сообщений без текста, например, фото или стикеров
         }
+    }
+
+    private void handleStartCommand(Long chatId, String username) {
+        String effectiveUsername = username != null && !username.isEmpty() ? username : "defaultUsername";
+        if (isAdopter(chatId)) {
+            eventPublisher.publishEvent(new AdopterStartEvent(this, chatId, effectiveUsername));
+        } else {
+            eventPublisher.publishEvent(new RegularUserStartEvent(this, chatId, effectiveUsername));
+        }
+        log.info("Инициировано событие /start для пользователя {}", effectiveUsername);
     }
 
     private boolean isAdopter(Long chatId) {
         return userService.checkIfUserIsAdopter(chatId);
     }
 
-    private boolean isVolunteer(Long chatId) {
-        return false;
+    private boolean isReportMessage(String caption, PhotoSize[] photoSizes) {
+        boolean matchesPetIdFormat = caption != null && caption.matches("^\\d+\\..*");
+        boolean hasPhoto = photoSizes != null && photoSizes.length > 0;
+        return matchesPetIdFormat && hasPhoto;
     }
 
 
@@ -86,4 +104,5 @@ public class MessageServiceImpl implements MessageService {
             log.error("Ошибка отправки документа {}: {}", path, response.description());
         }
     }
+
 }

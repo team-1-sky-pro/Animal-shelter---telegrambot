@@ -4,14 +4,18 @@ package pro.sky.animalsheltertelegrambot.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import pro.sky.animalsheltertelegrambot.exception.AdoptionNotFoundExceptions;
 import pro.sky.animalsheltertelegrambot.model.Adoption;
 import pro.sky.animalsheltertelegrambot.service.AdoptionService;
 import pro.sky.animalsheltertelegrambot.utils.ErrorUtils;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/adoptions")
@@ -114,6 +118,29 @@ public class AdoptionController {
     public ResponseEntity<String> deleteAdoption(@PathVariable Long id) {
         adoptionService.deleteAdoption(id);
         return new ResponseEntity<>("Adoption deleted " + id, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Показывает заявки на усыновление",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Заявки найдены"
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Заявки не найдены"
+                    )
+            },
+            tags = "Adoptions"
+    )
+    @GetMapping("/noactive")
+    public ResponseEntity<List<Adoption>> allNoActiveAdoption() {
+        List<Adoption> noActiveList = adoptionService.allAdoptionIsFalse();
+        if (noActiveList.isEmpty()) {
+            throw new AdoptionNotFoundExceptions("Нет активных заявок на усыновление.");
+        }
+        return new ResponseEntity<>(noActiveList, HttpStatus.OK);
     }
 
 

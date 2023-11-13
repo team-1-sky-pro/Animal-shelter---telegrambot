@@ -96,8 +96,8 @@ public class CommandServiceImpl implements CommandService {
                 .callbackData(ABOUT_SHELTER.toString());
         InlineKeyboardButton applicationButton = new InlineKeyboardButton(APPLICATION_DOG.getText())
                 .callbackData(APPLICATION_DOG.toString());
-        InlineKeyboardButton adoptAnimalButton = new InlineKeyboardButton(ADOPT_ANIMAL_DOG.getText())
-                .callbackData(ADOPT_ANIMAL_DOG.toString());
+        InlineKeyboardButton adoptAnimalButton = new InlineKeyboardButton(HOW_TO_TAKE_PET.getText())
+                .callbackData(HOW_TO_TAKE_PET.toString());
         InlineKeyboardButton volunteerButton = new InlineKeyboardButton(VOLUNTEER.getText())
                 .callbackData(VOLUNTEER.toString());
 
@@ -119,7 +119,7 @@ public class CommandServiceImpl implements CommandService {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         InlineKeyboardButton aboutShelterButton = new InlineKeyboardButton(ABOUT_SHELTER_CAT.getText()).callbackData(ABOUT_SHELTER_CAT.toString());
         InlineKeyboardButton applicationButton = new InlineKeyboardButton(APPLICATION_CAT.getText()).callbackData(APPLICATION_CAT.toString());
-        InlineKeyboardButton adoptAnimalButton = new InlineKeyboardButton(ADOPT_ANIMAL_CAT.getText()).callbackData(ADOPT_ANIMAL_CAT.toString());
+        InlineKeyboardButton adoptAnimalButton = new InlineKeyboardButton(HOW_TO_TAKE_PET.getText()).callbackData(HOW_TO_TAKE_PET.toString());
         InlineKeyboardButton volunteerButton = new InlineKeyboardButton(VOLUNTEER.getText()).callbackData(VOLUNTEER.toString());
 
         inlineKeyboardMarkup.addRow(aboutShelterButton, adoptAnimalButton);
@@ -180,5 +180,4 @@ public class CommandServiceImpl implements CommandService {
             log.error("Ошибка при отправке меню усыновителя для chatId: {}: {}", chatId, sendResponse.description());
         }
     }
-
 }

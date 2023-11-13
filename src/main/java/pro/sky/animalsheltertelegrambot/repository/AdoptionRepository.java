@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import pro.sky.animalsheltertelegrambot.model.Adoption;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface AdoptionRepository extends JpaRepository<Adoption,Long> {
@@ -14,5 +15,7 @@ public interface AdoptionRepository extends JpaRepository<Adoption,Long> {
 
     boolean existsByUserIdAndPetId(Long chatId, Long animalId);
     boolean existsByPetId(Long petId);
+
+    List<Adoption> findByIsActiveFalse();
 
 }

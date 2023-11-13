@@ -32,4 +32,5 @@ public interface UserService {
 
     public void handleStart(Long chatId, String userName);
 
+    void sendVolunteerChat(Long chatId);
 }
