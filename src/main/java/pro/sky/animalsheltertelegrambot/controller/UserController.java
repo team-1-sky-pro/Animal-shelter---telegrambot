@@ -69,13 +69,6 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    /**
-     * получает список всех волонтеров
-     */
-//    @GetMapping("/volunteer")
-//    public Collection<User> getAllVolunteers() {
-//        return userService.getAllVolunteer();
-//    }
     @Operation(
             summary = "Добавление нового пользователя в базу",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody,
@@ -89,7 +82,7 @@ public class UserController {
                             }
                     ),
                     @ApiResponse(
-                            responseCode = "400",
+                            responseCode = "405",
                             description = "неправильное заполнение полей пользователя"
                     )
             }
@@ -136,7 +129,7 @@ public class UserController {
                             description = "Пользователь успешно удален"
                     ),
                     @ApiResponse(
-                            responseCode = "404",
+                            responseCode = "400",
                             description = "Пользователь с таким id не найден"
                     )
             }

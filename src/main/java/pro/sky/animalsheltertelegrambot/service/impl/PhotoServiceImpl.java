@@ -65,7 +65,7 @@ public class PhotoServiceImpl implements PhotoService {
 
     @Override
     public void addPhotosForPet(Long petId, MultipartFile[] photos) throws IOException {
-        logWhenMethodInvoked(getMethodName());
+        log.info("Was invoked method " + getMethodName());
         log.info("Вызов валидации фото");
         validatePhotos(photos);
 
@@ -119,7 +119,7 @@ public class PhotoServiceImpl implements PhotoService {
 
     @Override
     public void addPhotosForReport(Long reportId, MultipartFile[] photos) throws IOException {
-        logWhenMethodInvoked(getMethodName());
+        log.info("Was invoked method " + getMethodName());
         validatePhotos(photos);
         int start = findIndexOfLastPhoto(photoRepository.findLastFilePathByReportId(reportId).orElse(null));
 
@@ -265,7 +265,7 @@ public class PhotoServiceImpl implements PhotoService {
      * @throws BadPhotoExtensionException если один из файлов недопустимого расширения
      */
     private void validatePhotos(MultipartFile[] photos) {
-        logWhenMethodInvoked(getMethodName());
+        log.info("Was invoked method " + getMethodName());
         for (MultipartFile photo : photos) {
             if (photo == null) {
                 throw new PhotoIsEmptyException();
@@ -286,7 +286,7 @@ public class PhotoServiceImpl implements PhotoService {
      * @throws LimitOfPhotosException если превышен лимит по количеству фотографий
      */
     private int findIndexOfLastPhoto(String filePath) {
-        logWhenMethodInvoked(getMethodName());
+        log.info("Was invoked method " + getMethodName());
         if (filePath == null) {
             return 0;
         } else {
@@ -296,9 +296,5 @@ public class PhotoServiceImpl implements PhotoService {
             }
             return curValue;
         }
-    }
-
-    private void logWhenMethodInvoked(String methodName) {
-        log.info("Method '{}'", methodName);
     }
 }
