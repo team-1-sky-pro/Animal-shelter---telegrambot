@@ -70,7 +70,7 @@ public class ReportController {
         if (report != null) {
             return new ResponseEntity<>(report, HttpStatus.OK);
         }
-        return new ResponseEntity<>("Нет такого отчета с таким id: " + id, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>("There is no such report with this: " + id, HttpStatus.NOT_FOUND);
 
     }
 
@@ -117,7 +117,7 @@ public class ReportController {
     public ResponseEntity<?> getAllReports() {
         List allReport = service.listAllReport();
         if (allReport.isEmpty()) {
-            return new ResponseEntity<>("Нет доступных отчетов", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Not found reports", HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(allReport, HttpStatus.OK);
     }
