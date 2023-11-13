@@ -15,6 +15,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.multipart.MultipartFile;
 import pro.sky.animalsheltertelegrambot.exception.photos.BadPhotoExtensionException;
+import pro.sky.animalsheltertelegrambot.exception.photos.LimitOfPhotosException;
 import pro.sky.animalsheltertelegrambot.exception.photos.PhotoIsEmptyException;
 import pro.sky.animalsheltertelegrambot.exception.photos.PhotoNotFoundException;
 import pro.sky.animalsheltertelegrambot.model.Pet;
@@ -300,5 +301,24 @@ public class PhotoServiceImplTest {
         assertThrows(BadPhotoExtensionException.class, () -> {
             photoService.validatePhotos(photosWithBadExtension);
         });
+    }
+
+    @Test
+    public void testFindIndexOfLastPhoto() {
+
+        // Тест на случай, когда filePath равен null
+        int result1 = photoService.findIndexOfLastPhoto(null);
+        assertEquals(0, result1);
+
+        // Тест на случай, когда filePath содержит "index=5"
+        int result2 = photoService.findIndexOfLastPhoto("index=5");
+        assertEquals(5, result2);
+
+        // Тест на случай, когда filePath содержит "index=9" и ожидается исключение LimitOfPhotosException
+        assertThrows(LimitOfPhotosException.class, () -> {
+            photoService.findIndexOfLastPhoto("index=9");
+        });
+
+        // Другие тесты по вашему усмотрению
     }
 }
