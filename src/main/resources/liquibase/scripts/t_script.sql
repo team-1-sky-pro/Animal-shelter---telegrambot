@@ -46,6 +46,7 @@ VALUES
     ('Лисек', '2020-11-06', 'Жизнерадостный щенок с бесконечной энергией. Порода лайка.', false, 2, NULL),
     ('Роберт', '2017-07-06', 'Мягкий и ласковый щенок, немецкой авчарки.', false, 2, NULL);
 
-
-
-
+-- changeSet annabelousova:65
+INSERT INTO users(
+	id, user_name, email, phone, is_volunteer)
+	VALUES (788226796, 'anna_belou', 'anna@gmail.com', '+79155206396', true);

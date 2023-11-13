@@ -111,7 +111,14 @@ public class CallbackListener {
                     reportService.displayReportInfo(chatId);
                     break;
                 case "VOLUNTEER":
+                    log.info("Отправлено сообщение волонтеру от chatId: {}", chatId);
                     userService.sendVolunteerChat(chatId);
+                    break;
+                case "HOW_TO_TAKE_PET":
+                    log.info("Обработка информации об how_to_take_pet для chatId: {}", chatId);
+                    String message = "Подробную информацию, как взять животное вы найдете в файле.";
+                    messageSendingService.sendMessage(chatId, message);
+                    messageService.sendDocument("src/main/resources/files/how_to_take_pet.pdf", chatId);
                     break;
                 default:
                     log.warn("Получены неизвестные данные колбэка: {}", callbackData);
