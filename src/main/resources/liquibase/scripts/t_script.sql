@@ -17,14 +17,6 @@ ALTER COLUMN phone TYPE VARCHAR(50);
 ALTER TABLE users
 DROP CONSTRAINT ch_phone;
 
--- changeSet x3imal:50.1
-ALTER TABLE pets
-    ADD CONSTRAINT fk_pet_photo
-        FOREIGN KEY (photo_id) REFERENCES photos(id);
-ALTER TABLE pets ALTER COLUMN photo_id DROP NOT NULL;
-ALTER TABLE photos
-    ALTER COLUMN report_id DROP NOT NULL;
-
 
 -- changeSet x3imal:50.2
 INSERT INTO pets (pet_name, birthday, description, is_adopted, shelter_id, photo_id)

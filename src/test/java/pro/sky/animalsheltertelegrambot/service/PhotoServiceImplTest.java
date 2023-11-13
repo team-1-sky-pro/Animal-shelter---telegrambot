@@ -1,4 +1,4 @@
-package pro.sky.animalsheltertelegrambot.service.impl;
+package pro.sky.animalsheltertelegrambot.service;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +23,7 @@ import pro.sky.animalsheltertelegrambot.model.Photo;
 import pro.sky.animalsheltertelegrambot.model.Report;
 import pro.sky.animalsheltertelegrambot.repository.PhotoRepository;
 import pro.sky.animalsheltertelegrambot.service.PetService;
-import pro.sky.animalsheltertelegrambot.service.PhotoService;
+import pro.sky.animalsheltertelegrambot.service.PhotoServiceImpl;
 import pro.sky.animalsheltertelegrambot.service.ReportService;
 
 import javax.imageio.ImageIO;
@@ -42,7 +42,6 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 
-@ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
 public class PhotoServiceImplTest {
 
@@ -107,7 +106,6 @@ public class PhotoServiceImplTest {
 
     @Test
     void addPhotosForReport_ValidData_Success() throws IOException {
-        //проверяем добавление валидной фотографии
         MultipartFile mockFile = Mockito.mock(MultipartFile.class);
 
         BufferedImage image = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
@@ -176,7 +174,6 @@ public class PhotoServiceImplTest {
 
     @Test
     void getPhotosByPetId_ValidPhotos_Success() throws IOException {
-        // Создаем список с фотографией для теста
         List<Photo> photos = new ArrayList<>();
         Photo mockPhoto = new Photo();
         mockPhoto.setFilePath("/test/photos/test.jpg");
@@ -184,16 +181,12 @@ public class PhotoServiceImplTest {
         mockPhoto.setMediaType("image/jpeg");
         photos.add(mockPhoto);
 
-        // Настроим мок PhotoRepository для возврата списка фотографий при вызове findByPetId
         when(photoRepository.findByPetId(anyLong())).thenReturn(photos);
 
-        // Создаем MockHttpServletResponse
         MockHttpServletResponse response = new MockHttpServletResponse();
 
-        // Вызываем метод getPhotosByPetId
         photoService.getPhotosByPetId(1L, response);
 
-        // Проверяем, что ContentType, ContentLength и Status установлены правильно
         assertEquals("image/jpeg", response.getContentType());
         assertEquals(1024, response.getContentLength());
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
@@ -216,10 +209,8 @@ public class PhotoServiceImplTest {
             mockedFiles.when(() -> Files.newInputStream(any(Path.class)))
                     .thenReturn(new ByteArrayInputStream(new byte[1024]));
 
-            // Вызовите метод getPhotosByReportId и проверьте, что он не выбрасывает исключение
             assertDoesNotThrow(() -> photoService.getPhotosByReportId(1L, response));
 
-            // Проверьте, что методы response были вызваны правильно
             assertEquals("image/jpeg", response.getContentType());
             assertEquals(1024, response.getContentLength());
             assertEquals(HttpServletResponse.SC_OK, response.getStatus());
@@ -228,21 +219,15 @@ public class PhotoServiceImplTest {
 
     @Test
     void getPhotosByReportId_ThrowsPhotoNotFoundException() {
-
         when(photoRepository.findByReportId(anyLong())).thenReturn(Collections.emptyList());
-
-        // Проверьте, что метод выбрасывает исключение PhotoNotFoundException
         assertThrows(PhotoNotFoundException.class, () -> photoService.getPhotosByReportId(1L, response));
     }
 
     @Test
     public void testDeletePhotosByPetId() {
         List<Photo> photosToDelete = new ArrayList<>();
-
         Long petIdToDelete = 1L;
-
         photoService.deletePhotosByPetId(petIdToDelete);
-
         for (Photo photo : photosToDelete) {
             verify(photoRepository).delete(photo);
         }
@@ -252,9 +237,7 @@ public class PhotoServiceImplTest {
     public void testDeletePhotosByReportId() {
         List<Photo> photosToDelete = new ArrayList<>();
         Long reportId = 1L;
-
         photoService.deletePhotosByReportId(reportId);
-
         for (Photo photo : photosToDelete) {
             verify(photoRepository).delete(photo);
         }
@@ -277,10 +260,7 @@ public class PhotoServiceImplTest {
 
     @Test
     public void testValidatePhotos_WhenPhotoIsEmpty_ShouldThrowPhotoIsEmptyException() throws IOException {
-        // Создаем массив MultipartFile с одним элементом, равным null
         MultipartFile[] photos = new MultipartFile[]{null};
-
-        // Проверяем, что вызов метода validatePhotos с пустым фото вызывает PhotoIsEmptyException
         assertThrows(PhotoIsEmptyException.class, () -> {
             photoService.validatePhotos(photos);
         });
@@ -288,16 +268,12 @@ public class PhotoServiceImplTest {
 
     @Test
     public void testValidatePhotos_WhenPhotoHasBadExtension_ShouldThrowBadPhotoExtensionException() throws IOException {
-        // Создаем мок для MultipartFile
         MultipartFile mockFile = Mockito.mock(MultipartFile.class);
 
-        // Мокируем метод getOriginalFilename, чтобы он возвращал файл с неправильным расширением (например, "file.exe")
         when(mockFile.getOriginalFilename()).thenReturn("file.exe");
 
-        // Создаем массив MultipartFile с одним мокированным файлом
         MultipartFile[] photosWithBadExtension = new MultipartFile[]{mockFile};
 
-        // Проверяем, что вызов метода validatePhotos с фото с неправильным расширением вызывает BadPhotoExtensionException
         assertThrows(BadPhotoExtensionException.class, () -> {
             photoService.validatePhotos(photosWithBadExtension);
         });
@@ -305,20 +281,13 @@ public class PhotoServiceImplTest {
 
     @Test
     public void testFindIndexOfLastPhoto() {
-
-        // Тест на случай, когда filePath равен null
         int result1 = photoService.findIndexOfLastPhoto(null);
         assertEquals(0, result1);
 
-        // Тест на случай, когда filePath содержит "index=5"
         int result2 = photoService.findIndexOfLastPhoto("index=5");
         assertEquals(5, result2);
-
-        // Тест на случай, когда filePath содержит "index=9" и ожидается исключение LimitOfPhotosException
         assertThrows(LimitOfPhotosException.class, () -> {
             photoService.findIndexOfLastPhoto("index=9");
         });
-
-        // Другие тесты по вашему усмотрению
     }
 }

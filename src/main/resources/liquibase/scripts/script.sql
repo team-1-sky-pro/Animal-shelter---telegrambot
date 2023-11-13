@@ -80,3 +80,11 @@ alter table adoptions
 alter column adoption_date drop not null;
 alter table adoptions
 alter column trial_end_date drop not null;
+
+-- changeSet annabelousova:38.1
+ALTER TABLE pets
+    ADD CONSTRAINT fk_pet_photo
+        FOREIGN KEY (photo_id) REFERENCES photos(id);
+ALTER TABLE pets ALTER COLUMN photo_id DROP NOT NULL;
+ALTER TABLE photos
+    ALTER COLUMN report_id DROP NOT NULL;

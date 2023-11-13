@@ -7,7 +7,6 @@ import pro.sky.animalsheltertelegrambot.model.Photo;
 /**
  * PetService предоставляет базовые CRUD операции
  */
-@Service
 public interface PetService {
     void addPet(Pet pet);
     void updatePet(Long id, Pet pet);

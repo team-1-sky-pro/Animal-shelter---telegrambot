@@ -1,4 +1,4 @@
-package pro.sky.animalsheltertelegrambot.service.impl;
+package pro.sky.animalsheltertelegrambot.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import pro.sky.animalsheltertelegrambot.exception.ShelterNotFoundException;
 import pro.sky.animalsheltertelegrambot.model.Shelter;
 import pro.sky.animalsheltertelegrambot.repository.ShelterRepository;
+import pro.sky.animalsheltertelegrambot.service.ShelterServiceImpl;
 
 import java.util.List;
 import java.util.Optional;
